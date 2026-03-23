@@ -9,10 +9,21 @@
         
     </style>
 </head>
-<body class="bg-blue-900">
+<body class="bg-blue-800">
     <h1 id="title" class="text-7xl">Crescendo</h1>
-    <div id="playlists" class="text-4xl"><h2>Playlists</h2></div>
-    <div id="songs" class="text-4xl"><h2>Songs</h2></div>
+    <div id="drop-zone" class="w-50 h-30 bg-gray-400">
+        <h3 class="text-3xl">Drag and drop files here or click to browse</h3>
+    </div>
+    <input type="file" id="file-input" multiple hidden>
+    
+    <div class="flex-row">
+        <div id="playlists" class="text-4xl bg-linear-to-t from-blue-500 to-indigo-500">
+            <h2>Playlists</h2>
+        </div>
+        <div id="songs" class="text-4xl bg-linear-to-t from-bluee-500 to-indigo-500">
+            <h2>Songs</h2>
+        </div>
+    </div>
     <script defer src="script.js"></script>
 </body>
 </html>
