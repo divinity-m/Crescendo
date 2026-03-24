@@ -81,5 +81,10 @@ function processFiles(fileList) {
     // Process files by iterating over the FileList
     [...audioFiles].forEach(file => {
         console.log(file);
+        /* example code to get me started later
+        
+        audioPlayer.src = URL.createObjectURL(file);
+        audioPlayer.play();
+        */
     });
 }
