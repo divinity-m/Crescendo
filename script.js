@@ -81,7 +81,7 @@ function viewFiles(e) {
 
     if (files && files.length > 0) {
         processFiles(files);
-  }
+    }
 }
 
 function processFiles(fileList) {
