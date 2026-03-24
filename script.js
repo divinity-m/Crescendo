@@ -39,9 +39,9 @@ class Playlist {
     }
 }
 
-// variables to store every song and playlist
+// the allSongs object keeps track of every song and the PLAYLISTS object may be furthur extended with new playlists
 let allSongs = new Playlist("All Songs");
-let [SONGS, PLAYLISTS] = [[], [allSongs]];
+let PLAYLISTS = [allSongs];
 
 
 // EVENT LISTENERS
@@ -94,9 +94,8 @@ function processFiles(fileList) {
         console.log(file);
         let songName = "song";
 
-        // initialize a new song object and add it to the songs array and allSongs class
+        // initialize a new song object and add it to the allSongs object
         let newSong = new Song(songName, file);
-        SONGS.push(song);
         allSongs.songs.push(song);
 
         
@@ -106,4 +105,8 @@ function processFiles(fileList) {
         audioPlayer.play();
         */
     });
+}
+
+function updateWebsite() {
+    
 }
