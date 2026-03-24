@@ -6,7 +6,7 @@ let playlistsEl = document.getElementById("playlists-el");
 let songsEl = document.getElementById("songs-el");
 
 // Global Variables & Classes
-// stores every song and playlist
+// variables to store every song and playlist
 let [songs, playlists] = [[], []];
 
 // basic bulding block for every song
