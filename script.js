@@ -12,7 +12,7 @@ class Song {
     constructor(file) {
         this.file = file;
         this.name = file.name.split(".")[0];
-        this.src = file.name;
+        this.src = URL.createObjectURL(file);
         this.author = "unknown";
         this.elementId = `${name}-song`;
         this.promise = null;
@@ -85,22 +85,22 @@ function preventDefaults(e) {
 
 function handleDrop(e) {
     // gets the FileList object and converts it into an array
-    const files = Array.from(e.dataTransfer.files);
+    const files = e.dataTransfer.files;
 
     // if the files are valid, then it processes them and updates the website
-    if (validateFiles(files) != null) {
-        processFiles(Array.from(files));
+    if (validateFiles(Array.from(files)) != null) {
+        processFiles(files);
         updateWebsite();
     }
 }
 
 function viewFiles(e) {
     // gets the FileList object and converts it into an array
-    const files = Array.from(e.target.files);
+    const files = e.target.files;
     
     // if the files are valid, then it processes them and updates the website
-    if (validateFiles(files) != null) {
-        processFiles(Array.from(files));
+    if (validateFiles(Array.from(files))) != null) {
+        processFiles(files);
         updateWebsite();
     }
 }
@@ -120,11 +120,8 @@ function validateFiles(files) {
 }
 
 function processFiles(files) {
-    // assigns the files to the hidden input element
-    fileInput.files = files;
-    
-    [...files].forEach(file => {
-        console.log(file);
+    // iterates over the files
+    [...Array.from(files)].forEach(file => {
         // initializes a new song object containing the audio file then adds it to the allSongs object
         let newSong = new Song(file);
         allSongs.songs.push(newSong);
