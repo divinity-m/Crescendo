@@ -7,7 +7,7 @@ let songsEl = document.getElementById("songs-el");
 
 // Global Variables & Classes
 // variables to store every song and playlist
-let [songs, playlists] = [[], []];
+let [SONGS, PLAYLISTS] = [[], []];
 
 // basic bulding block for every song
 class Song {
@@ -70,18 +70,16 @@ function handleDrop(e) {
     // Get the FileList object
     const files = e.dataTransfer.files;
 
-    if (files && files.length > 0) {
-        processFiles(files);
-    }
+    // Validate the files exist
+    if (files && files.length > 0) processFiles(files);
 }
 
 function viewFiles(e) {
     // Get the FileList object
     const files = e.target.files;
 
-    if (files && files.length > 0) {
-        processFiles(files);
-    }
+    // Validate the files exist
+    if (files && files.length > 0) processFiles(files);
 }
 
 function processFiles(fileList) {
@@ -94,6 +92,9 @@ function processFiles(fileList) {
     // Process files by iterating over the FileList
     [...audioFiles].forEach(file => {
         console.log(file);
+        name = "song"
+        song = new Song(name, file);
+        SONGS.push(song);
         /* example code to get me started later
         
         audioPlayer.src = URL.createObjectURL(file);
