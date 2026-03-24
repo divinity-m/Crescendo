@@ -11,9 +11,9 @@ let songsEl = document.getElementById("songs-el");
 class Song {
     constructor(name, file) {
         this.name = name;
-        this.file = file;
+        this.src = file.name;
         this.author = "unknown";
-        this.elementId = `${name}-el`;
+        this.elementId = `${name}-song`;
         this.promise = null;
     }
 
@@ -42,6 +42,7 @@ class Playlist {
     constructor(name) {
         this.name = name;
         this.songs = [];
+        this.elementId = `${name}-playlist`;
     }
     
     play() {
@@ -54,8 +55,9 @@ class Playlist {
 }
 
 // the allSongs object keeps track of every song and the PLAYLISTS object may be furthur extended with new playlists
-let allSongs = new Playlist("Songs");
+const allSongs = new Playlist("Songs");
 let PLAYLISTS = [allSongs];
+let CURRENT_PLAYLIST = allSongs;
 
 
 // EVENT LISTENERS
@@ -122,10 +124,8 @@ function processFiles(files) {
     
     [...files].forEach(file => {
         console.log(file);
-        let songName = "song";
-
         // initializes a new song object containing the audio file then adds it to the allSongs object
-        let newSong = new Song(songName, file);
+        let newSong = new Song(file.name.split(".")[0], file);
         allSongs.songs.push(song);
     });
 }
@@ -136,9 +136,10 @@ function updateWebsite() {
     
     
     PLAYLISTS.forEach(playlist => {
-        playlistsEl.innerHTML += `<button class="text-3xl text-blue-700">${playlist.name}</button>`;
-        // songsEl.innerHTML += `<audio id="${song.elementId}" src="${song.file}"></audio>`;
+        playlistsEl.innerHTML += `<button id="${playlist.elementId}" class="text-3xl text-blue-700">${playlist.name}</button>`;
     })
 
-    
+    CURRENT_PLAYLIST.songs.forEach(song => {
+        songsEl.innerHTML += `<audio id="${song.elementId}" src="${song.src}">${song.name}</audio>`;
+    })
 }
