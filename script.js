@@ -41,7 +41,7 @@ class Playlist {
 }
 
 // the allSongs object keeps track of every song and the PLAYLISTS object may be furthur extended with new playlists
-let allSongs = new Playlist("All Songs");
+let allSongs = new Playlist("Songs");
 let PLAYLISTS = [allSongs];
 
 
