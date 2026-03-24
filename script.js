@@ -2,8 +2,8 @@
 // Elements
 let dropZone = document.getElementById("drop-zone");
 let fileInput = document.getElementById("file-input");
-let playlistsEl = document.getElementById("playlists");
-let songsEl = document.getElementById("songs");
+let playlistsEl = document.getElementById("playlists-el");
+let songsEl = document.getElementById("songs-el");
 
 // Global Variables & Classes
 // stores every song and playlist
