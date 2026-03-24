@@ -53,10 +53,10 @@ let PLAYLISTS = [allSongs];
 });
 
 // Handles dropped files
-dropArea.addEventListener("drop", handleDrop);
+dropZone.addEventListener("drop", handleDrop);
 
-// Handles dropArea clicks
-dropArea.addEventListener("click", () => { fileInput.click() });
+// Handles dropZone clicks
+dropZone.addEventListener("click", () => { fileInput.click() });
 fileInput.addEventListener("change", viewFiles);
 
 
