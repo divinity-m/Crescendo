@@ -127,7 +127,7 @@ function processFiles(files) {
         console.log(file);
         // initializes a new song object containing the audio file then adds it to the allSongs object
         let newSong = new Song(file);
-        allSongs.songs.push(song);
+        allSongs.songs.push(newSong);
     });
 }
 
