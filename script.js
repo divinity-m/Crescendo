@@ -13,17 +13,17 @@ let [songs, playlists] = [[], []];
 class Song {
     title, author, filetype;
 
-    def constructor(title, filetype) {
+    constructor(title, filetype) {
         this.title = title;
         this.author = "unknown";
         this.filetype = filetype;
     }
     
-    def play() {
+    play() {
     
     }
     
-    def pause() {
+    pause() {
     
     }
 }
@@ -32,15 +32,15 @@ class Song {
 class Playlist {
     name;
     
-    def constructor(name) {
+    constructor(name) {
         this.name = name;
     }
     
-    def play() {
+    play() {
     
     }
     
-    def shuffle() {
+    shuffle() {
     
     }
 }
