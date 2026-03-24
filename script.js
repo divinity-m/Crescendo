@@ -108,5 +108,8 @@ function processFiles(fileList) {
 }
 
 function updateWebsite() {
-    
+    playlistsEl.innerHTML = '<h2 class="text-4xl text-blue-700 ml-20">Playlists</h2>';
+    PLAYLISTS.forEach(playlist => {
+        playlistsEl.innerHTML += `<button class="text-3xl text-blue-700">${playlist.name}</button>`;
+    })
 }
