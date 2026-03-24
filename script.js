@@ -5,6 +5,7 @@ let fileInput = document.getElementById("file-input");
 let playlistsEl = document.getElementById("playlists-el");
 let songsEl = document.getElementById("songs-el");
 
+
 // GLOBAL VARIABLES & CLASSES
 // basic bulding block for every song
 class Song {
@@ -45,10 +46,10 @@ let PLAYLISTS = [allSongs];
 
 
 // EVENT LISTENERS
-// Prevent default browser behavior for drag events
+// Prevents default browser behavior for drag events
 ["dragenter", "dragover", "dragleave", "drop"].forEach(eventName => {
     dropZone.addEventListener(eventName, preventDefaults);
-    // also prevent default bahaviour for the whole window
+    // also prevents default bahaviour for the whole window
     window.addEventListener(eventName, preventDefaults); 
 });
 
@@ -67,37 +68,36 @@ function preventDefaults(e) {
 }
 
 function handleDrop(e) {
-    // Get the FileList object
+    // Gets the FileList object
     const files = e.dataTransfer.files;
 
-    // Validate the files exist
+    // Validates the files exist
     if (files && files.length > 0) processFiles(files);
 }
 
 function viewFiles(e) {
-    // Get the FileList object
+    // Gets the FileList object
     const files = e.target.files;
 
-    // Validate the files exist
-    if (files && files.length > 0) processFiles(files);
+    // Validates the files exist
+    if (files && files.length > 0) {
+        processFiles(files);
+        updateWebsite();
+    }
 }
 
 function processFiles(fileList) {
-    // Validate every file before continuing
+    // Validates every file then assigns the files to the hidden input element
     const audioFiles = fileList.filter(file.type.startsWith("audio/"));
-    
-    // Assign the dropped files to the hidden input
     fileInput.files = audioFiles;
-            
-    // Process files by iterating over the FileList
+    
     [...audioFiles].forEach(file => {
         console.log(file);
         let songName = "song";
 
-        // initialize a new song object and add it to the allSongs object
+        // initializes a new song object containing the audio file then adds it to the allSongs object
         let newSong = new Song(songName, file);
         allSongs.songs.push(song);
-
         
         /* example code to get me started later
         
