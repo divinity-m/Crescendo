@@ -99,7 +99,7 @@ function viewFiles(e) {
     const files = e.target.files;
     
     // if the files are valid, then it processes them and updates the website
-    if (validateFiles(Array.from(files))) != null) {
+    if (validateFiles(Array.from(files)) != null) {
         processFiles(files);
         updateWebsite();
     }
