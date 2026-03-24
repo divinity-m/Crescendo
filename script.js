@@ -49,7 +49,7 @@ class Playlist = {
 // Prevent default browser behavior for drag events
 ["dragenter", "dragover", "dragleave", "drop"].forEach(eventName => {
     dropZone.addEventListener(eventName, preventDefaults);
-    // Also prevent default for the whole window to stop the browser from opening the file
+    // also prevent default bahaviour for the whole window
     window.addEventListener(eventName, preventDefaults); 
 });
 
