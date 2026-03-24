@@ -9,8 +9,9 @@ let songsEl = document.getElementById("songs-el");
 // GLOBAL VARIABLES & CLASSES
 // basic bulding block for every song
 class Song {
-    constructor(name, file) {
-        this.name = name;
+    constructor(file) {
+        this.file = file;
+        this.name = file.name.split(".")[0];
         this.src = file.name;
         this.author = "unknown";
         this.elementId = `${name}-song`;
@@ -125,7 +126,7 @@ function processFiles(files) {
     [...files].forEach(file => {
         console.log(file);
         // initializes a new song object containing the audio file then adds it to the allSongs object
-        let newSong = new Song(file.name.split(".")[0], file);
+        let newSong = new Song(file);
         allSongs.songs.push(song);
     });
 }
