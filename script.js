@@ -141,6 +141,6 @@ function updateWebsite() {
     })
 
     CURRENT_PLAYLIST.songs.forEach(song => {
-        songsEl.innerHTML += `<audio id="${song.elementId}" src="${song.src}">${song.name}</audio>`;
+        songsEl.innerHTML += `<audio id="${song.elementId}" src="${song.src}" class="text-xl text-blue-700">${song.name}</audio>`;
     })
 }
