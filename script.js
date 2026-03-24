@@ -81,34 +81,46 @@ function preventDefaults(e) {
 }
 
 function handleDrop(e) {
-    // Gets the FileList object
-    const files = e.dataTransfer.files;
+    // gets the FileList object and converts it into an array
+    const files = Array.from(e.dataTransfer.files);
 
-    // Validates the files exist
-    if (files && files.length > 0) {
+    // if the files are valid, then it processes them and updates the website
+    if (validateFiles(files) != null) {
         processFiles(Array.from(files));
         updateWebsite();
     }
 }
 
 function viewFiles(e) {
-    // Gets the FileList object
-    const files = e.target.files;
-
-    // Validates the files exist
-    if (files && files.length > 0) {
+    // gets the FileList object and converts it into an array
+    const files = Array.from(e.target.files);
+    
+    // if the files are valid, then it processes them and updates the website
+    if (validateFiles(files) != null) {
         processFiles(Array.from(files));
         updateWebsite();
     }
 }
 
-function processFiles(fileList) {
-    // Validates every file then assigns the files to the hidden input element
-    console.log(fileList);
-    const audioFiles = fileList.filter(file => file.type.startsWith("audio/"));
-    fileInput.files = audioFiles;
+function validateFiles(files) {
+    // validates the files exist
+    if (files && files.length > 0) {
+        
+        // filters the files for audio files 
+        const audioFiles = files.filter(file => file.type.startsWith("audio/"));
+        
+        // validates that there are any audio files
+        if (audioFiles.length > 0) return audioFiles;
+    }
+    // returns null if nothing useful is obtained from the files
+    return null
+}
+
+function processFiles(files) {
+    // assigns the files to the hidden input element
+    fileInput.files = files;
     
-    [...audioFiles].forEach(file => {
+    [...files].forEach(file => {
         console.log(file);
         let songName = "song";
 
