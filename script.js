@@ -1,14 +1,11 @@
 // CRESCENDO //
-// Elements
+// DOCUMENT ELEMENTS
 let dropZone = document.getElementById("drop-zone");
 let fileInput = document.getElementById("file-input");
 let playlistsEl = document.getElementById("playlists-el");
 let songsEl = document.getElementById("songs-el");
 
-// Global Variables & Classes
-// variables to store every song and playlist
-let [SONGS, PLAYLISTS] = [[], []];
-
+// GLOBAL VARIABLES & CLASSES
 // basic bulding block for every song
 class Song {
     constructor(name, file) {
@@ -42,7 +39,12 @@ class Playlist {
     }
 }
 
-// Event Listeners
+// variables to store every song and playlist
+let allSongs = new Playlist("All Songs");
+let [SONGS, PLAYLISTS] = [[], [allSongs]];
+
+
+// EVENT LISTENERS
 // Prevent default browser behavior for drag events
 ["dragenter", "dragover", "dragleave", "drop"].forEach(eventName => {
     dropZone.addEventListener(eventName, preventDefaults);
@@ -57,7 +59,8 @@ dropArea.addEventListener("drop", handleDrop);
 dropArea.addEventListener("click", () => { fileInput.click() });
 fileInput.addEventListener("change", viewFiles);
 
-// Functions
+
+// FUNCTIONS
 function preventDefaults(e) {
     e.preventDefault();
     e.stopPropagation();
@@ -89,9 +92,14 @@ function processFiles(fileList) {
     // Process files by iterating over the FileList
     [...audioFiles].forEach(file => {
         console.log(file);
-        name = "song"
-        song = new Song(name, file);
+        let songName = "song";
+
+        // initialize a new song object and add it to the songs array and allSongs class
+        let newSong = new Song(songName, file);
         SONGS.push(song);
+        allSongs.songs.push(song);
+
+        
         /* example code to get me started later
         
         audioPlayer.src = URL.createObjectURL(file);
