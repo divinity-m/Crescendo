@@ -11,8 +11,6 @@ let [SONGS, PLAYLISTS] = [[], []];
 
 // basic bulding block for every song
 class Song {
-    name, author, file;
-
     constructor(name, file) {
         this.name = name;
         this.author = "unknown";
@@ -30,8 +28,6 @@ class Song {
 
 // basic bulding block for every playlist
 class Playlist {
-    name;
-    
     constructor(name) {
         this.name = name;
     }
