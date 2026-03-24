@@ -1,3 +1,4 @@
+
 // CRESCENDO //
 // DOCUMENT ELEMENTS
 let dropZone = document.getElementById("drop-zone");
@@ -14,7 +15,7 @@ class Song {
         this.name = file.name.split(".")[0];
         this.src = URL.createObjectURL(file);
         this.author = "unknown";
-        this.elementId = `${name}-song`;
+        this.elementId = `${this.name}-song`;
         this.promise = null;
     }
 
@@ -113,7 +114,21 @@ function validateFiles(files) {
         const audioFiles = files.filter(file => file.type.startsWith("audio/"));
         
         // validates that there are any audio files
-        if (audioFiles.length > 0) return audioFiles;
+        if (audioFiles.length > 0) {
+
+            // checks for duplicate songs
+            unduplicatedFiles = [];
+            audioFiles.forEach(file => {
+                let songObj = new Song(file)
+                console.log(file == songObj.file);
+                if (file in allSongs.songs) {
+                    console.log("dupe")
+                    return null
+                }
+            })
+
+            return audioFiles;
+        }
     }
     // returns null if nothing useful is obtained from the files
     return null
@@ -138,6 +153,6 @@ function updateWebsite() {
     })
 
     CURRENT_PLAYLIST.songs.forEach(song => {
-        songsEl.innerHTML += `<audio id="${song.elementId}" src="${song.src}" class="text-xl text-blue-700">${song.name}</audio>`;
+        songsEl.innerHTML += `<audio id="${song.elementId}" src="${song.src}" class="text-xl text-blue-700" controls>${song.name} controls></audio>`;
     })
 }

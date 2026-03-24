@@ -8,9 +8,9 @@
     <!-- Tailwind CSS -->
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
 </head>
-<body class="text-center bg-linear-to-br from-blue-600 to-blue-800">
+<body class="text-center bg-linear-to-br from-blue-500 to-blue-600">
     <h1 id="title" class="text-7xl text-blue-700">Crescendo</h1>
-    <br>
+    <hr class="text-blue-600 pb-5 mt-4">
     
     <!-- Drag & Drop -->
     <div id="drop-zone"
@@ -21,7 +21,7 @@
         <p class="text-sm text-blue-700">Drag and drop files here or click to browse</p>
     </div>
     <input id="file-input" type="file" multiple hidden>
-    <br>
+    <hr class="text-blue-600 pb-5 mt-5">
 
     <!-- Playlist & Songs -->
     <div class="flex flex-row">
@@ -31,6 +31,7 @@
         </div>
         <div id="songs-el" class="w-150 h-screen">
             <h2 class="text-4xl text-blue-700 ml-75">Songs</h2>
+            <!-- <audio src="interstellar.mp3" controls> test song </audio> -->
         </div>
     </div>
 
