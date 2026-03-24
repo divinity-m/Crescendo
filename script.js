@@ -11,16 +11,23 @@ let songsEl = document.getElementById("songs-el");
 class Song {
     constructor(name, file) {
         this.name = name;
-        this.author = "unknown";
         this.file = file;
+        this.author = "unknown";
+        this.element = null;
+        this.promise = null;
     }
     
-    play() {
-    
-    }
-    
-    pause() {
-    
+    pause() { // pause music without causing any errors with a promise
+        this.promise = this.element.play();
+        
+        if (this.promise !== undefined) {
+            this.promise.then(_ => {
+                this.element.pause();
+            })
+            .catch(error => {
+                console.warn(error);
+            });
+        }
     }
 }
 
@@ -72,7 +79,10 @@ function handleDrop(e) {
     const files = e.dataTransfer.files;
 
     // Validates the files exist
-    if (files && files.length > 0) processFiles(files);
+    if (files && files.length > 0) {
+        processFiles(Array.from(files));
+        updateWebsite();
+    }
 }
 
 function viewFiles(e) {
@@ -81,7 +91,7 @@ function viewFiles(e) {
 
     // Validates the files exist
     if (files && files.length > 0) {
-        processFiles(files);
+        processFiles(Array.from(files));
         updateWebsite();
     }
 }
@@ -99,12 +109,6 @@ function processFiles(fileList) {
         // initializes a new song object containing the audio file then adds it to the allSongs object
         let newSong = new Song(songName, file);
         allSongs.songs.push(song);
-        
-        /* example code to get me started later
-        
-        audioPlayer.src = URL.createObjectURL(file);
-        audioPlayer.play();
-        */
     });
 }
 
