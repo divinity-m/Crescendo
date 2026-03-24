@@ -11,12 +11,12 @@ let [songs, playlists] = [[], []];
 
 // basic bulding block for every song
 class Song {
-    title, author, filetype;
+    name, author, file;
 
-    constructor(title, filetype) {
-        this.title = title;
+    constructor(name, file) {
+        this.name = name;
         this.author = "unknown";
-        this.filetype = filetype;
+        this.file = file;
     }
     
     play() {
