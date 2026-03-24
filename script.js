@@ -8,28 +8,41 @@ let songsEl = document.getElementById("songs");
 // Global Variables & Classes
 // stores every song and playlist
 let songs, playlists = [], [];
-//
+
+// basic bulding block for every song
 class Song = {
-  def _init() {
+    title, author, filetype;
+
+    def constructor(title, filetype) {
+        this.title = title;
+        this.author = "unknown";
+        this.filetype = filetype;
+    }
     
-  }
-  def play() {
+    def play() {
     
-  }
-  def pause() {
+    }
     
-  }
+    def pause() {
+    
+    }
 }
+
+// basic bulding block for every playlist
 class Playlist = {
-  def _init() {
+    name;
     
-  }
-  def play() {
+    def constructor(name) {
+        this.name = name;
+    }
     
-  }
-  def shuffle() {
+    def play() {
     
-  }
+    }
+    
+    def shuffle() {
+    
+    }
 }
 
 // Event Listeners
