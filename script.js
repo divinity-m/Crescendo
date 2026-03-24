@@ -10,7 +10,7 @@ let songsEl = document.getElementById("songs-el");
 let [songs, playlists] = [[], []];
 
 // basic bulding block for every song
-class Song = {
+class Song {
     title, author, filetype;
 
     def constructor(title, filetype) {
@@ -29,7 +29,7 @@ class Song = {
 }
 
 // basic bulding block for every playlist
-class Playlist = {
+class Playlist {
     name;
     
     def constructor(name) {
