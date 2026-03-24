@@ -88,6 +88,7 @@ function viewFiles(e) {
 
 function processFiles(fileList) {
     // Validates every file then assigns the files to the hidden input element
+    console.log(fileList);
     const audioFiles = fileList.filter(file => file.type.startsWith("audio/"));
     fileInput.files = audioFiles;
     
