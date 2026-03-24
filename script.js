@@ -13,16 +13,22 @@ class Song {
         this.name = name;
         this.file = file;
         this.author = "unknown";
-        this.element = null;
+        this.elementId = `${name}-el`;
         this.promise = null;
+    }
+
+    play() { // resets the duration and plays the song
+        const audioEl = document.getElementById(this.elementId);
+        audioEl.currentTime = 0;
+        this.promise = audioEl.play();
     }
     
     pause() { // pause music without causing any errors with a promise
-        this.promise = this.element.play();
+        const audioEl = document.getElementById(this.elementId);
         
         if (this.promise !== undefined) {
             this.promise.then(_ => {
-                this.element.pause();
+                audioEl.pause();
             })
             .catch(error => {
                 console.warn(error);
@@ -114,7 +120,13 @@ function processFiles(fileList) {
 
 function updateWebsite() {
     playlistsEl.innerHTML = '<h2 class="text-4xl text-blue-700 ml-20">Playlists</h2>';
+    songsEl.innerHTML = '<h2 class="text-4xl text-blue-700 ml-75">Songs</h2>';
+    
+    
     PLAYLISTS.forEach(playlist => {
         playlistsEl.innerHTML += `<button class="text-3xl text-blue-700">${playlist.name}</button>`;
+        // songsEl.innerHTML += `<audio id="${song.elementId}" src="${song.file}"></audio>`;
     })
+
+    
 }
