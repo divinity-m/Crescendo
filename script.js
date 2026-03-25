@@ -100,7 +100,7 @@ function viewFiles(e) {
     const files = e.target.files;
     
     // if the files are valid, then it processes them and updates the website
-    let validatedFiles = validateFiles(Array.from(files));
+    const validatedFiles = validateFiles(Array.from(files));
     if (validatedFiles !== null) {
         processFiles(validatedFiles);
         updateWebsite();
@@ -115,12 +115,17 @@ function validateFiles(files) {
         const audioFiles = files.filter(file => file.type.startsWith("audio/"));
         
         // stores unduped files
-        unduplicatedFiles = [];
+        let unduplicatedFiles = [];
 
-        // iterates through the audioFiles array compares its files to the files in the allSongs rray
+        // iterates through the audioFiles array and compares its files to the existing songs in the allSongs array
         audioFiles.forEach(file => {
-            let potentialDupe = new Song(file);
-            if (allSongs.songs.some(existingSong => existingSong.name !== potentialDope.name)) unduplicatedFiles.push(file);
+            allSongs.songs.forEach(existingSong => {
+                const potentialDupe = new Song(file);
+                
+                if (potentialDupe.name !== existingSong.name) unduplicatedFiles.push(file);
+                else console.log(`Duplicate Song Name: ${potentialDupe.name} : Existing Song Name: ${existingSong.name}`)
+            })
+            // if (allSongs.songs.some(existingSong => existingSong.name !== potentialDope.name)) unduplicatedFiles.push(file);
         })
 
         // validates that there are any unduplicated files before returning them
@@ -134,7 +139,7 @@ function processFiles(files) {
     // iterates over the files
     [...Array.from(files)].forEach(file => {
         // initializes a new song object containing the audio file then adds it to the allSongs object
-        let newSong = new Song(file);
+        const newSong = new Song(file);
         allSongs.songs.push(newSong);
     });
 }
