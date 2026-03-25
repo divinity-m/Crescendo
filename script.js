@@ -89,7 +89,7 @@ function handleDrop(e) {
     const files = e.dataTransfer.files;
 
     // if the files are valid, then it processes them and updates the website
-    if (validateFiles(Array.from(files)) != null) {
+    if (validateFiles(Array.from(files)) !== null) {
         processFiles(files);
         updateWebsite();
     }
@@ -100,8 +100,9 @@ function viewFiles(e) {
     const files = e.target.files;
     
     // if the files are valid, then it processes them and updates the website
-    if (validateFiles(Array.from(files)) != null) {
-        processFiles(files);
+    let validatedFiles = validateFiles(Array.from(files));
+    if (validatedFiles !== null) {
+        processFiles(validatedFiles);
         updateWebsite();
     }
 }
@@ -113,25 +114,20 @@ function validateFiles(files) {
         // filters the files for audio files 
         const audioFiles = files.filter(file => file.type.startsWith("audio/"));
         
-        // validates that there are any audio files
-        if (audioFiles.length > 0) {
+        // stores unduped files
+        unduplicatedFiles = [];
 
-            // checks for duplicate songs
-            unduplicatedFiles = [];
-            audioFiles.forEach(file => {
-                let songObj = new Song(file)
-                console.log(file == songObj.file);
-                if (file in allSongs.songs) {
-                    console.log("dupe")
-                    return null
-                }
-            })
+        // iterates through the audioFiles array compares its files to the files in the allSongs rray
+        audioFiles.forEach(file => {
+            let potentialDupe = new Song(file);
+            if (allSongs.songs.some(existingSong => existingSong.name !== potentialDope.name)) unduplicatedFiles.push(file);
+        })
 
-            return audioFiles;
-        }
+        // validates that there are any unduplicated files before returning them
+        if (unduplicatedFiles.length > 0) return unduplicatedFiles;
     }
-    // returns null if nothing useful is obtained from the files
-    return null
+    // returns null if nothing useful is obtained from the files (all the conditions aren't met)
+    return null;
 }
 
 function processFiles(files) {
