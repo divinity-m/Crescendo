@@ -118,13 +118,14 @@ function validateFiles(files) {
 
         // iterates through the audioFiles array and compares its files to the existing songs in the allSongs array
         audioFiles.forEach(file => {
-            allSongs.songs.forEach(existingSong => {
-                const potentialDupe = new Song(file);
+            // allSongs.songs.forEach(existingSong => {
+            //     const potentialDupe = new Song(file);
                 
-                if (potentialDupe.name !== existingSong.name) unduplicatedFiles.push(file);
-                else console.log(`Duplicate Song Name: ${potentialDupe.name} - Existing Song Name: ${existingSong.name}`);
-            })
-            // if (allSongs.songs.some(existingSong => existingSong.name !== potentialDope.name)) unduplicatedFiles.push(file);
+            //     if (potentialDupe.name !== existingSong.name) unduplicatedFiles.push(file);
+            //     else console.log(`Duplicate Song Name: ${potentialDupe.name} - Existing Song Name: ${existingSong.name}`);
+            // })
+            const potentialDupe = new Song(file);
+            if (allSongs.songs.length < 1 || !(allSongs.songs.some(song => song.name === potentialDupe.name)) ) unduplicatedFiles.push(file);
         })
 
         // validates that there are any unduplicated files before returning them
