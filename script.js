@@ -122,7 +122,7 @@ function validateFiles(files) {
                 const potentialDupe = new Song(file);
                 
                 if (potentialDupe.name !== existingSong.name) unduplicatedFiles.push(file);
-                else console.log(`Duplicate Song Name: ${potentialDupe.name} : Existing Song Name: ${existingSong.name}`)
+                else console.log(`Duplicate Song Name: ${potentialDupe.name} - Existing Song Name: ${existingSong.name}`);
             })
             // if (allSongs.songs.some(existingSong => existingSong.name !== potentialDope.name)) unduplicatedFiles.push(file);
         })
