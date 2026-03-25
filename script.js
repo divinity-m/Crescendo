@@ -1,4 +1,3 @@
-
 // CRESCENDO //
 // DOCUMENT ELEMENTS
 let dropZone = document.getElementById("drop-zone");
