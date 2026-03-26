@@ -204,7 +204,7 @@ function playSong(songClicked) {
         CURRENT_SONG.play();
     }
     else {
-        CURRENT_SONG.playImg = "Images/playBtn.png");
+        CURRENT_SONG.playImg = "Images/playBtn.png";
         CURRENT_SONG.pause();
     }
 
