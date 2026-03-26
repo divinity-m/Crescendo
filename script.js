@@ -16,7 +16,7 @@ class Song {
         this.author = "unknown";
         this.elementId = `${this.name}-song`;
         this.promise = null;
-        this.img = null;
+        this.img = "Images/music_note.png";
     }
 
     play() { // resets the duration if the song is over then plays the song
@@ -152,20 +152,15 @@ function processFiles(files) {
 }
 
 function updateWebsite() {
-    playlistsEl.innerHTML = '<h2 class="text-5xl text-blue-800 ml-20 mb-5">Playlists</h2>';
-    songsEl.innerHTML = '<h2 class="text-4xl text-blue-700 ml-75">Songs</h2>';
+    playlistsEl.innerHTML = '<h2 class="text-5xl text-blue-700 mb-5 pl-5 pt-2.5">Playlists</h2>';
+    songsEl.innerHTML = '<h2 class="text-5xl text-blue-700 mb-5 pl-5 pt-2.5">Songs</h2>';
     
     
     PLAYLISTS.forEach(playlist => {
         playlistsEl.innerHTML += `
-            <div id="${playlist.elementId}"
-                class="w-100 h-18 text-3xl
-                text-blue-800 hover:text-blue-800/60
-                bg-blue-600/60 hover:bg-blue-600/35
-                flex flex-row items-center gap-3
-                border-blue-600 border-3 border-solid rounded-3xl">
-                <img src="Images/music_note.png" class="w-15 h-15">
-                <p>${playlist.name}</p>
+            <div id="${playlist.elementId}" class="h-18 pl-5 flex items-center gap-3 hover:bg-blue-600/60">
+                <img src="${playlist.img}" class="w-15 h-15 border-blue-600/80 border-2 bg-blue-600/60">
+                <p class="text-3xl text-blue-700 hover:text-blue-700/80">${playlist.name}</p>
                 <img src="Images/playBtn.png" class="w-5 h-5">
             </div>
         `;
