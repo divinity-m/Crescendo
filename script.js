@@ -19,13 +19,13 @@ class Song {
         this.img = null;
     }
 
-    play() { // resets the duration and plays the song
+    play() { // resets the duration if the song is over then plays the song
         const audioEl = document.getElementById(this.elementId);
-        audioEl.currentTime = 0;
+        if (audioEl.currentTime === audioEl.duration) audioEl.currentTime = 0;
         this.promise = audioEl.play();
     }
     
-    pause() { // pause music without causing any errors with a promise
+    pause() { // pauses music without causing any errors by using a promise
         const audioEl = document.getElementById(this.elementId);
         
         if (this.promise !== undefined) {
