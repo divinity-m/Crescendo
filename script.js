@@ -153,14 +153,14 @@ function updateWebsite() {
     
     PLAYLISTS.forEach(playlist => {
         playlistsEl.innerHTML += `
-            <div id="Songs-playlist"
+            <div id="${playlist.elementId}"
                 class="w-100 h-18 text-3xl
                 text-blue-800 hover:text-blue-800/60
                 bg-blue-600/60 hover:bg-blue-600/35
                 flex flex-row items-center gap-3
                 border-blue-600 border-3 border-solid rounded-3xl">
                 <img src="Images/music_note.png" class="w-15 h-15">
-                <p>Songs</p>
+                <p>${playlist.name}</p>
                 <img src="Images/playBtn.png" class="w-5 h-5">
             </div>
         `;
