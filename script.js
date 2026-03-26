@@ -147,14 +147,20 @@ function processFiles(files) {
 }
 
 function updateWebsite() {
-    playlistsEl.innerHTML = '<h2 class="text-4xl text-blue-700 ml-20">Playlists</h2>';
+    playlistsEl.innerHTML = '<h2 class="text-5xl text-blue-800 ml-20 mb-5">Playlists</h2>';
     songsEl.innerHTML = '<h2 class="text-4xl text-blue-700 ml-75">Songs</h2>';
     
     
     PLAYLISTS.forEach(playlist => {
         playlistsEl.innerHTML += `
-            <div id="${playlist.elementId}" class="w-100 h-30 text-3xl text-blue-700 flex flex-row">
-                <p>${playlist.name}</p>
+            <div id="Songs-playlist"
+                class="w-100 h-18 text-3xl
+                text-blue-800 hover:text-blue-800/60
+                bg-blue-600/60 hover:bg-blue-600/35
+                flex flex-row items-center gap-3
+                border-blue-600 border-3 border-solid rounded-3xl">
+                <img src="Images/music_note.png" class="w-15 h-15">
+                <p>Songs</p>
                 <img src="Images/playBtn.png" class="w-5 h-5">
             </div>
         `;
