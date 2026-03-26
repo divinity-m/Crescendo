@@ -16,17 +16,18 @@ class Song {
         this.author = "unknown";
         this.elementId = `${this.name}-song`;
         this.promise = null;
-        this.img = "Images/music_note.png";
+        this.picture = "Images/music_note.png";
+        this.playImg = "Images/playBtn.png";
     }
 
     play() { // resets the duration if the song is over then plays the song
-        const audioEl = document.getElementById(this.elementId);
+        const audioEl = document.getElementById(this.elementId).querySelector("audio");
         if (audioEl.currentTime === audioEl.duration) audioEl.currentTime = 0;
         this.promise = audioEl.play();
     }
     
     pause() { // pauses music without causing any errors by using a promise
-        const audioEl = document.getElementById(this.elementId);
+        const audioEl = document.getElementById(this.elementId).querySelector("audio");
         
         if (this.promise !== undefined) {
             this.promise.then(_ => {
@@ -45,7 +46,8 @@ class Playlist {
         this.name = name;
         this.songs = [];
         this.elementId = `${name}-playlist`;
-        this.img = null;
+        this.picture = "Images/music_note.png";
+        this.playImg = "Images/playBtn.png";
     }
     
     play() {
@@ -66,6 +68,7 @@ class Playlist {
 const allSongs = new Playlist("Songs");
 let PLAYLISTS = [allSongs];
 let CURRENT_PLAYLIST = allSongs;
+let CURRENT_SONG = null;
 
 
 // EVENT LISTENERS
@@ -159,16 +162,50 @@ function updateWebsite() {
     PLAYLISTS.forEach(playlist => {
         playlistsEl.innerHTML += `
             <div id="${playlist.elementId}" class="h-18 pl-5 flex items-center gap-3 hover:bg-blue-600/60">
-                <img src="${playlist.img}" class="w-15 h-15 border-blue-600/80 border-2 bg-blue-600/60">
+                <img src="${playlist.picture}" class="w-15 h-15 border-blue-600/80 border-2 bg-blue-600/60">
                 <p class="text-3xl text-blue-700 hover:text-blue-700/80">${playlist.name}</p>
-                <img src="Images/playBtn.png" class="w-5 h-5">
+                <img src="${playlist.playImg}" class="w-5 h-5" onclick="playPlaylist(${playlist})">
             </div>
         `;
     })
 
     CURRENT_PLAYLIST.songs.forEach(song => {
         songsEl.innerHTML += `
-            <audio id="${song.elementId}" src="${song.src}" class="text-xl text-blue-700" controls>${song.name} controls></audio>
+            <div id="${song.elementId}" class="h-18 pl-5 flex items-center gap-3 hover:bg-blue-600/60">
+                <img src="${song.picture}" class="w-15 h-15 border-blue-600/80 border-2 bg-blue-600/60">
+                <audio src="${song.src}" class="text-xl text-blue-700">${song.name}></audio>
+                <img src="${song.playImg}" class="w-5 h-5" onclick="playSong(${song})">
+            </div>
         `;
     })
+}
+
+// Plays the first song in a playlist if the playlist was just chosen, or plays/pauses the currently playing/paused song in a playlist
+function playPlaylist(playlistClicked) {
+    if (CURRENT_PLAYLIST.name === playlistClicked.name) {
+        playSong(CURRENT_SONG);
+    }
+    else {
+        CURRENT_SONG.pause();
+        
+        CURRENT_PLAYLIST = playlistClicked;
+        if (CURRENT_PLAYLIST.songs.length > 0) playSong(CURRENT_PLAYLIST.songs[0]);
+    }
+}
+
+
+// Plays or pauses a song
+function playSong(songClicked) {
+    CURRENT_SONG = songClicked;
+
+    if (CURRENT_SONG.playImg === "Images/playBtn.png") {
+        CURRENT_SONG.playImg = "Images/pauseBtn.png";
+        CURRENT_SONG.play();
+    }
+    else {
+        CURRENT_SONG.playImg = "Images/playBtn.png");
+        CURRENT_SONG.pause();
+    }
+
+    updateWebsite();
 }
