@@ -191,6 +191,7 @@ function playPlaylist(playlistClicked) {
         CURRENT_PLAYLIST = playlistClicked;
         if (CURRENT_PLAYLIST.songs.length > 0) playSong(CURRENT_PLAYLIST.songs[0]);
     }
+    updateWebsite();
 }
 
 
