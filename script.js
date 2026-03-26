@@ -16,6 +16,7 @@ class Song {
         this.author = "unknown";
         this.elementId = `${this.name}-song`;
         this.promise = null;
+        this.img = null;
     }
 
     play() { // resets the duration and plays the song
@@ -44,6 +45,7 @@ class Playlist {
         this.name = name;
         this.songs = [];
         this.elementId = `${name}-playlist`;
+        this.img = null;
     }
     
     play() {
