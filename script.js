@@ -150,10 +150,17 @@ function updateWebsite() {
     
     
     PLAYLISTS.forEach(playlist => {
-        playlistsEl.innerHTML += `<button id="${playlist.elementId}" class="text-3xl text-blue-700">${playlist.name}</button>`;
+        playlistsEl.innerHTML += `
+            <div id="${playlist.elementId} class="w-100 h-30 text-3xl text-blue-700 flex flex-row">
+                <p>${playlist.name}</p>
+                <img src="Images/playBtn.png" class="w-5 h-5">
+            </div>
+        `;
     })
 
     CURRENT_PLAYLIST.songs.forEach(song => {
-        songsEl.innerHTML += `<audio id="${song.elementId}" src="${song.src}" class="text-xl text-blue-700" controls>${song.name} controls></audio>`;
+        songsEl.innerHTML += `
+            <audio id="${song.elementId}" src="${song.src}" class="text-xl text-blue-700" controls>${song.name} controls></audio>
+        `;
     })
 }
