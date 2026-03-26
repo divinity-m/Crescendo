@@ -49,11 +49,16 @@ class Playlist {
     }
     
     play() {
-    
+    // plays the first song in the songs array
+    }
+
+    loop() {
+    // when the last song is complete, play the first song again
     }
     
     shuffle() {
-    
+    // assign every song a random value (like as a porperty to their object) then .sort() them based on their random values
+    // or some import some random module or smn
     }
 }
 
