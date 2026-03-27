@@ -67,8 +67,7 @@ class Playlist {
 // the allSongs object keeps track of every song and the PLAYLISTS object may be furthur extended with new playlists
 const allSongs = new Playlist("Songs");
 let PLAYLISTS = [allSongs];
-let CURRENT_PLAYLIST = allSongs;
-let CURRENT_SONG = null;
+let [CURRENT_PLAYLIST, CURRENT_SONG] = [allSongs, null];
 
 
 // EVENT LISTENERS
@@ -154,15 +153,21 @@ function processFiles(files) {
 }
 
 function updateWebsite() {
-    playlistsEl.innerHTML = '<h2 class="text-5xl text-blue-700 font-bold mb-5 pl-5 pt-2.5">Playlists</h2>';
-    songsEl.innerHTML = '<h2 class="text-5xl text-blue-700 font-bold mb-5 pl-5 pt-2.5">Songs</h2>';
+    playlistsEl.innerHTML = `
+        <div class="flex items-center gap-3 sticky top-0 bg-neutral-50 z-1">
+            <h2 class="mb-5 pl-5 pt-2.5 text-5xl text-blue-700 hover:text-blue-700/80 font-bold">Playlists</h2>
+            <img src="Images/addBtn.png"
+                 class="w-10 h-10 hover:w-10.5 hover:h-10.5 hover:-ml-px hover:-mt-px"
+                 onclick="addNewPlaylist()">
+        </div>`;
+    songsEl.innerHTML = '<h2 class="mb-5 pl-5 pt-2.5 text-5xl text-blue-700 hover:text-blue-700/80 font-bold">Songs</h2>';
     
     
     PLAYLISTS.forEach(playlist => {
         playlistsEl.innerHTML += `
             <div id="${playlist.elementId}" class="h-18 pl-5 flex items-center gap-3 hover:bg-blue-600/20">
                 <img src="${playlist.picture}" class="w-15 h-15 p-1 bg-blue-600/60 rounded-md">
-                <p class="text-3xl text-blue-700 hover:text-blue-700/80">${playlist.name}</p>
+                <p class="text-3xl text-blue-700 hover:text-blue-700/80 hover:cursor-default">${playlist.name}</p>
                 <img src="${playlist.playImg}"
                      class="w-7.5 h-7.5 hover:w-8 hover:h-8 hover:-ml-px hover:-mt-px"
                      onclick="playPlaylist('${playlist.name}')">
@@ -174,7 +179,9 @@ function updateWebsite() {
         songsEl.innerHTML += `
             <div id="${song.elementId}" class="h-18 pl-5 flex items-center gap-3 hover:bg-blue-600/20">
                 <img src="${song.picture}" class="w-15 h-15 p-1 bg-blue-600/60 rounded-md">
-                <p class="text-3xl text-blue-700 hover:text-blue-700/80">${song.name}</p>
+                <p class="text-3xl text-blue-700 hover:text-blue-700/80 hover:cursor-default"
+                   onclick="playSong('${song.name}')">
+                   ${song.name}</p>
                 <img src="${song.playImg}"
                      class="w-7.5 h-7.5 hover:w-8 hover:h-8 hover:-ml-px hover:-mt-px"
                      onclick="playSong('${song.name}')">
@@ -194,13 +201,16 @@ function playPlaylist(playlistName) {
         if (CURRENT_SONG === null) CURRENT_SONG = playlistClicked.songs[0];
         
         if (CURRENT_PLAYLIST.name === playlistClicked.name) {
-            playSong(CURRENT_SONG);
+            playSong(CURRENT_SONG.name);
         }
         else {
             CURRENT_SONG.pause();
+            CURRENT_PLAYLIST.playImg = "Images/playBtn.png";
+
             CURRENT_PLAYLIST = playlistClicked;
-            if (CURRENT_PLAYLIST.songs.length > 0) playSong(CURRENT_PLAYLIST.songs[0]);
+            playSong(CURRENT_PLAYLIST.songs[0]);
         }
+        CURRENT_PLAYLIST.playImg = CURRENT_SONG.playImg;
             
         updateWebsite();
     }
@@ -213,6 +223,7 @@ function playSong(songName) {
     let index = CURRENT_PLAYLIST.songs.findIndex(song => song.name === songName);
     let songClicked = CURRENT_PLAYLIST.songs[index];
     CURRENT_SONG = songClicked;
+    console.log()
 
     if (CURRENT_SONG.playImg === "Images/playBtn.png") {
         CURRENT_SONG.playImg = "Images/pauseBtn.png";
@@ -223,5 +234,18 @@ function playSong(songName) {
         CURRENT_SONG.pause();
     }
 
+    updateWebsite();
+}
+
+function addNewPlaylist() {
+    let index = 1;
+    PLAYLISTS.forEach(playlist => {
+        if (playlist.name.startsWith('Playlist')) {
+            if (+playlist.name.at(-1) === index) index = +playlist.name.at(-1) + 1;
+        }
+    })
+
+    let newPlaylist = new Playlist(`Playlist ${index}`);
+    PLAYLISTS.push(newPlaylist);
     updateWebsite();
 }
