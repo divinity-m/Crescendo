@@ -165,7 +165,7 @@ function updateWebsite() {
                 <p class="text-3xl text-blue-700 hover:text-blue-700/80">${playlist.name}</p>
                 <img src="${playlist.playImg}"
                      class="w-7.5 h-7.5 hover:w-8 hover:h-8 hover:ml-[-1.5px] hover:mt-[-1.5px]"
-                     onclick="playPlaylist(${playlist})">
+                     onclick="playPlaylist(${playlist.name})">
             </div>
         `;
     })
@@ -177,7 +177,7 @@ function updateWebsite() {
                 <p class="text-3xl text-blue-700 hover:text-blue-700/80">${song.name}</p>
                 <img src="${song.playImg}"
                      class="w-7.5 h-7.5 hover:w-8 hover:h-8 hover:ml-[-1.5px] hover:mt-[-1.5px]"
-                     onclick="playSong(${song})">
+                     onclick="playSong(${song.name})">
                 <audio src="${song.src}" class="text-xl text-blue-700"></audio>
             </div>
         `;
@@ -185,7 +185,11 @@ function updateWebsite() {
 }
 
 // Plays the first song in a playlist if the playlist was just chosen, or plays/pauses the currently playing/paused song in a playlist
-function playPlaylist(playlistClicked) {
+function playPlaylist(playlistName) {
+    // finds the playlist through a findIndex search
+    let index = PLAYLISTS.findIndex(playlist => playlist.name === playlistName);
+    let playlistClicked = PLAYLISTS[index];
+    
     if (playlistClicked.songs.length > 0) {
         if (CURRENT_SONG === null) CURRENT_SONG = playlistClicked.songs[0];
         
@@ -204,7 +208,10 @@ function playPlaylist(playlistClicked) {
 
 
 // Plays or pauses a song
-function playSong(songClicked) {
+function playSong(songName) {
+    // finds the song through a findIndex search
+    let index = CURRENT_PLAYLIST.songs.findIndex(song => song.name === songName);
+    let songClicked = CURRENT_PLAYLIST.songs[index];
     CURRENT_SONG = songClicked;
 
     if (CURRENT_SONG.playImg === "Images/playBtn.png") {
