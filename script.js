@@ -155,14 +155,14 @@ function processFiles(files) {
 }
 
 function updateWebsite() {
-    playlistsEl.innerHTML = '<h2 class="text-5xl text-blue-700 mb-5 pl-5 pt-2.5">Playlists</h2>';
-    songsEl.innerHTML = '<h2 class="text-5xl text-blue-700 mb-5 pl-5 pt-2.5">Songs</h2>';
+    playlistsEl.innerHTML = '<h2 class="text-5xl text-blue-700 font-bold mb-5 pl-5 pt-2.5">Playlists</h2>';
+    songsEl.innerHTML = '<h2 class="text-5xl text-blue-700 font-bold mb-5 pl-5 pt-2.5">Songs</h2>';
     
     
     PLAYLISTS.forEach(playlist => {
         playlistsEl.innerHTML += `
-            <div id="${playlist.elementId}" class="h-18 pl-5 flex items-center gap-3 hover:bg-blue-600/60">
-                <img src="${playlist.picture}" class="w-15 h-15 border-blue-600/80 border-2 bg-blue-600/60">
+            <div id="${playlist.elementId}" class="h-18 pl-5 flex items-center gap-3 hover:bg-blue-600/20">
+                <img src="${playlist.picture}" class="w-15 h-15 p-1 bg-blue-600/60 rounded-md">
                 <p class="text-3xl text-blue-700 hover:text-blue-700/80">${playlist.name}</p>
                 <img src="${playlist.playImg}" class="w-7.5 h-7.5" onclick="playPlaylist(${playlist})">
             </div>
@@ -171,8 +171,8 @@ function updateWebsite() {
 
     CURRENT_PLAYLIST.songs.forEach(song => {
         songsEl.innerHTML += `
-            <div id="${song.elementId}" class="h-18 pl-5 flex items-center gap-3 hover:bg-blue-600/60">
-                <img src="${song.picture}" class="w-15 h-15 border-blue-600/80 border-2 bg-blue-600/60">
+            <div id="${song.elementId}" class="h-18 pl-5 flex items-center gap-3 hover:bg-blue-600/20">
+                <img src="${song.picture}" class="w-15 h-15 p-1 bg-blue-600/60 rounded-md">
                 <audio src="${song.src}" class="text-xl text-blue-700">${song.name}></audio>
                 <img src="${song.playImg}" class="w-7.5 h-7.5" onclick="playSong(${song})">
             </div>
