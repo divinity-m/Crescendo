@@ -164,7 +164,9 @@ function updateWebsite() {
             <div id="${playlist.elementId}" class="h-18 pl-5 flex items-center gap-3 hover:bg-blue-600/20">
                 <img src="${playlist.picture}" class="w-15 h-15 p-1 bg-blue-600/60 rounded-md">
                 <p class="text-3xl text-blue-700 hover:text-blue-700/80">${playlist.name}</p>
-                <img src="${playlist.playImg}" class="w-7.5 h-7.5" onclick="playPlaylist(${playlist})">
+                <img src="${playlist.playImg}"
+                     class="w-7.5 h-7.5 hover:w-8 hover:h-8 hover:ml-[-1.5px] hover:mt-[-1.5px]"
+                     onclick="playPlaylist(${playlist})">
             </div>
         `;
     })
