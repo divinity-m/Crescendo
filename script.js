@@ -72,10 +72,9 @@ let CURRENT_SONG = null;
 
 
 // EVENT LISTENERS
-// Prevents default browser behavior for drag events
+// Prevents default browser behavior for drag events considering the dropZone and the whole window
 ["dragenter", "dragover", "dragleave", "drop"].forEach(eventName => {
     dropZone.addEventListener(eventName, preventDefaults);
-    // also prevents default bahaviour for the whole window
     window.addEventListener(eventName, preventDefaults); 
 });
 
@@ -176,7 +175,9 @@ function updateWebsite() {
             <div id="${song.elementId}" class="h-18 pl-5 flex items-center gap-3 hover:bg-blue-600/20">
                 <img src="${song.picture}" class="w-15 h-15 p-1 bg-blue-600/60 rounded-md">
                 <audio src="${song.src}" class="text-xl text-blue-700">${song.name}></audio>
-                <img src="${song.playImg}" class="w-7.5 h-7.5" onclick="playSong(${song})">
+                <img src="${song.playImg}"
+                     class="w-7.5 h-7.5 hover:w-8 hover:h-8 hover:ml-[-1.5px] hover:mt-[-1.5px]"
+                     onclick="playSong(${song})">
             </div>
         `;
     })
