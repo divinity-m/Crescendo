@@ -174,7 +174,7 @@ function updateWebsite() {
             <div id="${song.elementId}" class="h-18 pl-5 flex items-center gap-3 hover:bg-blue-600/60">
                 <img src="${song.picture}" class="w-15 h-15 border-blue-600/80 border-2 bg-blue-600/60">
                 <audio src="${song.src}" class="text-xl text-blue-700">${song.name}></audio>
-                <img src="${song.playImg}" class="w-5 h-5" onclick="playSong(${song})">
+                <img src="${song.playImg}" class="w-7.5 h-7.5" onclick="playSong(${song})">
             </div>
         `;
     })
