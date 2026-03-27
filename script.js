@@ -165,7 +165,7 @@ function updateWebsite() {
                 <p class="text-3xl text-blue-700 hover:text-blue-700/80">${playlist.name}</p>
                 <img src="${playlist.playImg}"
                      class="w-7.5 h-7.5 hover:w-8 hover:h-8 hover:-ml-px hover:-mt-px"
-                     onclick="playPlaylist(${playlist.name})">
+                     onclick="playPlaylist('${playlist.name}')">
             </div>
         `;
     })
@@ -177,7 +177,7 @@ function updateWebsite() {
                 <p class="text-3xl text-blue-700 hover:text-blue-700/80">${song.name}</p>
                 <img src="${song.playImg}"
                      class="w-7.5 h-7.5 hover:w-8 hover:h-8 hover:-ml-px hover:-mt-px"
-                     onclick="playSong(${song.name})">
+                     onclick="playSong('${song.name}')">
                 <audio src="${song.src}" class="text-xl text-blue-700"></audio>
             </div>
         `;
