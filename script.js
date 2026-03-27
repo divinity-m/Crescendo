@@ -174,10 +174,11 @@ function updateWebsite() {
         songsEl.innerHTML += `
             <div id="${song.elementId}" class="h-18 pl-5 flex items-center gap-3 hover:bg-blue-600/20">
                 <img src="${song.picture}" class="w-15 h-15 p-1 bg-blue-600/60 rounded-md">
-                <audio src="${song.src}" class="text-xl text-blue-700">${song.name}></audio>
+                <p class="text-3xl text-blue-700 hover:text-blue-700/80">${song.name}</p>
                 <img src="${song.playImg}"
                      class="w-7.5 h-7.5 hover:w-8 hover:h-8 hover:ml-[-1.5px] hover:mt-[-1.5px]"
                      onclick="playSong(${song})">
+                <audio src="${song.src}" class="text-xl text-blue-700"></audio>
             </div>
         `;
     })
@@ -190,7 +191,6 @@ function playPlaylist(playlistClicked) {
     }
     else {
         CURRENT_SONG.pause();
-        
         CURRENT_PLAYLIST = playlistClicked;
         if (CURRENT_PLAYLIST.songs.length > 0) playSong(CURRENT_PLAYLIST.songs[0]);
     }
