@@ -2,6 +2,7 @@
 I spent the entire day working on the basic UI and i chose to use tailwind css to style everything. I decided to go with a blue theme simply because it's my favourite color. On a whim, I chose to name the website Crescendo, mainly because the word 'crescendo' is music-related and I think it sounds cool. Crescendo just means a gradual increase in the loudness of a song.
 At home, I created a `Songs` class, `Playlist` class, and a default `allSongs` object (from the `Playlist` class) to keep track of every existing song. I also completed a little bit of the file-implementation code at home, it doesn't work just yet but I plan to fix it up later.
 
+
 # Day 2 - Tuesday | In class & At home work #
 Audio files can now be added into the website through clicking the drag-and-drop box and choosing a file from your file list, or dragging and dropping a file into the box. I also worked a little bit more on the basic UI to make it look decent.
 At home and in class I tried to add a safeguard to prevent duplicate-files, but nothing was working. I've had to find a way to iterate through the fileList obtained from `e.target.files` and `e.dataTransfer.files` then compare it's files to the already existing files in an array called allSongs.songs.
@@ -9,8 +10,14 @@ To start, I made a function called `validateFiles` which accepts a `files` param
 ` if (allSongs.songs.length < 1 || allSongs.songs.some(song => song.name !== potentialDupe.name)) unduplicatedFiles.push(file); `.
 I felt very condifent that this concise method would work perfectly, but it didn't. Every file I entered would immetiadly pass the validation checks and be pushed into the allSongs.songs array. I started to feel very stuck.
 
+
 # Day 3 - Wednesday (Career Day) | At home work #
 I didn't give up. Adding duplicated files is a very common and bothersome user-mistake so I didn't want to just put aside preventing it. I started heavily testing what may have been going wrong in the code through the console and noticed something very important. When the standard built-in `.some()` method is paired with the `!==` operator, it returns true if there's a even single element in the array that's not equal to the provided value. I originally belived it only returned true if every single element is not equal to the provided value, and as a result the duplicate files would always get improperly validated.
 With this newfound knowledge, I quickly found a solution that worked: 
 ` if (allSongs.songs.length < 1 || !(allSongs.songs.some(song => song.name === potentialDupe.name)) ) unduplicatedFiles.push(file); `.
 Didn't feel like adding anything more to the after this script so I spend a couple hours on the UI. I also created a logo for the website and a little icon for the tab, the designs are based off of the literal standard crescendo musical notation which looks similar to the "<" symbol.
+
+
+# Day 4 - Thursday | In class & At home work #
+With the little time I had left in class due to the lesson on spreadsheets, I decided to focus more on designing the website than implementing new logic. I had trouble recoloring icons such as a black play button image to match of my website. Gavin gave me a short lesson on photoshop and the skills he learned from digital arts.
+At home I contacted Gavin and he gave me a more in depth guide on how to recolor images with photoshop. His tips helped a ton and I can definitely see myself using them in future projects.
