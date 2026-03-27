@@ -186,15 +186,20 @@ function updateWebsite() {
 
 // Plays the first song in a playlist if the playlist was just chosen, or plays/pauses the currently playing/paused song in a playlist
 function playPlaylist(playlistClicked) {
-    if (CURRENT_PLAYLIST.name === playlistClicked.name) {
-        playSong(CURRENT_SONG);
+    if (playlistClicked.songs.length > 0) {
+        if (CURRENT_SONG === null) CURRENT_SONG = playlistClicked.songs[0];
+        
+        if (CURRENT_PLAYLIST.name === playlistClicked.name) {
+            playSong(CURRENT_SONG);
+        }
+        else {
+            CURRENT_SONG.pause();
+            CURRENT_PLAYLIST = playlistClicked;
+            if (CURRENT_PLAYLIST.songs.length > 0) playSong(CURRENT_PLAYLIST.songs[0]);
+        }
+            
+        updateWebsite();
     }
-    else {
-        CURRENT_SONG.pause();
-        CURRENT_PLAYLIST = playlistClicked;
-        if (CURRENT_PLAYLIST.songs.length > 0) playSong(CURRENT_PLAYLIST.songs[0]);
-    }
-    updateWebsite();
 }
 
 
