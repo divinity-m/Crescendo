@@ -36,7 +36,7 @@
           Drag and drop files here or click to browse
         </p>
       </div>
-      <input id="file-input" type="file" multiple hidden />
+      <input id="audio-file-input" type="file" multiple hidden />
 
       <!-- Music Visualizer (Not Started Yet)-->
       <div
@@ -48,13 +48,30 @@
     </header>
     <br />
 
-    <!-- kebab menu for the triple dots button -->
+    <!-- kebab menu connecting to the editBtn -->
     <div
       id="kebab-menu"
-      class="w-48 z-50 py-2 hidden absolute text-blue-600/80
+      class="w-48 z-10 py-2 hidden absolute text-blue-600/80
              bg-linear-to-br from-[#3F81FE] to-[#75A4FE] shadow-lg rounded-md
              transition-all duration-200 opacity-0 -translate-x-2"
     ></div>
+      
+    <!-- menu overlay for changing aspects of songs and playlists -->
+    <div
+      id="modify-menu"
+      class="w-75 h-75 z-10 py-2 pz-4 hidden absolute margin-auto
+             bg-linear-to-b from-blue-600 to-[#3F81FE] shadow-lg rounded-lg
+             transition-all duration-200 opacity-0">
+      <img src="Images/music_note.png" class="w-30" />
+      <input id="image-file-input" type="file" hidden />
+    </div>
+
+    <!-- menu overlay for adding songs to playlists-->
+    <div
+      id="add-to-playlist-menu"
+      class="w-175 z-10 py-2 pz-4 hidden absolute margin-auto
+             bg-linear-to-b from-blue-600 to-[#3F81FE] shadow-lg rounded-lg
+             transition-all duration-200 opacity-0"></div>
 
     <!-- 3-Box Flexbox Layout -->
     <div class="flex justify-evenly text-left gap-2.5 ml-2.5 mr-2.5">
@@ -62,13 +79,24 @@
       <section
         id="playlists-el"
         class="basis-1/4 h-screen bg-blue-600/40 rounded-xl overflow-y-auto"
-      ></section>
+      >
+        <header class="h-20 sticky top-0 z-1 bg-linear-to-b from-blue-600 to-inherit flex items-center gap-3">
+          <h2 class="mb-5 pl-5 pt-2.5 text-5xl text-blue-700 hover:text-blue-700/80 font-bold">Playlists</h2>
+          <img src="Images/addBtn.png"
+                 class="w-10 h-10 hover:w-10.5 hover:h-10.5 hover:-ml-px hover:-mt-px"
+                 onclick="addNewPlaylist()">
+        </header>
+      </section>
 
       <!-- Songs -->
       <section
         id="songs-el"
         class="basis-1/2 h-screen bg-blue-600/40 rounded-xl overflow-y-auto"
-      ></section>
+      >
+        <header class="h-20 sticky top-0 z-1 bg-linear-to-b from-blue-600 to-inherit">
+          <h2 class="mb-5 pl-5 pt-2.5 text-5xl text-blue-700 hover:text-blue-700/80 font-bold">Songs</h2>
+        </header>
+      </section>
 
       <!-- Currently Playing Song -->
       <section class="basis-1/4 h-screen text-center bg-blue-600/40 rounded-xl overflow-y-auto">
