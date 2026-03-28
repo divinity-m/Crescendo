@@ -11,7 +11,7 @@ const nowPlayingEl = document.getElementById("now-playing-el");
 
 /* Other */
 const audioEl = document.getElementById("audio-el");
-const kebabMenu = document.getElementById("kebabMenu");
+const kebabMenu = document.getElementById("kebab-menu");
 
 // GLOBAL VARIABLES & CLASSES //
 /* Songs & Playlist Classes */
