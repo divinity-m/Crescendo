@@ -68,6 +68,9 @@ const ALLSONGS = new Playlist("Songs"); // necessary to keep track of every song
 let allPlaylists = [ALLSONGS];
 let [currentPlaylist, currentSong] = [ALLSONGS, null];
 
+let menuOpen = false;
+let currentMenuAnchor = null;
+
 // EVENT LISTENERS //
 // Updates the allPlaylists and songs once the document and script have loaded in
 window.addEventListener("load", () => {
@@ -91,7 +94,7 @@ fileInput.addEventListener("change", viewFiles);
 
 // Hides the kebab menu when the page is clicked
 document.addEventListener("click", (e) => {
-  if (!kebabMenu.contains(e.target)) hideMenu();
+  if (!kebabMenu.contains(e.target) && menuOpen && e.target !== currentMenuAnchor) hideMenu();
 });
 
 // FUNCTIONS //
@@ -163,17 +166,18 @@ function processFiles(files) {
 /* Basic UI Related Functions */
 function updateWebsite() {
   // Sets up the playlist and song html headers
+  
   playlistsEl.innerHTML = `
-        <div class="h-20 sticky top-0 z-1 bg-linear-to-b from-blue-600 to-inherit flex items-center gap-3">
+        <header class="h-20 sticky top-0 z-1 bg-linear-to-b from-blue-600 to-inherit flex items-center gap-3">
             <h2 class="mb-5 pl-5 pt-2.5 text-5xl text-blue-700 hover:text-blue-700/80 font-bold">Playlists</h2>
             <img src="Images/addBtn.png"
                  class="w-10 h-10 hover:w-10.5 hover:h-10.5 hover:-ml-px hover:-mt-px"
                  onclick="addNewPlaylist()">
-        </div>`;
+        </header>`;
   songsEl.innerHTML = `
-        <div class="h-20 sticky top-0 z-1 bg-linear-to-b from-blue-600 to-inherit">
+        <header class="h-20 sticky top-0 z-1 bg-linear-to-b from-blue-600 to-inherit">
             <h2 class="mb-5 pl-5 pt-2.5 text-5xl text-blue-700 hover:text-blue-700/80 font-bold">Songs</h2>
-        </div>`;
+        </header>`;
 
   // Adds every created playlist into the playlist section
   allPlaylists.forEach((playlist) => {
@@ -342,22 +346,34 @@ function openSongMenu(songName, element) {
 }
 
 function toggleMenu(element, options) {
-  kebabMenu.innerHtml = "";
-
+  // checks if the menu is already open
+  if (menuOpen && currentMenuAnchor === element) {
+    hideMenu();
+    return;
+  }
+  
+  menuOpen = true;
+  currentMenuAnchor = element;
+  
+  // clears the menu
+  kebabMenu.querySelectorAll('p').forEach(p => {
+    kebabMenu.removeChild(p)
+  })
+  
   // adds options
   options.forEach((option) => {
     if (
       (option.label !== "Remove from playlist" &&
-        CURRENT_PLAYLIST.name !== "Songs") ||
+        currentPlaylist.name !== "Songs") ||
       (option.label === "Remove from playlist" &&
-        CURRENT_PLAYLIST.name !== "Songs") ||
+        currentPlaylist.name !== "Songs") ||
       (option.label !== "Remove from playlist" &&
-        CURRENT_PLAYLIST.name === "Songs")
+        currentPlaylist.name === "Songs")
     ) {
-      const item = document.createElement("div");
+      const item = document.createElement("p");
       item.textContent = option.label;
       item.className =
-        "px-4 py-2 text-blue-600/50 hover:bg-[#FFFFFF4D] cursor-pointer";
+        "px-4 py-2 hover:bg-[#FFFFFF10] cursor-pointer";
 
       item.onclick = () => {
         option.action();
@@ -378,47 +394,49 @@ function toggleMenu(element, options) {
   kebabMenu.classList.remove("hidden");
 
   setTimeout(() => {
-    kebabMenu.classList.remove("opacity-0", "translate-x-2");
+    kebabMenu.classList.remove("opacity-0", "-translate-x-2");
   }, 10);
 }
 
 function hideMenu() {
   // the menu slides inward and fades out
-  kebabMenu.classList.add("opacity-0", "translate-x-2");
+  kebabMenu.classList.add("opacity-0", "-translate-x-2");
 
   setTimeout(() => {
     kebabMenu.classList.add("hidden");
   }, 200);
+  menuOpen = false
+  currentMenuAnchor = null;
 }
 
 /* Functions For The Kebab Menu Options */
 function addToPlaylist(songName) {
-  let song = findObjectByName(songName);
+  let song = findObjectByName(currentPlaylist, songName);
   allPlaylists.push(song);
 
   updateWebsite();
 }
 
 function renameSong(songName) {
-  let song = findObjectByName(songName);
+  let song = findObjectByName(currentPlaylist, songName);
 
   updateWebsite();
 }
 
 function deleteSong(songName) {
-  let song = findObjectByName(songName);
+  let song = findObjectByName(currentPlaylist, songName);
 
   updateWebsite();
 }
 
 function renamePlaylist(playlistName) {
-  let playlist = findObjectByName(playlistName);
+  let playlist = findObjectByName(allPlaylists, playlistName);
 
   updateWebsite();
 }
 
 function deletePlaylist(playlistName) {
-  let playlist = findObjectByName(playlistName);
+  let playlist = findObjectByName(allPlaylists, playlistName);
 
   updateWebsite();
 }
