@@ -1,17 +1,22 @@
 // CRESCENDO SCRIPT.JS //
+
 // DOCUMENT ELEMENTS //
 /* Files */
 const dropZone = document.getElementById("drop-zone");
-const fileInput = document.getElementById("file-input");
+const audioFileInput = document.getElementById("audio-file-input");
 
 /* Containers */
 const playlistsEl = document.getElementById("playlists-el");
 const songsEl = document.getElementById("songs-el");
 const nowPlayingEl = document.getElementById("now-playing-el");
+const audioEl = document.getElementById("audio-el");
 
 /* Other */
-const audioEl = document.getElementById("audio-el");
 const kebabMenu = document.getElementById("kebab-menu");
+const modifyMenu = document.getElementById("modify-menu");
+const addPlaylistMenu = document.getElementById("add-to-playlist-menu");
+
+
 
 // GLOBAL VARIABLES & CLASSES //
 /* Songs & Playlist Classes */
@@ -24,7 +29,7 @@ class Song {
     this.elementId = `${this.name}-song`;
     this.promise = null;
     this.picture = "Images/music_note.png";
-    this.playImg = "Images/playBtn.png";
+    this._playImg = "Images/playBtn.png";
   }
 
   play(restart) {
@@ -44,6 +49,13 @@ class Song {
     this.playImg = "Images/playBtn.png";
     audioEl.pause();
   }
+
+  // changes the elements play button image whenever playImg changes
+  set playImg(value) {
+    this._playImg = value;
+    let playBtnEl = document.getElementById(`${this.elementId}-play-btn`);
+    if (playBtnEl) playBtnEl.src = value;
+  }
 }
 
 class Playlist {
@@ -52,14 +64,22 @@ class Playlist {
     this.songs = [];
     this.elementId = `${name}-playlist`;
     this.picture = "Images/music_note.png";
-    this.playImg = "Images/playBtn.png";
+    this._playImg = "Images/playBtn.png";
     this.loopOn = false;
     this.shuffleOn = false;
   }
 
   shuffle() {
+    // i'll work on this later
     // assign every song a random value (like as a porperty to their object) then .sort() them based on their random values
     // or some import some random module or smn
+  }
+
+  // changes the elements play button image whenever playImg changes
+  set playImg(value) {
+    this._playImg = value;
+    const playBtnEl = document.getElementById(`${this.elementId}-play-btn`);
+    if (playBtnEl) playBtnEl.src = value;
   }
 }
 
@@ -68,10 +88,13 @@ const ALLSONGS = new Playlist("Songs"); // necessary to keep track of every song
 let allPlaylists = [ALLSONGS];
 let [currentPlaylist, currentSong] = [ALLSONGS, null];
 
-let menuOpen = false;
-let currentMenuAnchor = null;
+let [kebabMenuOpen, modifyMenuOpen, addPlaylistMenuOpen] = [false, false, false];
+let currentKebabMenuAnchor = null;
+
+
 
 // EVENT LISTENERS //
+
 // Updates the allPlaylists and songs once the document and script have loaded in
 window.addEventListener("load", () => {
   updateWebsite();
@@ -88,14 +111,20 @@ dropZone.addEventListener("drop", handleDrop);
 
 // Handles dropZone clicks
 dropZone.addEventListener("click", () => {
-  fileInput.click();
+  audioFileInput.click();
 });
-fileInput.addEventListener("change", viewFiles);
+audioFileInput.addEventListener("change", viewFiles);
 
-// Hides the kebab menu when the page is clicked
+// Hides menus when the page is clicked
 document.addEventListener("click", (e) => {
-  if (!kebabMenu.contains(e.target) && menuOpen && e.target !== currentMenuAnchor) hideMenu();
+  if (!kebabMenu.contains(e.target) && kebabMenuOpen && e.target !== currentKebabMenuAnchor) hideKebabMenu();
+    
+  if (!modifyMenu.contains(e.target) && modifyMenuOpen && !kebabMenu.contains(e.target)) hideModifyMenu();
+    
+  if (!addPlaylistMenu.contains(e.target) && addPlaylistMenuOpen && !kebabMenu.contains(e.target)) hideAddPlaylistMenu();
 });
+
+
 
 // FUNCTIONS //
 
@@ -106,25 +135,26 @@ function preventDefaults(e) {
 }
 
 function handleDrop(e) {
-  // gets the FileList object and converts it into an array
+  // gets the FileList object through dataTransfer
   const files = e.dataTransfer.files;
 
-  // if the files are valid, then it processes them and updates the website
-  if (validateFiles(Array.from(files)) !== null) {
-    processFiles(files);
+  // checks file validity then it processes them and updates the website
+  const validatedFiles = validateFiles(Array.from(files));
+  if (validatedFiles !== null) {
+    processFiles(validatedFiles);
     updateWebsite();
   }
 }
 
 function viewFiles(e) {
-  // gets the FileList object and converts it into an array
+  // gets the FileList object through target
   const files = e.target.files;
 
-  // if the files are valid, then it processes them and updates the website
+  // checks file validity then it processes them and updates the website
   const validatedFiles = validateFiles(Array.from(files));
   if (validatedFiles !== null) {
     processFiles(validatedFiles);
-    updateWebsite();
+    updateSongsSection();
   }
 }
 
@@ -143,8 +173,7 @@ function validateFiles(files) {
       if (
         ALLSONGS.songs.length < 1 ||
         !ALLSONGS.songs.some((song) => song.name === potentialDupe.name)
-      )
-        unduplicatedFiles.push(file);
+      ) unduplicatedFiles.push(file);
     });
 
     // validates that there are any unduplicated files before returning them
@@ -155,7 +184,6 @@ function validateFiles(files) {
 }
 
 function processFiles(files) {
-  // iterates over the files
   [...Array.from(files)].forEach((file) => {
     // initializes a new song object containing the audio file then adds it to the ALLSONGS object
     const newSong = new Song(file);
@@ -164,124 +192,102 @@ function processFiles(files) {
 }
 
 /* Basic UI Related Functions */
-function updateWebsite() {
-  // Sets up the playlist and song html headers
-  
-  playlistsEl.innerHTML = `
-        <header class="h-20 sticky top-0 z-1 bg-linear-to-b from-blue-600 to-inherit flex items-center gap-3">
-            <h2 class="mb-5 pl-5 pt-2.5 text-5xl text-blue-700 hover:text-blue-700/80 font-bold">Playlists</h2>
-            <img src="Images/addBtn.png"
-                 class="w-10 h-10 hover:w-10.5 hover:h-10.5 hover:-ml-px hover:-mt-px"
-                 onclick="addNewPlaylist()">
-        </header>`;
-  songsEl.innerHTML = `
-        <header class="h-20 sticky top-0 z-1 bg-linear-to-b from-blue-600 to-inherit">
-            <h2 class="mb-5 pl-5 pt-2.5 text-5xl text-blue-700 hover:text-blue-700/80 font-bold">Songs</h2>
-        </header>`;
+function createPlaylistDiv(playlist) {
+  const div = document.createElement("div");
 
-  // Adds every created playlist into the playlist section
-  allPlaylists.forEach((playlist) => {
-    playlistsEl.innerHTML += `
-            <div id="${playlist.elementId}" class="h-18 pl-5 flex items-center gap-3 hover:bg-blue-600/20">
-                <img src="${playlist.picture}" class="w-15 h-15 p-1 bg-blue-600/60 rounded-md">
-                <p class="text-3xl text-blue-700 hover:text-blue-700/60 hover:cursor-default"
-                   onclick="showPlaylistSongs('${playlist.name}')">${playlist.name}</p>
-                <img src="${playlist.playImg}"
-                     class="w-7.5 h-7.5 hover:w-8 hover:h-8 hover:-ml-px hover:-mt-px"
-                     onclick="playPlaylist('${playlist.name}')">
-                <img src="Images/editBtn.png"
-                     class="w-7.5 h-7.5 hover:bg-[#0000FF1A] rounded-3xl"
-                     onclick="openPlaylistMenu('${playlist.name}', this)">
-            </div>
-        `;
+  // sets div's id and class
+  div.id = `${playlist.elementId}`
+  div.className = "h-18 pl-5 flex items-center gap-3 hover:bg-blue-600/20"
+  // creates the div's content
+  div.innerHTML = `
+              <img src="${playlist.picture}" class="w-15 h-15 p-1 bg-blue-600/60 rounded-md">
+              <p class="text-3xl text-blue-700 hover:text-blue-700/60 hover:cursor-default"
+                onclick="showPlaylistSongs('${playlist.name}')">${playlist.name}</p>
+              <img id="${playlist.elementId}-play-btn"  src="${playlist._playImg}"
+                class="w-7.5 h-7.5 hover:w-8 hover:h-8 hover:-ml-px hover:-mt-px"
+                onclick="playPlaylist('${playlist.name}')">
+              <img src="Images/editBtn.png"
+                class="w-7.5 h-7.5 hover:bg-[#0000FF1A] rounded-3xl"
+                onclick="openPlaylistMenu('${playlist.name}', this)">`
+  return div;
+}
+
+function createSongDiv(song) {
+  const div = document.createElement("div");
+
+  // sets div's id and class
+  div.id = `${song.elementId}`
+  div.className = "h-18 pl-5 flex items-center gap-3 hover:bg-blue-600/20"
+
+  // creates the div's content
+  div.innerHTML = `
+              <img src="${song.picture}" class="w-15 h-15 p-1 bg-blue-600/60 rounded-md">
+              <p class="flex flex-col justify-center text-left">
+                <span class="text-2xl text-blue-700 hover:text-blue-700/80 hover:cursor-default"
+                  onclick="playSong('${song.name}')">
+                    ${song.name}</span>
+                <span class="text-md text-blue-600 hover:text-blue-600/50 hover:cursor-default">
+                    ${song.artist}</span>
+               </p>
+               <img id="${song.elementId}-play-btn" src="${song._playImg}"
+                 class="w-7.5 h-7.5 hover:w-8 hover:h-8 hover:-ml-px hover:-mt-px"
+                 onclick="playSong('${song.name}')">
+               <img src="Images/editBtn.png"
+                 class="w-7.5 h-7.5 hover:bg-[#0000FF1A] rounded-3xl"
+                 onclick="openSongMenu('${song.name}', this)">`
+
+  return div;
+}
+
+function updatePlaylistsSection() {
+  // clears the playlistsEl
+  playlistsEl.querySelectorAll("div").forEach((div) => {
+    playlistsEl.removeChild(div);
+  })
+    
+  // creates a div for every playlist
+  allPlaylists.forEach((object) => {
+    const playlistDiv = createPlaylistDiv(object);
+    playlistsEl.appendChild(playlistDiv);
   });
+}
 
-  // Adds every created song into the songs section
-  currentPlaylist.songs.forEach((song) => {
-    songsEl.innerHTML += `
-            <div id="${song.elementId}" class="h-18 pl-5 flex items-center gap-3 hover:bg-blue-600/20">
-                <img src="${song.picture}" class="w-15 h-15 p-1 bg-blue-600/60 rounded-md">
-                <div class="flex flex-col justify-center text-left">
-                  <p class="text-3xl text-blue-700 hover:text-blue-700/80 hover:cursor-default"
-                     onclick="playSong('${song.name}')">
-                     ${song.name}</p>
-                  <p class="text-xl text-blue-700/70 hover:text-blue-600/50 hover:cursor-default">
-                     ${song.artist}</p>
-                </div>
-                <img src="${song.playImg}"
-                     class="w-7.5 h-7.5 hover:w-8 hover:h-8 hover:-ml-px hover:-mt-px"
-                     onclick="playSong('${song.name}')">
-                <img src="Images/editBtn.png"
-                   class="w-7.5 h-7.5 hover:bg-[#0000FF1A] rounded-3xl"
-                   onclick="openSongMenu('${song.name}', this)">
-            </div>
-        `;
+function updateSongsSection() {
+  // clears the songsEl
+  songsEl.querySelectorAll("div").forEach((div) => {
+    songsEl.removeChild(div);
+  })
+    
+  // adds every created song into the songs section
+  currentPlaylist.songs.forEach((song) => { 
+    const songDiv = createSongDiv(song);
+    songsEl.appendChild(songDiv);
   });
+}
 
+function updateCurrentlyPlayingSongSection() {
   // sets up the image and text of the currently playing song
-  if (currentSong != null) {
-    nowPlayingEl.innerHTML = `
-            <img src="${currentSong.picture}" class="w-60">
-            <p class="text-3xl text-blue-700 hover:text-blue-700/80 hover:cursor-default">${currentSong.name}</p>
-            <p class="text-xl text-blue-700/70 hover:text-blue-600/50 hover:cursor-default">${currentSong.artist}</p>
-    `;
-  } else {
-    nowPlayingEl.innerHTML = `
-            <img src="Images/music_note.png" class="w-60">
-            <p class="text-3xl text-blue-700 hover:text-blue-700/80 hover:cursor-default">No Song Selected</p>
-    `;
+  let potentialSong = {
+      "picture": "Images/music_note.png",
+      "name": "No Song Selected",
+      "artist": "...",
   }
+    
+  // checks if a song has been chosen
+  if (currentSong != null) potentialSong = currentSong;
+
+  // updates the inner html
+  nowPlayingEl.innerHTML = `
+            <img src="${potentialSong.picture}" class="w-60">
+            <p class="text-3xl text-blue-700 hover:text-blue-700/80 hover:cursor-default">${potentialSong.name}</p>
+            <p class="text-xl text-blue-600 hover:text-blue-600/50 hover:cursor-default">${potentialSong.artist}</p>`;
 }
 
-function findObjectByName(array, name) {
-  // finds the object's index through a findIndex search
-  let index = array.findIndex((object) => object.name === name);
 
-  // returns the object
-  return array[index];
-}
-
-function playPlaylist(playlistName) {
-  let playlistClicked = findObjectByName(allPlaylists, playlistName);
-
-  // only proceeds with the logic if the playlist has songs
-  if (playlistClicked.songs.length > 0) {
-    // prevents errors caused by currentSong being null by default
-    if (currentSong === null) currentSong = playlistClicked.songs[0];
-
-    if (currentPlaylist.name !== playlistClicked.name) {
-      // pauses the old song and swaps the image of the old playlist before redifining currentPlaylist
-      currentPlaylist.playImg = "Images/playBtn.png";
-      currentPlaylist = playlistClicked;
-    }
-
-    // plays the first song in the songs array
-    playSong(playlistClicked.songs[0].name, true);
-
-    updateWebsite();
-  }
-}
-
-function playSong(songName, restart = false) {
-  let songClicked = findObjectByName(currentPlaylist.songs, songName);
-
-  // prevents errors caused by currentSong being null by default
-  if (currentSong === null) currentSong = songClicked;
-
-  // pauses the previously playing song a changes currentSong
-  if (currentSong.name !== songClicked.name && !currentSong.paused)
-    currentSong.pause();
-  currentSong = songClicked;
-
-  // plays or pauses the song based on the play button image
-  if (songClicked.playImg === "Images/playBtn.png" || restart)
-    songClicked.play(restart);
-  else songClicked.pause();
-
-  // updates the play button image of the current playlist
-  currentPlaylist.playImg = songClicked.playImg;
-
-  updateWebsite();
+function updateWebsite() {
+  updatePlaylistsSection();
+  updateSongsSection();
+  updateCurrentlyPlayingSongSection();
 }
 
 function addNewPlaylist() {
@@ -292,96 +298,149 @@ function addNewPlaylist() {
   allPlaylists.forEach((playlist) => {
     if (playlist.name.startsWith("Playlist")) {
       let playlistNum = playlist.name.split(" ")[1];
-      if (+playlistNum === index) index = +playlistNum + 1;
+      if (+playlistNum >= index) index = +playlistNum + 1;
     }
   });
 
   // makes a playlist with the index then pushes it into allPlaylists
-  let newPlaylist = new Playlist(`Playlist ${index}`);
+  const newPlaylist = new Playlist(`Playlist ${index}`);
   allPlaylists.push(newPlaylist);
 
-  updateWebsite();
+  // makes a new div for the playlist
+  const playlistDiv = createPlaylistDiv(newPlaylist);
+  playlistsEl.appendChild(playlistDiv);
+}
+
+function findObjectByName(array, name) {
+  // finds the object's index through a findIndex search
+  const index = array.findIndex((object) => object.name === name);
+
+  // returns the object
+  if (array[index]) return array[index];
+  else return null;
+}
+
+function playPlaylist(playlistName) {
+  const playlistClicked = findObjectByName(allPlaylists, playlistName);
+
+  // only proceeds with the logic if the playlist has songs
+  if (playlistClicked.songs.length > 0) {
+    // prevents errors caused by currentSong being null by default
+    if (currentSong === null) currentSong = playlistClicked.songs[0];
+
+    if (currentPlaylist.name !== playlistClicked.name) {
+      // swaps the image of the old playlist before redifining currentPlaylist
+      currentPlaylist.playImg = "Images/playBtn.png";
+      
+      currentPlaylist = playlistClicked;
+    }
+
+    // plays the first song in the songs array
+    playSong(playlistClicked.songs[0].name, true);
+  }
+}
+
+function playSong(songName, restart = false) {
+  const songClicked = findObjectByName(currentPlaylist.songs, songName);
+
+  // prevents errors caused by currentSong being null by default
+  if (currentSong === null) currentSong = songClicked;
+
+  // pauses the previously playing song before redifining currentSong
+  if (currentSong.name !== songClicked.name && !currentSong.paused) {
+      currentSong.pause();
+  }
+    
+  currentSong = songClicked;
+
+  // plays or pauses the song based on the play button image
+  if (songClicked._playImg === "Images/playBtn.png" || restart) songClicked.play(restart);
+  else songClicked.pause();
+
+  // updates the play button image of the current playlist
+  currentPlaylist.playImg = songClicked._playImg;
+
+  // updates the html
+  updateCurrentlyPlayingSongSection();
 }
 
 function showPlaylistSongs(playlistName) {
-  let playlistClicked = findObjectByName(allPlaylists, playlistName);
+  const playlistClicked = findObjectByName(allPlaylists, playlistName);
   currentPlaylist = playlistClicked;
 
-  updateWebsite();
+  updateSongsSection();
 }
 
 /* Kebab Menu Functions */
 function openPlaylistMenu(playlistName, element) {
-  toggleMenu(element, [
+  let options = [
     {
-      label: "Rename Playlist",
-      action: () => renamePlaylist(playlistName),
+      label: "Change Details",
+      action: () => toggleModifyPlaylistMenu(playlistName),
     },
     {
       label: "Delete Playlist",
       action: () => deletePlaylist(playlistName),
-    },
-  ]);
+    }
+  ]
+
+  // removes option two if ALLSONGS is the chosen playlist
+  if (playlistName === "Songs") options.splice(1, 1);
+    
+  toggleMenu(element, options);
 }
 
 function openSongMenu(songName, element) {
-  toggleMenu(element, [
+  let options = [
     {
       label: "Add to playlist",
-      action: () => addToPlaylist(songName),
+      action: () => toggleAddPlaylistMenu(songName),
     },
     {
-      label: "Remove from playlist",
+      label: "Remove from this playlist",
       action: () => removeFromPlaylist(songName),
     },
     {
-      label: "Rename song",
-      action: () => renameSong(songName),
+      label: "Change Details",
+      action: () => toggleModifySongMenu(songName),
     },
     {
       label: "Delete song",
       action: () => deleteSong(songName),
     },
-  ]);
+  ]
+    
+  // removes option two if ALLSONGS is currently open
+  if (currentPlaylist.name === "Songs") options.splice(1, 1);
+    
+  toggleMenu(element, options);
 }
 
 function toggleMenu(element, options) {
   // checks if the menu is already open
-  if (menuOpen && currentMenuAnchor === element) {
-    hideMenu();
+  if (kebabMenuOpen && currentKebabMenuAnchor === element) {
+    hideKebabMenu();
     return;
   }
   
-  menuOpen = true;
-  currentMenuAnchor = element;
+  kebabMenuOpen = true;
+  currentKebabMenuAnchor = element;
   
   // clears the menu
-  kebabMenu.querySelectorAll('p').forEach(p => {
-    kebabMenu.removeChild(p)
-  })
+  kebabMenu.replaceChildren();
   
   // adds options
   options.forEach((option) => {
-    if (
-      (option.label !== "Remove from playlist" &&
-        currentPlaylist.name !== "Songs") ||
-      (option.label === "Remove from playlist" &&
-        currentPlaylist.name !== "Songs") ||
-      (option.label !== "Remove from playlist" &&
-        currentPlaylist.name === "Songs")
-    ) {
-      const item = document.createElement("p");
-      item.textContent = option.label;
-      item.className =
-        "px-4 py-2 hover:bg-[#FFFFFF10] cursor-pointer";
+    const para = document.createElement("p");
+    para.textContent = option.label;
+    para.className = "px-4 py-2 hover:bg-[#FFFFFF10] cursor-pointer";
 
-      item.onclick = () => {
-        option.action();
-        hideMenu();
-      };
+    para.onclick = () => {
+    option.action();
+    hideKebabMenu();
+    };
 
-      kebabMenu.appendChild(item);
-    }
+    kebabMenu.appendChild(para);
   });
 
   // positions the menu next to the clicked element
@@ -390,7 +449,7 @@ function toggleMenu(element, options) {
   kebabMenu.style.top = `${rect.top + window.scrollY}px`;
   kebabMenu.style.left = `${rect.right + 5}px`;
 
-  // the menu slides outward and fades in
+  // provides classes so the menu slides outward and fades in
   kebabMenu.classList.remove("hidden");
 
   setTimeout(() => {
@@ -398,45 +457,126 @@ function toggleMenu(element, options) {
   }, 10);
 }
 
-function hideMenu() {
-  // the menu slides inward and fades out
+function hideKebabMenu() {
+  // provides classes so the menu slides inward and fades out
   kebabMenu.classList.add("opacity-0", "-translate-x-2");
 
   setTimeout(() => {
     kebabMenu.classList.add("hidden");
   }, 200);
-  menuOpen = false
-  currentMenuAnchor = null;
+    
+  kebabMenuOpen = false
+  currentKebabMenuAnchor = null;
 }
 
 /* Functions For The Kebab Menu Options */
-function addToPlaylist(songName) {
-  let song = findObjectByName(currentPlaylist, songName);
-  allPlaylists.push(song);
-
-  updateWebsite();
+function removeFromPlaylist(songName) {
+  // targets the index, then splices the song
+  const index = currentPlaylist.songs.findIndex((song) => song.name === songName);
+  currentPlaylist.songs.splice(index, 1);
 }
 
-function renameSong(songName) {
-  let song = findObjectByName(currentPlaylist, songName);
-
-  updateWebsite();
-}
 
 function deleteSong(songName) {
-  let song = findObjectByName(currentPlaylist, songName);
+  allPlaylists.forEach((playlist) => {
+    // targets the index, checks if it's valid, then splices the song
+    const index = playlist.songs.findIndex((song) => song.name === songName);
+    if (index > -1) playlist.songs.splice(index, 1);
+  })
 
-  updateWebsite();
-}
-
-function renamePlaylist(playlistName) {
-  let playlist = findObjectByName(allPlaylists, playlistName);
-
-  updateWebsite();
+  updateSongsSection();
 }
 
 function deletePlaylist(playlistName) {
-  let playlist = findObjectByName(allPlaylists, playlistName);
+  const playlist = findObjectByName(allPlaylists, playlistName);
 
-  updateWebsite();
+  // deletes the playlist's div
+  const div = document.getElementById(playlist.elementId);
+  playlistsEl.removeChild(div);
+
+  // bug prevention
+  if (currentPlaylist.name === playlist.name) {
+    currentPlaylist = ALLSONGS;
+    updateSongsSection();
+  }
+
+  // deletes the playlist from the playlists array
+  const index = allPlaylists.findIndex((object) => object.name === playlistName);
+  allPlaylists.splice(index, 1);
+}
+
+/* Functions For The Kebab Menu Options Which Involve Menu Creation */
+function toggleAddPlaylistMenu(songName) {
+  addPlaylistMenuOpen = true;
+
+  // clears the menu
+  addPlaylistMenu.replaceChildren();
+
+  // adds content to the menu
+  if (allPlaylists.length === 1) {
+    const para = document.createElement("p");
+    para.textContent = "You have no unique playlists to add songs to.";
+    para.id = "user-lacks-playlist-popup";
+    para.className = "text-blue-800";
+
+    addPlaylistMenu.appendChild(para);
+  }
+  else {
+    allPlaylists.forEach((playlist) => {
+      const div = document.createElement("div");
+    })
+  }
+
+  // fades in the playlist menu
+  addPlaylistMenu.classList.remove("hidden");
+    
+  setTimeout(() => {
+    addPlaylistMenu.classList.remove("opacity-0");
+  }, 10);
+}
+
+function toggleModifySongMenu(songName) {
+  const song = findObjectByName(currentPlaylist.songs, songName);
+  modifyMenuOpen = true;
+
+  // fades in the modify menu
+  modifyMenu.classList.remove("hidden");
+    
+  setTimeout(() => {
+    modifyMenu.classList.remove("opacity-0");
+  }, 10);
+}
+
+function toggleModifyPlaylistMenu(playlistName) {
+  const playlist = findObjectByName(allPlaylists, playlistName);
+  modifyMenuOpen = true;
+
+  // fades in the modify menu
+  modifyMenu.classList.remove("hidden");
+    
+  setTimeout(() => {
+    modifyMenu.classList.remove("opacity-0");
+  }, 10);
+}
+
+function hideAddPlaylistMenu() {
+  // fades out the playlist menu
+  addPlaylistMenu.classList.add("opacity-0");
+    
+  setTimeout(() => {
+    addPlaylistMenu.classList.add("hidden");
+  }, 200);
+
+  addPlaylistMenuOpen = false;
+}
+
+function hideModifyMenu() {
+  // fades out the playlist menu
+  modifyMenu.classList.add("opacity-0");
+    
+  setTimeout(() => {
+    modifyMenu.classList.add("hidden");
+  }, 200);
+    
+  modifyMenuOpen = false;
 }
