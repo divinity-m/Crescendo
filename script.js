@@ -517,7 +517,7 @@ function toggleAddPlaylistMenu(songName) {
     const para = document.createElement("p");
     para.textContent = "You have no unique playlists to add songs to.";
     para.id = "user-lacks-playlist-popup";
-    para.className = "text-blue-800";
+    para.className = "text-blue-700 font-semibold";
 
     addPlaylistMenu.appendChild(para);
   }
