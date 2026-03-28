@@ -1,251 +1,424 @@
-// CRESCENDO //
-// DOCUMENT ELEMENTS
-let dropZone = document.getElementById("drop-zone");
-let fileInput = document.getElementById("file-input");
-let playlistsEl = document.getElementById("playlists-el");
-let songsEl = document.getElementById("songs-el");
+// CRESCENDO SCRIPT.JS //
+// DOCUMENT ELEMENTS //
+/* Files */
+const dropZone = document.getElementById("drop-zone");
+const fileInput = document.getElementById("file-input");
 
+/* Containers */
+const playlistsEl = document.getElementById("playlists-el");
+const songsEl = document.getElementById("songs-el");
+const nowPlayingEl = document.getElementById("now-playing-el");
 
-// GLOBAL VARIABLES & CLASSES
-// basic bulding block for every song
+/* Other */
+const audioEl = document.getElementById("audio-el");
+const kebabMenu = document.getElementById("kebabMenu");
+
+// GLOBAL VARIABLES & CLASSES //
+/* Songs & Playlist Classes */
 class Song {
-    constructor(file) {
-        this.file = file;
-        this.name = file.name.split(".")[0];
-        this.src = URL.createObjectURL(file);
-        this.author = "unknown";
-        this.elementId = `${this.name}-song`;
-        this.promise = null;
-        this.picture = "Images/music_note.png";
-        this.playImg = "Images/playBtn.png";
-    }
+  constructor(file) {
+    this.file = file;
+    this.name = file.name.split(".")[0];
+    this.src = URL.createObjectURL(file);
+    this.artist = "unknown artist";
+    this.elementId = `${this.name}-song`;
+    this.promise = null;
+    this.picture = "Images/music_note.png";
+    this.playImg = "Images/playBtn.png";
+  }
 
-    play() { // resets the duration if the song is over then plays the song
-        const audioEl = document.getElementById(this.elementId).querySelector("audio");
-        if (audioEl.currentTime === audioEl.duration) audioEl.currentTime = 0;
-        this.promise = audioEl.play();
-    }
-    
-    pause() { // pauses music without causing any errors by using a promise
-        const audioEl = document.getElementById(this.elementId).querySelector("audio");
-        
-        if (this.promise !== undefined) {
-            this.promise.then(_ => {
-                audioEl.pause();
-            })
-            .catch(error => {
-                console.warn(error);
-            });
-        }
-    }
+  play(restart) {
+    this.playImg = "Images/pauseBtn.png";
+
+    // resets the song if it has already ended or the parameter is true
+    if (audioEl.currentTime === audioEl.duration || restart)
+      audioEl.currentTime = 0;
+    // changes the audio elements src then plays it, storing the .play() in a promise
+    if (audioEl.src !== this.src) audioEl.src = this.src;
+    this.promise = audioEl.play().catch((err) => {
+      console.warn("Play interrupted:", err);
+    });
+  }
+
+  pause() {
+    this.playImg = "Images/playBtn.png";
+    audioEl.pause();
+  }
 }
 
-// basic bulding block for every playlist
 class Playlist {
-    constructor(name) {
-        this.name = name;
-        this.songs = [];
-        this.elementId = `${name}-playlist`;
-        this.picture = "Images/music_note.png";
-        this.playImg = "Images/playBtn.png";
-    }
-    
-    play() {
-    // plays the first song in the songs array
-    }
+  constructor(name) {
+    this.name = name;
+    this.songs = [];
+    this.elementId = `${name}-playlist`;
+    this.picture = "Images/music_note.png";
+    this.playImg = "Images/playBtn.png";
+    this.loopOn = false;
+    this.shuffleOn = false;
+  }
 
-    loop() {
-    // when the last song is complete, play the first song again
-    }
-    
-    shuffle() {
+  shuffle() {
     // assign every song a random value (like as a porperty to their object) then .sort() them based on their random values
     // or some import some random module or smn
-    }
+  }
 }
 
-// the allSongs object keeps track of every song and the PLAYLISTS object may be furthur extended with new playlists
-const allSongs = new Playlist("Songs");
-let PLAYLISTS = [allSongs];
-let [CURRENT_PLAYLIST, CURRENT_SONG] = [allSongs, null];
+/* global variables */
+const ALLSONGS = new Playlist("Songs"); // necessary to keep track of every song
+let allPlaylists = [ALLSONGS];
+let [currentPlaylist, currentSong] = [ALLSONGS, null];
 
+// EVENT LISTENERS //
+// Updates the allPlaylists and songs once the document and script have loaded in
+window.addEventListener("load", () => {
+  updateWebsite();
+});
 
-// EVENT LISTENERS
 // Prevents default browser behavior for drag events considering the dropZone and the whole window
-["dragenter", "dragover", "dragleave", "drop"].forEach(eventName => {
-    dropZone.addEventListener(eventName, preventDefaults);
-    window.addEventListener(eventName, preventDefaults); 
+["dragenter", "dragover", "dragleave", "drop"].forEach((eventName) => {
+  dropZone.addEventListener(eventName, preventDefaults);
+  window.addEventListener(eventName, preventDefaults);
 });
 
 // Handles dropped files
 dropZone.addEventListener("drop", handleDrop);
 
 // Handles dropZone clicks
-dropZone.addEventListener("click", () => { fileInput.click() });
+dropZone.addEventListener("click", () => {
+  fileInput.click();
+});
 fileInput.addEventListener("change", viewFiles);
 
+// Hides the kebab menu when the page is clicked
+document.addEventListener("click", (e) => {
+  if (!kebabMenu.contains(e.target)) hideMenu();
+});
 
-// FUNCTIONS
+// FUNCTIONS //
+
+/* Drop Zone Related Functions */
 function preventDefaults(e) {
-    e.preventDefault();
-    e.stopPropagation();
+  e.preventDefault();
+  e.stopPropagation();
 }
 
 function handleDrop(e) {
-    // gets the FileList object and converts it into an array
-    const files = e.dataTransfer.files;
+  // gets the FileList object and converts it into an array
+  const files = e.dataTransfer.files;
 
-    // if the files are valid, then it processes them and updates the website
-    if (validateFiles(Array.from(files)) !== null) {
-        processFiles(files);
-        updateWebsite();
-    }
+  // if the files are valid, then it processes them and updates the website
+  if (validateFiles(Array.from(files)) !== null) {
+    processFiles(files);
+    updateWebsite();
+  }
 }
 
 function viewFiles(e) {
-    // gets the FileList object and converts it into an array
-    const files = e.target.files;
-    
-    // if the files are valid, then it processes them and updates the website
-    const validatedFiles = validateFiles(Array.from(files));
-    if (validatedFiles !== null) {
-        processFiles(validatedFiles);
-        updateWebsite();
-    }
+  // gets the FileList object and converts it into an array
+  const files = e.target.files;
+
+  // if the files are valid, then it processes them and updates the website
+  const validatedFiles = validateFiles(Array.from(files));
+  if (validatedFiles !== null) {
+    processFiles(validatedFiles);
+    updateWebsite();
+  }
 }
 
 function validateFiles(files) {
-    // validates the files exist
-    if (files && files.length > 0) {
-        
-        // filters the files for audio files 
-        const audioFiles = files.filter(file => file.type.startsWith("audio/"));
-        
-        // stores unduped files
-        let unduplicatedFiles = [];
+  // validates the files exist
+  if (files && files.length > 0) {
+    // filters the files for audio files
+    const audioFiles = files.filter((file) => file.type.startsWith("audio/"));
 
-        // iterates through the audioFiles array and compares its files to the existing songs in the allSongs array
-        audioFiles.forEach(file => {
-            // allSongs.songs.forEach(existingSong => {
-            //     const potentialDupe = new Song(file);
-                
-            //     if (potentialDupe.name !== existingSong.name) unduplicatedFiles.push(file);
-            //     else console.log(`Duplicate Song Name: ${potentialDupe.name} - Existing Song Name: ${existingSong.name}`);
-            // })
-            const potentialDupe = new Song(file);
-            if (allSongs.songs.length < 1 || !(allSongs.songs.some(song => song.name === potentialDupe.name)) ) unduplicatedFiles.push(file);
-        })
+    // stores unduped files
+    let unduplicatedFiles = [];
 
-        // validates that there are any unduplicated files before returning them
-        if (unduplicatedFiles.length > 0) return unduplicatedFiles;
-    }
-    // returns null if nothing useful is obtained from the files (all the conditions aren't met)
-    return null;
+    // iterates through the audioFiles array and compares its files to the existing songs in the ALLSONGS object
+    audioFiles.forEach((file) => {
+      const potentialDupe = new Song(file);
+      if (
+        ALLSONGS.songs.length < 1 ||
+        !ALLSONGS.songs.some((song) => song.name === potentialDupe.name)
+      )
+        unduplicatedFiles.push(file);
+    });
+
+    // validates that there are any unduplicated files before returning them
+    if (unduplicatedFiles.length > 0) return unduplicatedFiles;
+  }
+  // returns null if nothing useful is obtained from the files (all the conditions aren't met)
+  return null;
 }
 
 function processFiles(files) {
-    // iterates over the files
-    [...Array.from(files)].forEach(file => {
-        // initializes a new song object containing the audio file then adds it to the allSongs object
-        const newSong = new Song(file);
-        allSongs.songs.push(newSong);
-    });
+  // iterates over the files
+  [...Array.from(files)].forEach((file) => {
+    // initializes a new song object containing the audio file then adds it to the ALLSONGS object
+    const newSong = new Song(file);
+    ALLSONGS.songs.push(newSong);
+  });
 }
 
+/* Basic UI Related Functions */
 function updateWebsite() {
-    playlistsEl.innerHTML = `
-        <div class="flex items-center gap-3 sticky top-0 bg-neutral-50 z-1">
+  // Sets up the playlist and song html headers
+  playlistsEl.innerHTML = `
+        <div class="h-20 sticky top-0 z-1 bg-linear-to-b from-blue-600 to-inherit flex items-center gap-3">
             <h2 class="mb-5 pl-5 pt-2.5 text-5xl text-blue-700 hover:text-blue-700/80 font-bold">Playlists</h2>
             <img src="Images/addBtn.png"
                  class="w-10 h-10 hover:w-10.5 hover:h-10.5 hover:-ml-px hover:-mt-px"
                  onclick="addNewPlaylist()">
         </div>`;
-    songsEl.innerHTML = '<h2 class="mb-5 pl-5 pt-2.5 text-5xl text-blue-700 hover:text-blue-700/80 font-bold">Songs</h2>';
-    
-    
-    PLAYLISTS.forEach(playlist => {
-        playlistsEl.innerHTML += `
+  songsEl.innerHTML = `
+        <div class="h-20 sticky top-0 z-1 bg-linear-to-b from-blue-600 to-inherit">
+            <h2 class="mb-5 pl-5 pt-2.5 text-5xl text-blue-700 hover:text-blue-700/80 font-bold">Songs</h2>
+        </div>`;
+
+  // Adds every created playlist into the playlist section
+  allPlaylists.forEach((playlist) => {
+    playlistsEl.innerHTML += `
             <div id="${playlist.elementId}" class="h-18 pl-5 flex items-center gap-3 hover:bg-blue-600/20">
                 <img src="${playlist.picture}" class="w-15 h-15 p-1 bg-blue-600/60 rounded-md">
-                <p class="text-3xl text-blue-700 hover:text-blue-700/80 hover:cursor-default">${playlist.name}</p>
+                <p class="text-3xl text-blue-700 hover:text-blue-700/60 hover:cursor-default"
+                   onclick="showPlaylistSongs('${playlist.name}')">${playlist.name}</p>
                 <img src="${playlist.playImg}"
                      class="w-7.5 h-7.5 hover:w-8 hover:h-8 hover:-ml-px hover:-mt-px"
                      onclick="playPlaylist('${playlist.name}')">
+                <img src="Images/editBtn.png"
+                     class="w-7.5 h-7.5 hover:bg-[#0000FF1A] rounded-3xl"
+                     onclick="openPlaylistMenu('${playlist.name}', this)">
             </div>
         `;
-    })
+  });
 
-    CURRENT_PLAYLIST.songs.forEach(song => {
-        songsEl.innerHTML += `
+  // Adds every created song into the songs section
+  currentPlaylist.songs.forEach((song) => {
+    songsEl.innerHTML += `
             <div id="${song.elementId}" class="h-18 pl-5 flex items-center gap-3 hover:bg-blue-600/20">
                 <img src="${song.picture}" class="w-15 h-15 p-1 bg-blue-600/60 rounded-md">
-                <p class="text-3xl text-blue-700 hover:text-blue-700/80 hover:cursor-default"
-                   onclick="playSong('${song.name}')">
-                   ${song.name}</p>
+                <div class="flex flex-col justify-center text-left">
+                  <p class="text-3xl text-blue-700 hover:text-blue-700/80 hover:cursor-default"
+                     onclick="playSong('${song.name}')">
+                     ${song.name}</p>
+                  <p class="text-xl text-blue-700/70 hover:text-blue-600/50 hover:cursor-default">
+                     ${song.artist}</p>
+                </div>
                 <img src="${song.playImg}"
                      class="w-7.5 h-7.5 hover:w-8 hover:h-8 hover:-ml-px hover:-mt-px"
                      onclick="playSong('${song.name}')">
-                <audio src="${song.src}" class="text-xl text-blue-700"></audio>
+                <img src="Images/editBtn.png"
+                   class="w-7.5 h-7.5 hover:bg-[#0000FF1A] rounded-3xl"
+                   onclick="openSongMenu('${song.name}', this)">
             </div>
         `;
-    })
+  });
+
+  // sets up the image and text of the currently playing song
+  if (currentSong != null) {
+    nowPlayingEl.innerHTML = `
+            <img src="${currentSong.picture}" class="w-60">
+            <p class="text-3xl text-blue-700 hover:text-blue-700/80 hover:cursor-default">${currentSong.name}</p>
+            <p class="text-xl text-blue-700/70 hover:text-blue-600/50 hover:cursor-default">${currentSong.artist}</p>
+    `;
+  } else {
+    nowPlayingEl.innerHTML = `
+            <img src="Images/music_note.png" class="w-60">
+            <p class="text-3xl text-blue-700 hover:text-blue-700/80 hover:cursor-default">No Song Selected</p>
+    `;
+  }
 }
 
-// Plays the first song in a playlist if the playlist was just chosen, or plays/pauses the currently playing/paused song in a playlist
+function findObjectByName(array, name) {
+  // finds the object's index through a findIndex search
+  let index = array.findIndex((object) => object.name === name);
+
+  // returns the object
+  return array[index];
+}
+
 function playPlaylist(playlistName) {
-    // finds the playlist through a findIndex search
-    let index = PLAYLISTS.findIndex(playlist => playlist.name === playlistName);
-    let playlistClicked = PLAYLISTS[index];
-    
-    if (playlistClicked.songs.length > 0) {
-        if (CURRENT_SONG === null) CURRENT_SONG = playlistClicked.songs[0];
-        
-        if (CURRENT_PLAYLIST.name === playlistClicked.name) {
-            playSong(CURRENT_SONG.name);
-        }
-        else {
-            CURRENT_SONG.pause();
-            CURRENT_PLAYLIST.playImg = "Images/playBtn.png";
+  let playlistClicked = findObjectByName(allPlaylists, playlistName);
 
-            CURRENT_PLAYLIST = playlistClicked;
-            playSong(CURRENT_PLAYLIST.songs[0]);
-        }
-        CURRENT_PLAYLIST.playImg = CURRENT_SONG.playImg;
-            
-        updateWebsite();
+  // only proceeds with the logic if the playlist has songs
+  if (playlistClicked.songs.length > 0) {
+    // prevents errors caused by currentSong being null by default
+    if (currentSong === null) currentSong = playlistClicked.songs[0];
+
+    if (currentPlaylist.name !== playlistClicked.name) {
+      // pauses the old song and swaps the image of the old playlist before redifining currentPlaylist
+      currentPlaylist.playImg = "Images/playBtn.png";
+      currentPlaylist = playlistClicked;
     }
-}
 
-
-// Plays or pauses a song
-function playSong(songName) {
-    // finds the song through a findIndex search
-    let index = CURRENT_PLAYLIST.songs.findIndex(song => song.name === songName);
-    let songClicked = CURRENT_PLAYLIST.songs[index];
-    CURRENT_SONG = songClicked;
-    console.log()
-
-    if (CURRENT_SONG.playImg === "Images/playBtn.png") {
-        CURRENT_SONG.playImg = "Images/pauseBtn.png";
-        CURRENT_SONG.play();
-    }
-    else {
-        CURRENT_SONG.playImg = "Images/playBtn.png";
-        CURRENT_SONG.pause();
-    }
+    // plays the first song in the songs array
+    playSong(playlistClicked.songs[0].name, true);
 
     updateWebsite();
+  }
+}
+
+function playSong(songName, restart = false) {
+  let songClicked = findObjectByName(currentPlaylist.songs, songName);
+
+  // prevents errors caused by currentSong being null by default
+  if (currentSong === null) currentSong = songClicked;
+
+  // pauses the previously playing song a changes currentSong
+  if (currentSong.name !== songClicked.name && !currentSong.paused)
+    currentSong.pause();
+  currentSong = songClicked;
+
+  // plays or pauses the song based on the play button image
+  if (songClicked.playImg === "Images/playBtn.png" || restart)
+    songClicked.play(restart);
+  else songClicked.pause();
+
+  // updates the play button image of the current playlist
+  currentPlaylist.playImg = songClicked.playImg;
+
+  updateWebsite();
 }
 
 function addNewPlaylist() {
-    let index = 1;
-    PLAYLISTS.forEach(playlist => {
-        if (playlist.name.startsWith('Playlist')) {
-            if (+playlist.name.at(-1) === index) index = +playlist.name.at(-1) + 1;
-        }
-    })
+  let index = 1;
 
-    let newPlaylist = new Playlist(`Playlist ${index}`);
-    PLAYLISTS.push(newPlaylist);
-    updateWebsite();
+  // iterate through the allPlaylists to find one with the basic 'Playlist #' format
+  // if a playlist with the default format exists, the index becomes a number higher than it
+  allPlaylists.forEach((playlist) => {
+    if (playlist.name.startsWith("Playlist")) {
+      let playlistNum = playlist.name.split(" ")[1];
+      if (+playlistNum === index) index = +playlistNum + 1;
+    }
+  });
+
+  // makes a playlist with the index then pushes it into allPlaylists
+  let newPlaylist = new Playlist(`Playlist ${index}`);
+  allPlaylists.push(newPlaylist);
+
+  updateWebsite();
+}
+
+function showPlaylistSongs(playlistName) {
+  let playlistClicked = findObjectByName(allPlaylists, playlistName);
+  currentPlaylist = playlistClicked;
+
+  updateWebsite();
+}
+
+/* Kebab Menu Functions */
+function openPlaylistMenu(playlistName, element) {
+  toggleMenu(element, [
+    {
+      label: "Rename Playlist",
+      action: () => renamePlaylist(playlistName),
+    },
+    {
+      label: "Delete Playlist",
+      action: () => deletePlaylist(playlistName),
+    },
+  ]);
+}
+
+function openSongMenu(songName, element) {
+  toggleMenu(element, [
+    {
+      label: "Add to playlist",
+      action: () => addToPlaylist(songName),
+    },
+    {
+      label: "Remove from playlist",
+      action: () => removeFromPlaylist(songName),
+    },
+    {
+      label: "Rename song",
+      action: () => renameSong(songName),
+    },
+    {
+      label: "Delete song",
+      action: () => deleteSong(songName),
+    },
+  ]);
+}
+
+function toggleMenu(element, options) {
+  kebabMenu.innerHtml = "";
+
+  // adds options
+  options.forEach((option) => {
+    if (
+      (option.label !== "Remove from playlist" &&
+        CURRENT_PLAYLIST.name !== "Songs") ||
+      (option.label === "Remove from playlist" &&
+        CURRENT_PLAYLIST.name !== "Songs") ||
+      (option.label !== "Remove from playlist" &&
+        CURRENT_PLAYLIST.name === "Songs")
+    ) {
+      const item = document.createElement("div");
+      item.textContent = option.label;
+      item.className =
+        "px-4 py-2 text-blue-600/50 hover:bg-[#FFFFFF4D] cursor-pointer";
+
+      item.onclick = () => {
+        option.action();
+        hideMenu();
+      };
+
+      kebabMenu.appendChild(item);
+    }
+  });
+
+  // positions the menu next to the clicked element
+  const rect = element.getBoundingClientRect();
+
+  kebabMenu.style.top = `${rect.top + window.scrollY}px`;
+  kebabMenu.style.left = `${rect.right + 5}px`;
+
+  // the menu slides outward and fades in
+  kebabMenu.classList.remove("hidden");
+
+  setTimeout(() => {
+    kebabMenu.classList.remove("opacity-0", "translate-x-2");
+  }, 10);
+}
+
+function hideMenu() {
+  // the menu slides inward and fades out
+  kebabMenu.classList.add("opacity-0", "translate-x-2");
+
+  setTimeout(() => {
+    kebabMenu.classList.add("hidden");
+  }, 200);
+}
+
+/* Functions For The Kebab Menu Options */
+function addToPlaylist(songName) {
+  let song = findObjectByName(songName);
+  allPlaylists.push(song);
+
+  updateWebsite();
+}
+
+function renameSong(songName) {
+  let song = findObjectByName(songName);
+
+  updateWebsite();
+}
+
+function deleteSong(songName) {
+  let song = findObjectByName(songName);
+
+  updateWebsite();
+}
+
+function renamePlaylist(playlistName) {
+  let playlist = findObjectByName(playlistName);
+
+  updateWebsite();
+}
+
+function deletePlaylist(playlistName) {
+  let playlist = findObjectByName(playlistName);
+
+  updateWebsite();
 }
