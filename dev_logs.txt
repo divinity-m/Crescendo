@@ -15,18 +15,46 @@ I felt very condifent that this concise method would work perfectly, but it didn
 I didn't give up. Adding duplicated files is a very common and bothersome user-mistake so I didn't want to just put aside preventing it. I started heavily testing what may have been going wrong in the code through the console and noticed something very important. When the standard built-in `.some()` method is paired with the `!==` operator, it returns true if there's a even single element in the array that's not equal to the provided value. I originally belived it only returned true if every single element is not equal to the provided value, and as a result the duplicate files would always get improperly validated.
 With this newfound knowledge, I quickly found a solution that worked: 
 ` if (allSongs.songs.length < 1 || !(allSongs.songs.some(song => song.name === potentialDupe.name)) ) unduplicatedFiles.push(file); `.
-Didn't feel like adding anything more to the after this script so I spend a couple hours on the UI. I also created a logo for the website and a little icon for the tab, the designs are based off of the literal standard crescendo musical notation which looks similar to the "<" symbol.
+
+I didn't feel like adding anything more to the after struggling with this so I spent a couple hours on the UI. I also created a logo for the website and a little icon for the tab, the designs are based off of the literal standard crescendo musical notation which looks similar to the "<" symbol.
 
 
 # Day 4 - Thursday | In class & At home work #
 With the little time I had left in class due to the lesson on spreadsheets, I decided to focus more on designing the website than implementing new logic. I had trouble recoloring icons such as a black play button image to match of my website. Gavin gave me a short lesson on photoshop and the skills he learned from digital arts.
 At home I contacted Gavin and he gave me a more in depth guide on how to recolor images with photoshop. His tips helped a ton and I can definitely see myself using them in future projects.
 
+
 # Day 5 - Friday | In class & At home work #
 I wanted to implement a scroll feature into the "Playlists" and "Songs" sections of the website, but I couldn't figure out how to make the header tags stay in place when the div element scrolled up and down. None of my friends could figure it out either so I asked Mr. Durstling and found out that I needed to use a property called 'sticky' in css to keep the header in place and also increase the z-index to position the header over every other element.
 At home, I encountered a couple bugs while polishing my code to make it more consice and readable. I wanted to create a single audio element that played a song one at a time, rather than keep track of multiple audio elements in multiple divs. When I started this, I quickly came in contact with an error, when I pause the previously playing song so safely replace the audio's src and play a new song (all in one function), the console presented me with this error message:
 ` The play() request was interrupted by a call to pause(). `
 I threw whatever I think of at my script but nothing stopped that error message from popping up. I tried playing the song first then pausing the previous one. I tried seperating the pause and play into seperate functions. Then finally, I tried asking chatGPT what I could possibly be doing wrong.
+
 The issue revolves around how `.pause()` is synchronous with the code while `.play()` is asynchronous, causing it to have a slight delay with the overall process. With the way my code originally worked, I stored the `audio.play()` in a `promise` variable whenever I played a song. Whenever a song is paused, it's paused within an conditional that checks for the promise before pausing. As a result, both the pause() and play() become asynchronous, and due to how I started using only a single audio element to handle all the songs, the pause() and play() fight over who does what, the audio element has no clue whats going on, and everything just breaks. To fix this, I eliminated the promise-conditional for the play.pause() and ensured that the previous song would pause before a new song played, a simple and straightforward fix.
 I honestly feel ashamed that I couldn't fix the issue with my own coding knowledge, but I learned something new in the process so I think it balances out.
-I began working on a kebab menu for every song and playlist so users can add a specific song to a playlist or change the name of a song or playlist. I've never done this before so I did a lot of research before I started and figured out the basic UI and pop-up logic. I plan to work on the logic for its buttons later.
+I began working on a kebab menu (the little 3 dots that open up a small menu) so users can add a specific song to a playlist or change the name of a song or playlist. I've never made anything like it before so I did a lot of research on youtube and also some help from chatGPT to figure out the basic UI and pop-up logic, it was definietly a lot simpler than I thought it would be to implement. I plan to work on the logic for its individual buttons later.
+
+
+# Day 6 - Saturday (Spring Break has begun) | At home work #
+I started working on the project at around 9am~ish, and at the time I'm writing this, it's 7pm. Subtract 1h 30m~ for the time spent eating and playing with siblings and that's about 8h 30m~ hours of nonstop coding.
+In the morining I believe I spent about 30m changing up my style of code for a function called updatewebsite(), which refreshed all the playlist and song divs in the html with `.innerHTML`. It was called everytime something in the page changed, so even the slightest update would have it be called. Initially, I didn't really care too much about it, but then I realized, there's absolutely no reason to refresh 80% of the paged because ONE song was added uploaded into the website. So I split updateWebsite() into 3 separate functions that could refresh parts of the page independently, only ever using the original function for very specific cases. The 3 separate functions also had their own modifications, I started swapping statements like
+```
+songsEl.innerHTML = "";
+songsEl.innerHTML += "<div>a bunch of content</div>"
+```
+to
+```
+const div = document.createElement(div);
+div.innerHTML = "a bunch of content";
+
+songsEl.replaceChildren();
+songsEl.appendChild(div);
+```
+which I believe is a more efficient approach to resetting an elements content through JS.
+
+I also used up about another 30m working on the basic buttons for the kebab menu, ones like, "Delete Song" and "Delete Playlist"; simple logic I had minimal issues integrating.
+
+Where things became complicated is the buttons which involved the creation of their own pop-up menu, such as "Add song to playlist", and "Change Details" (for renaming songs/playlists and changing their album picture). Unless I'm mistaken, I probably spent about 5 hours working on the "Add song to playlist" option alone—mainly because I vehemently chose not to get any help from anywhere, I wanted to see if the skills I learned from making the kebab menu internalized. And they did.
+I lost track of the amount of times my functions would clash with each other while I was working on this, it really was a struggle, but I fully completed the button.
+
+I spent another 30m~ making updates to the UI, whatever playlist is being viewed is now bolded to pop out, same with whatever song is being played. Certain buttons also become transaprent when they're clicked.
