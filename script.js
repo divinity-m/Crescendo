@@ -83,11 +83,16 @@ class Playlist {
         this.picture = "Images/music_note.png";
         this._playImg = "Images/playBtn.png";
         
-        this.loopOn = false;
+        this.loopState = "all"; // 3 states: none, one, and all 
         this.shuffleOn = false;
     }
 
+    nextSong() {
+        // moves onto the next song in the playlist or loops the current song
+    }
+
     loop() {
+        // work on this before shuffle
         
     }
 
@@ -108,10 +113,10 @@ class Playlist {
 /* global variables */
 const allSongs = new Playlist("Songs", 0); // necessary to keep track of every song
 const allPlaylists = [allSongs];
-let [currentPlaylist, currentSong] = [allSongs, null];
+let [viewingPlaylist, playingPlaylist, currentSong] = [allSongs, null, null];
 
 let [kebabMenuOpen, modifyMenuOpen, addPlaylistMenuOpen] = [ false, false, false, ];
-let [kebabMenuTransitioning, innerMenuTransitioning, blurTransitioning] = [ false, false, false];
+let [kebabMenuTransitioning, innerMenuTransitioning, blurTransitioning] = [ false, false, false, ];
 let currentKebabMenuAnchor = null;
 
 
@@ -168,6 +173,10 @@ document.addEventListener("click", (e) => {
     )
         hideAddPlaylistMenu();
 });
+
+
+// reacts to the audio element finishing its song
+audioEl.addEventListener("ended", current)
 
 
 
@@ -233,7 +242,7 @@ function processFiles(files) {
 
         // updates the songs flexbox if the currently open playlist is the default allSongs playlist
         const newSongDiv = createSongDiv(newSong);
-        if (currentPlaylist.identifier === allSongs.identifier) songsEl.appendChild(newSongDiv);
+        if (viewingPlaylist.identifier === allSongs.identifier) songsEl.appendChild(newSongDiv);
     });
 }
 
@@ -359,7 +368,7 @@ function updatePlaylistsSection() {
         playlistsEl.appendChild(playlistDiv);
 
         // bolds the playlist if it's the current playlist
-        if (object.identifier === currentPlaylist.identifier) {
+        if (object.identifier === viewingPlaylist.identifier) {
             const p = playlistDiv.querySelector("p");
             p.classList.add("font-semibold", "underline");
         }
@@ -373,13 +382,17 @@ function updateSongsSection() {
     });
 
     // adds every created song into the songs section
-    currentPlaylist.songs.forEach((song) => {
+    viewingPlaylist.songs.forEach((song) => {
         const songDiv = createSongDiv(song);
         songsEl.appendChild(songDiv);
 
-        // bolds the song if its the currently playing/paused song
-        if (currentSong) {
-            if (currentSong.identifier === song.identifier) {
+        
+        if (currentSong && playingPlaylist) {
+            // bolds the song if its the currently playing song and its in the currently playing playlist
+            const songIsPlaying = currentSong.identifier === song.identifier;
+            const playlistIsPlaying = playingPlaylist.identifier === viewingPlaylist.identifier;
+            
+            if (songIsPlaying && playlistIsPlaying) {
                 const span = songDiv.querySelector("p").firstElementChild;
 
                 span.classList.add("font-semibold", "underline");
@@ -440,22 +453,22 @@ function addNewPlaylist() {
 }
 
 function swapPlaylist(playlistId) {
-    if (playlistId !== currentPlaylist.identifier) {
+    if (playlistId !== viewingPlaylist.identifier) {
         const playlistClicked = findObjectByIdentifier(allPlaylists, playlistId);
 
         // unbolds the old playList
         let p = document
-            .getElementById(currentPlaylist.elementId)
+            .getElementById(viewingPlaylist.elementId)
             .querySelector("p");
         
         p.classList.remove("font-semibold", "underline");
 
-        // updates currentPlaylist and the songs section
-        currentPlaylist = playlistClicked;
+        // updates viewingPlaylist and the songs section
+        viewingPlaylist = playlistClicked;
         updateSongsSection();
 
         // bolds the new playList
-        p = document.getElementById(currentPlaylist.elementId).querySelector("p");
+        p = document.getElementById(viewingPlaylist.elementId).querySelector("p");
         p.classList.add("font-semibold", "underline");
     }
 }
@@ -507,7 +520,7 @@ function playPlaylist(playlistId) {
         if (currentSong === null) currentSong = playlistClicked.songs[0];
 
         // swaps the playlists
-        if (currentPlaylist.identifier !== playlistId) swapPlaylist(playlistId);
+        if (viewingPlaylist.identifier !== playlistId) swapPlaylist(playlistId);
 
         // plays the first song in the songs array
         playSong(playlistClicked.songs[0].identifier, true);
@@ -521,10 +534,13 @@ function playPlaylist(playlistId) {
 }
 
 function playSong(songId, restart = false) {
-    const songClicked = findObjectByIdentifier(currentPlaylist.songs, songId);
+    playingPlaylist = currentPlaylist;
 
     // prevents errors caused by currentSong being null by default
+    const songClicked = findObjectByIdentifier(viewingPlaylist.songs, songId);
+    
     if (currentSong === null) currentSong = songClicked;
+    
 
     // pauses and unbolds the previously playing song
     if (currentSong.identifier !== songId) {
@@ -553,7 +569,7 @@ function playSong(songId, restart = false) {
 
     // updates the play button image of the current playlist while ensuring every other playlist gets the default play button
     allPlaylists.forEach((playlist) => {
-        if (playlist.identifier === currentPlaylist.identifier)
+        if (playlist.identifier === viewingPlaylist.identifier)
             playlist.playImg = songClicked._playImg;
         else playlist.playImg = "Images/playBtn.png";
     });
@@ -620,7 +636,7 @@ function openSongMenu(songId, element) {
     ];
 
     // removes option two if allSongs is currently open
-    if (currentPlaylist.identifier === allSongs.identifier) options.splice(1, 1);
+    if (viewingPlaylist.identifier === allSongs.identifier) options.splice(1, 1);
 
     toggleMenu(element, options);
 }
@@ -703,13 +719,13 @@ function hideKebabMenu() {
 
 function removeFromPlaylist(songId) {
     // removes the song's div from the songsEl
-    const songToDelete = findObjectByIdentifier(currentPlaylist.songs, songId);
+    const songToDelete = findObjectByIdentifier(viewingPlaylist.songs, songId);
     const div = document.getElementById(songToDelete.elementId);
     songsEl.removeChild(div);
 
     // targets the index, then splices the song
-    const index = findIndexByIdentifier(currentPlaylist.songs, songId);
-    currentPlaylist.songs.splice(index, 1);
+    const index = findIndexByIdentifier(viewingPlaylist.songs, songId);
+    viewingPlaylist.songs.splice(index, 1);
 }
 
 function deleteSong(songId) {
@@ -737,7 +753,7 @@ function deletePlaylist(playlistId) {
     const playlist = allPlaylists[playlistId];
 
     // if the playlist to be deleted is currenly open, changes the current playlist to the default allSongs playlist
-    if (currentPlaylist.identifier === playlistId) swapPlaylist(allSongs.identifier);
+    if (viewingPlaylist.identifier === playlistId) swapPlaylist(allSongs.identifier);
 
     // deletes the playlist's div
     const div = document.getElementById(playlist.elementId);
@@ -788,7 +804,7 @@ function toggleAddPlaylistMenu(songId) {
 
             // the code-block that actually adds the song into the playlist
             div.onclick = () => {
-                const song = findObjectByIdentifier(currentPlaylist.songs, songId);
+                const song = findObjectByIdentifier(viewingPlaylist.songs, songId);
                 
                 // checks the playlist for duplicates
                 const hasDuplicates = checkForDuplicateFiles(song.file, playlist.songs);
@@ -831,7 +847,7 @@ function toggleModifyMenu(objectId, isSong) {
 
     // chooses between the object being a song or playlist
     let object;
-    if (isSong) object = findObjectByIdentifier(currentPlaylist.songs, objectId);
+    if (isSong) object = findObjectByIdentifier(viewingPlaylist.songs, objectId);
     else object = findObjectByIdentifier(allPlaylists, objectId);
 
     // creates the content
@@ -932,7 +948,7 @@ function hideModifyMenu() {
 function setObjectValues(objectId, isSong) {
     // gets the object
     let object;
-    if (isSong) object = findObjectByIdentifier(currentPlaylist.songs, objectId);
+    if (isSong) object = findObjectByIdentifier(viewingPlaylist.songs, objectId);
     else object = findObjectByIdentifier(allPlaylists, objectId);
 
     // gets the objects corresponding HTML elements
