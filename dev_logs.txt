@@ -4,7 +4,7 @@ At home, I created a `Songs` class, `Playlist` class, and a default `allSongs` o
 
 
 # Day 2 - Tuesday | In class & At home work #
-Audio files can now be added into the website through clicking the drag-and-drop box and choosing a file from your file list, or dragging and dropping a file into the box. I also worked a little bit more on the basic UI to make it look decent.
+It took a long while to get working, but audio files can now be added into the website through clicking the drag-and-drop box and choosing a file from your file list, or dragging and dropping a file into the box. I also worked a little bit more on the basic UI to make it look decent.
 At home and in class I tried to add a safeguard to prevent duplicate-files, but nothing was working. I've had to find a way to iterate through the fileList obtained from `e.target.files` and `e.dataTransfer.files` then compare it's files to the already existing files in an array called allSongs.songs.
 To start, I made a function called `validateFiles` which accepts a `files` parameter and returns either `null` or an array of the validated/unduplicated files. I first converted the fileList into an array with `Array.from()` then passed that array into the `validateFiles` function. `validateFiles` iterates through the array of files with a `.forEach()` loop, converts every file into a Song object like so: `const potentialDupe = new Song(file)`, then compares eachs potential duplicate song to the existing song objects in the allSongs.songs array with an if-statement. This was the if-statement that compared the unvalidated and existing songs:
 ` if (allSongs.songs.length < 1 || allSongs.songs.some(song => song.name !== potentialDupe.name)) unduplicatedFiles.push(file); `.
