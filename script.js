@@ -1,6 +1,5 @@
 // CRESCENDO SCRIPT.JS //
 
-
 // DOCUMENT ELEMENTS //
 
 /* Files */
@@ -19,31 +18,37 @@ const kebabMenu = document.getElementById("kebab-menu");
 const modifyMenu = document.getElementById("modify-menu");
 const addPlaylistMenu = document.getElementById("add-to-playlist-menu");
 
-
-
 // GLOBAL VARIABLES & CLASSES //
 
 /* Songs & Playlist Classes */
 class Song {
-    constructor(file) {
+    constructor(file, identifier) {
         this.file = file;
-        this.name = file.name.split(".")[0];
         this.src = URL.createObjectURL(file);
-        this.artist = "unknown artist";
+        
+        this.identifier = identifier;
         this.elementId = `${this.name}-song`;
-        this.promise = null;
+        
+        this.name = file.name.split(".")[0];
+        this.artist = "unknown artist";
+        
         this.picture = "Images/music_note.png";
         this._playImg = "Images/playBtn.png";
+        
+        this.promise = null;
     }
 
     play(restart) {
         this.playImg = "Images/pauseBtn.png";
 
-        // resets the song if it has already ended or the parameter is true
-        if (audioEl.currentTime === audioEl.duration || restart)
-            audioEl.currentTime = 0;
+        let songEnded = audioEl.currentTime === audioEl.duration;
+        
+        // resets the song if it has already ended or the restart is true
+        if (songEnded || restart) audioEl.currentTime = 0;
+        
         // changes the audio elements src then plays it, storing the .play() in a promise
         if (audioEl.src !== this.src) audioEl.src = this.src;
+        
         this.promise = audioEl.play().catch((err) => {
             console.warn("Play interrupted:", err);
         });
@@ -63,12 +68,16 @@ class Song {
 }
 
 class Playlist {
-    constructor(name) {
+    constructor(name, identifier) {
+        this.identifier = identifier;
+        this.elementId = `${name}-playlist`;
+        
         this.name = name;
         this.songs = [];
-        this.elementId = `${name}-playlist`;
+        
         this.picture = "Images/music_note.png";
         this._playImg = "Images/playBtn.png";
+        
         this.loopOn = false;
         this.shuffleOn = false;
     }
@@ -88,9 +97,9 @@ class Playlist {
 }
 
 /* global variables */
-const ALLSONGS = new Playlist("Songs"); // necessary to keep track of every song
-let allPlaylists = [ALLSONGS];
-let [currentPlaylist, currentSong] = [ALLSONGS, null];
+const allSongs = new Playlist("Songs", 0); // necessary to keep track of every song
+const allPlaylists = [allSongs];
+let [currentPlaylist, currentSong] = [allSongs, null];
 
 let [kebabMenuOpen, modifyMenuOpen, addPlaylistMenuOpen] = [
     false,
@@ -99,11 +108,9 @@ let [kebabMenuOpen, modifyMenuOpen, addPlaylistMenuOpen] = [
 ];
 let currentKebabMenuAnchor = null;
 
-
-
 // EVENT LISTENERS //
 
-// Updates the allPlaylists and songs once the document and script have loaded in
+// Updates the 3-box flexbox sections once the document and script have loaded in
 window.addEventListener("load", () => {
     updateWebsite();
 });
@@ -150,11 +157,11 @@ document.addEventListener("click", (e) => {
         hideAddPlaylistMenu();
 });
 
-
-
 // FUNCTIONS //
 
+
 /* Drop Zone Related Functions */
+
 function preventDefaults(e) {
     e.preventDefault();
     e.stopPropagation();
@@ -191,12 +198,12 @@ function validateFiles(files) {
         // stores unduped files
         let unduplicatedFiles = [];
 
-        // iterates through the audioFiles array and compares its files to the existing songs in the ALLSONGS object
+        // iterates through the audioFiles array and compares its files to the existing songs in the allSongs object
         audioFiles.forEach((file) => {
-            const potentialDupe = new Song(file);
+            const potentialDupe = new Song(file, -1);
 
-            const arrayIsEmpty = ALLSONGS.songs.length < 1;
-            const noDuplicates = !ALLSONGS.songs.some(
+            const arrayIsEmpty = allSongs.songs.length < 1;
+            const noDuplicates = !allSongs.songs.some(
                 (song) => song.name === potentialDupe.name,
             );
 
@@ -212,9 +219,9 @@ function validateFiles(files) {
 
 function processFiles(files) {
     [...Array.from(files)].forEach((file) => {
-        // initializes a new song object containing the audio file then adds it to the ALLSONGS object
-        const newSong = new Song(file);
-        ALLSONGS.songs.push(newSong);
+        // initializes a new song object containing the audio file then adds it to the allSongs object
+        const newSong = new Song(file, id);
+        allSongs.songs.push(newSong);
 
         const newSongDiv = createSongDiv(newSong);
         if (currentPlaylist.name === "Songs") songsEl.appendChild(newSongDiv);
@@ -230,7 +237,9 @@ function getImageFile(e) {
     }
 }
 
-/* UI Changing Related Functions */
+
+/* UI Changing Functions */
+
 function createPlaylistDiv(playlist) {
     const div = document.createElement("div");
 
@@ -374,21 +383,12 @@ function addNewPlaylist() {
     });
 
     // makes a playlist with the index then pushes it into allPlaylists
-    const newPlaylist = new Playlist(`Playlist ${index}`);
+    const newPlaylist = new Playlist(`Playlist ${index}`, id);
     allPlaylists.push(newPlaylist);
 
     // makes a new div for the playlist
     const playlistDiv = createPlaylistDiv(newPlaylist);
     playlistsEl.appendChild(playlistDiv);
-}
-
-function findObjectByName(array, name) {
-    // finds the object's index through a findIndex search
-    const index = array.findIndex((object) => object.name === name);
-
-    // returns the object
-    if (array[index]) return array[index];
-    else return null;
 }
 
 function swapPlaylist(playlistName) {
@@ -411,7 +411,36 @@ function swapPlaylist(playlistName) {
     }
 }
 
+
+/* Utility functions for songs and playlists */
+
+function findObjectByName(array, objectName) {
+    // finds the object's index through a findIndex search
+    const index = array.findIndex((object) => object.name === objectName);
+
+    // returns the object
+    if (array[index]) return array[index];
+    else return null;
+}
+
+function createNewId(isSong) {
+    let id = 0;
+    let array;
+
+    // an if-else statement to verify the id is for a song or playlist (a song and a playlist can have the same id)
+    if (isSong) array = allSongs.songs;
+    else array = allPlaylists;
+
+    // a simple loop to create new id's
+    array.forEach((item) => {
+        if (id === item.identifier) id++;
+    })
+    return id;
+}
+
+
 /* Play And Pause Functions */
+
 function playPlaylist(playlistName) {
     const playlistClicked = findObjectByName(allPlaylists, playlistName);
 
@@ -493,7 +522,9 @@ function unfadeBtn(objectId) {
     });
 }
 
+
 /* Kebab Menu Functions */
+
 function openPlaylistMenu(playlistName, element) {
     let options = [
         {
@@ -506,8 +537,8 @@ function openPlaylistMenu(playlistName, element) {
         },
     ];
 
-    // removes option two if ALLSONGS is the chosen playlist
-    if (playlistName === "Songs") options.splice(1, 1);
+    // removes option two if allSongs is the chosen playlist
+    if (playlistName === allSongs.name) options.splice(1, 1);
 
     toggleMenu(element, options);
 }
@@ -532,8 +563,8 @@ function openSongMenu(songName, element) {
         },
     ];
 
-    // removes option two if ALLSONGS is currently open
-    if (currentPlaylist.name === "Songs") options.splice(1, 1);
+    // removes option two if allSongs is currently open
+    if (currentPlaylist.name === allSongs.name) options.splice(1, 1);
 
     toggleMenu(element, options);
 }
@@ -592,7 +623,9 @@ function hideKebabMenu() {
     currentKebabMenuAnchor = null;
 }
 
+
 /* Functions For The Kebab Menu Options */
+
 function removeFromPlaylist(songName) {
     // removes the song's div from the songsEl
     const songToDelete = findObjectByName(currentPlaylist.songs, songName);
@@ -631,10 +664,9 @@ function deletePlaylist(playlistName) {
     const div = document.getElementById(playlist.elementId);
     playlistsEl.removeChild(div);
 
-    // bug prevention
+    // if the playlist to be deleted is currenly open, changes the currentPlaylis to the default allSongs playlist
     if (currentPlaylist.name === playlist.name) {
-        currentPlaylist = ALLSONGS;
-        updateSongsSection();
+        currentPlaylist = allSongs;
     }
 
     // deletes the playlist from the playlists array
@@ -642,9 +674,15 @@ function deletePlaylist(playlistName) {
         (object) => object.name === playlistName,
     );
     allPlaylists.splice(index, 1);
+
+    // updates the html
+    updatePlaylistsSection();
+    updateSongsSection();
 }
 
-/* Functions For The Kebab Menu Options Which Involve Menu Creation */
+
+/* Add Song To Playlist Menu & Modify Menu Functions */
+
 function toggleAddPlaylistMenu(songName) {
     addPlaylistMenuOpen = true;
 
@@ -792,5 +830,3 @@ function setObjectValues(isSong) {
     }
     hideModifyMenu();
 }
-
-
