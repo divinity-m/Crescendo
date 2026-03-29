@@ -40,17 +40,18 @@ I started working on the project at around 9am-ish, and at the time I'm writing 
 In the morining I believe I spent about 1h changing up my style of code for a function called updatewebsite(), which refreshed all the playlist and song divs in the html with `.innerHTML`. It was called everytime something in the page changed, so even the slightest update would have it be called. Initially, I didn't really care too much about it, but then I realized, there's absolutely no reason to refresh 80% of the paged because ONE song was added uploaded into the website. So I split updateWebsite() into 3 separate functions that could refresh parts of the page independently, only ever using the original function for very specific cases. The 3 separate functions also had their own modifications, I started swapping statements like
 ```
 songsEl.innerHTML = "";
-songsEl.innerHTML += "<div>a bunch of content</div>"
+songsEl.innerHTML += "<div>a bunch of content</div>" // this would be looped to create a div for every song
 ```
 to
 ```
+songsEl.replaceChildren();
+
+// this section below would be looped to create a div for every song
 const div = document.createElement(div);
 div.innerHTML = "a bunch of content";
-
-songsEl.replaceChildren();
 songsEl.appendChild(div);
 ```
-which I believe is a more efficient approach to resetting an elements content through JS.
+despite typically having more lines, I believe it's a more efficient approach because it avoids the re-parsing and rebuilding caused by using `element.innerHTML +=` on an existing element.
 
 I also used up about another hour working on the basic buttons for the kebab menu, ones like, "Delete Song" and "Delete Playlist"; simple logic I had minimal issues integrating.
 
