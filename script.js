@@ -6,6 +6,7 @@
 /* Files */
 const dropZone = document.getElementById("drop-zone");
 const audioFileInput = document.getElementById("audio-file-input");
+const imageFileInput = document.getElementById("image-file-input");
 
 /* Containers */
 const playlistsEl = document.getElementById("playlists-el");
@@ -117,9 +118,12 @@ dropZone.addEventListener("drop", handleDrop);
 dropZone.addEventListener("click", () => {
   audioFileInput.click();
 });
-audioFileInput.addEventListener("change", viewFiles);
+audioFileInput.addEventListener("change", getAudioFiles);
 
-// Hides menus when the page is clicked
+// Reacts to picture-replacement clicks
+imageFileInput.addEventListener("change", getImageFile);
+
+// Hides pop up menus when the page is clicked
 document.addEventListener("click", (e) => {
   if (!kebabMenu.contains(e.target) && kebabMenuOpen && e.target !== currentKebabMenuAnchor) hideKebabMenu();
     
@@ -127,7 +131,6 @@ document.addEventListener("click", (e) => {
     
   if (!addPlaylistMenu.contains(e.target) && addPlaylistMenuOpen && !kebabMenu.contains(e.target)) hideAddPlaylistMenu();
 });
-
 
 
 // FUNCTIONS //
@@ -149,7 +152,7 @@ function handleDrop(e) {
   if (validatedFiles !== null) processFiles(validatedFiles);
 }
 
-function viewFiles(e) {
+function getAudioFiles(e) {
   // gets the FileList object through target
   const files = e.target.files;
 
@@ -198,6 +201,15 @@ function processFiles(files) {
 }
 
 
+function getImageFile(e) {
+  const files = e.target.files;
+
+  if (files && files.length > 0) {
+    file = files[0];
+    console.log(file);
+  }
+}
+
 /* UI Changing Related Functions */
 function createPlaylistDiv(playlist) {
   const div = document.createElement("div");
@@ -207,19 +219,20 @@ function createPlaylistDiv(playlist) {
   div.className = "h-18 pl-5 flex items-center gap-3 hover:bg-blue-600/20"
   // creates the div's content
   div.innerHTML = `
-              <img src="${playlist.picture}" class="w-15 h-15 p-1 bg-blue-600/60 rounded-md">
+              <img src="${playlist.picture}" class="w-15 p-1 bg-blue-600/60 rounded-md">
               
               <p class="text-3xl text-blue-700 hover:text-blue-700/60 hover:cursor-default"
                 onclick="swapPlaylist('${playlist.name}')">${playlist.name}</p>
                 
               <img id="${playlist.elementId}-play-btn"  src="${playlist._playImg}"
-                class="w-7.5 h-7.5 hover:w-8 hover:h-8 hover:-ml-px hover:-mt-px"
+                class="w-7.5 hover:w-8.5 hover:-ml-0.5"
                 onclick="playPlaylist('${playlist.name}')"
                 onmousedown="fadeBtn('${playlist.elementId}-play-btn')"
-                ondragleave="unfadeBtn('${playlist.elementId}-play-btn')">
+                ondragleave="unfadeBtn('${playlist.elementId}-play-btn')"
+                ondrop="unfadeBtn('${playlist.elementId}-play-btn')">
                 
               <img src="Images/editBtn.png"
-                class="w-7.5 h-7.5 hover:bg-[#0000FF1A] rounded-3xl"
+                class="w-5 h-8 ml-auto mr-1 hover:bg-[#0000FF1A] rounded-3xl "
                 onclick="openPlaylistMenu('${playlist.name}', this)">`
   return div;
 }
@@ -233,27 +246,28 @@ function createSongDiv(song) {
 
   // creates the div's content
   div.innerHTML = `
-              <img src="${song.picture}" class="w-15 h-15 p-1 bg-blue-600/60 rounded-md">
+              <img src="${song.picture}" class="w-15 p-1 bg-blue-600/60 rounded-md">
               
               <p class="flex flex-col justify-center text-left">
               
-                <span class="text-2xl text-blue-700 hover:text-blue-700/80 hover:cursor-default"
+                <span class="text-2xl text-blue-700"
                   onclick="playSong('${song.name}')">
                     ${song.name}</span>
                     
-                <span class="text-md text-blue-600 hover:text-blue-600/50 hover:cursor-default">
+                <span class="text-md text-blue-600">
                     ${song.artist}</span>
                     
               </p>
                
               <img id="${song.elementId}-play-btn" src="${song._playImg}"
-                class="w-7.5 h-7.5 hover:w-8 hover:h-8 hover:-ml-px hover:-mt-px"
+                class="w-7.5 hover:w-8.5 hover:-ml-0.5"
                 onclick="playSong('${song.name}')"
                 onmousedown="fadeBtn('${song.elementId}-play-btn')"
+                ondragleave="unfadeBtn('${song.elementId}-play-btn')"
                 ondragleave="unfadeBtn('${song.elementId}-play-btn')">
                  
               <img src="Images/editBtn.png"
-                class="w-7.5 h-7.5 hover:bg-[#0000FF1A] rounded-3xl"
+                class="w-5 h-8 ml-auto mr-1 hover:bg-[#0000FF1A] rounded-3xl"
                 onclick="openSongMenu('${song.name}', this)">`
 
   return div;
@@ -315,9 +329,9 @@ function updateCurrentlyPlayingSongSection() {
   nowPlayingEl.innerHTML = `
             <img src="${potentialSong.picture}" class="w-60">
             
-            <p class="text-3xl text-blue-700 hover:text-blue-700/80 hover:cursor-default">${potentialSong.name}</p>
+            <p class="font-medium text-3xl text-blue-700">${potentialSong.name}</p>
             
-            <p class="text-xl text-blue-600 hover:text-blue-600/50 hover:cursor-default">${potentialSong.artist}</p>`;
+            <p class="font-medium text-xl text-blue-600">${potentialSong.artist}</p>`;
 }
 
 
@@ -464,7 +478,7 @@ function openPlaylistMenu(playlistName, element) {
   let options = [
     {
       label: "Change Details",
-      action: () => toggleModifyPlaylistMenu(playlistName),
+      action: () => toggleModifyMenu(playlistName, false),
     },
     {
       label: "Delete Playlist",
@@ -490,7 +504,7 @@ function openSongMenu(songName, element) {
     },
     {
       label: "Change Details",
-      action: () => toggleModifySongMenu(songName),
+      action: () => toggleModifyMenu(songName, true),
     },
     {
       label: "Delete song",
@@ -505,12 +519,13 @@ function openSongMenu(songName, element) {
 }
 
 function toggleMenu(element, options) {
-  // checks if the menu is already open
+  // checks if the menu is already open on the element
   if (kebabMenuOpen && currentKebabMenuAnchor === element) {
     hideKebabMenu();
     return;
   }
-  
+    
+  // sets the flags value after the check
   kebabMenuOpen = true;
   currentKebabMenuAnchor = element;
   
@@ -622,11 +637,12 @@ function toggleAddPlaylistMenu(songName) {
     para.className = "text-blue-600 font-semibold";
     para.textContent = "You have no unique playlists to add songs to.";
 
+    // giv
     addPlaylistMenu.appendChild(para);
     addPlaylistMenu.classList.remove("min-h-0", "max-h-100");
   }
   else {
-    // iterates through every playlist and adds it into the menu
+    // iterates through every playlist and creates a div for it
     // this uses a for-of loop instead of a forEach loop so I can use the 'continue' keyword
     for (let playlist of allPlaylists) {
       if (playlist.name === "Songs") continue;
@@ -635,13 +651,16 @@ function toggleAddPlaylistMenu(songName) {
       div.className = "flex items-center w-98/100 h-20 px-5 gap-3 hover:bg-blue-600/20 rounded-md";
       div.innerHTML = `
                 <img src="${playlist.picture}" class="w-15 h-15 p-1 bg-blue-600/60 rounded-md">
+                
                 <p class="text-3xl text-blue-700 hover:text-blue-700/60 hover:cursor-default">${playlist.name}</p>`
 
       // the code-block that actually adds the song into the playlist
       div.onclick = () => {
+        // checks the playlist for duplicates
         const noDuplicates = !playlist.songs.some((possibleDupe) => possibleDupe.name === songName);
         
         if (noDuplicates) {
+          // finds the song, pushes it into the playlist, then updates the html
           const song = findObjectByName(currentPlaylist.songs, songName);
           playlist.songs.push(song);
           swapPlaylist(playlist.name);
@@ -650,6 +669,7 @@ function toggleAddPlaylistMenu(songName) {
         hideAddPlaylistMenu();
       }
 
+      // gives the menu the playlist-div
       addPlaylistMenu.appendChild(div);
       addPlaylistMenu.classList.add("min-h-0", "max-h-100");
     }
@@ -663,21 +683,50 @@ function toggleAddPlaylistMenu(songName) {
   }, 10);
 }
 
-function toggleModifySongMenu(songName) {
-  const song = findObjectByName(currentPlaylist.songs, songName);
-  modifyMenuOpen = true;
-
-  // fades in the modify menu
-  modifyMenu.classList.remove("hidden");
+function toggleModifyMenu(objectName, isSong) {
+  modifyMenuOpen = true
     
-  setTimeout(() => {
-    modifyMenu.classList.remove("opacity-0");
-  }, 10);
-}
+  // clears the menu
+  modifyMenu.replaceChildren();
+    
+  // chooses between the object being a song or playlist
+  let object;
+  if (isSong) object = findObjectByName(currentPlaylist.songs, objectName);
+  else object = findObjectByName(allPlaylists, objectName);
 
-function toggleModifyPlaylistMenu(playlistName) {
-  const playlist = findObjectByName(allPlaylists, playlistName);
-  modifyMenuOpen = true;
+  // creates the content
+  const div = document.createElement("div");
+  div.className = "w-full h-full flex flex-col justify-center items-center gap-y-2";
+
+  // decides on making the image a white music note
+  let src = object.picture;
+  if (object.picture.includes("music_note.png")) src = "Images/music_note_white.png";
+
+  // base content
+  div.innerHTML = `
+        <img src="${src}" class="w-40" onclick="(() => { imageFileInput.click() })()"/>
+        
+        <input id="replace-name-input" type="text" value="${object.name}"
+            class="px-2 text-white bg-white/10 border-2 border-white rounded-md focus:outline-white"
+            />`;
+    
+  // decides on whether to add the artist input
+  if (isSong) div.innerHTML += `
+        <input id="replace-artist-input" type="text" value="${object.artist}"
+            class="px-2 text-white bg-white/10 border-2 border-white rounded-md focus:outline-white"
+            />`;
+
+
+  // adds in the button
+  div.innerHTML += `
+        <button class="w-30 h-10 mt-auto text-white bg-white/20 hover:bg-white/10
+                border-2 border-white rounded-3xl"
+                onclick="setObjectValues(${isSong})">Confirm</button>`;
+    
+
+    
+  // gives the menu the content
+  modifyMenu.appendChild(div);
 
   // fades in the modify menu
   modifyMenu.classList.remove("hidden");
@@ -699,7 +748,7 @@ function hideAddPlaylistMenu() {
 }
 
 function hideModifyMenu() {
-  // fades out the playlist menu
+  // fades out the modify menu
   modifyMenu.classList.add("opacity-0");
     
   setTimeout(() => {
@@ -708,3 +757,16 @@ function hideModifyMenu() {
     
   modifyMenuOpen = false;
 }
+
+function setObjectValues(isSong) {
+  const replacementName = document.getElementById("replace-name-input").value;
+  console.log(replacementName);
+
+  if (isSong) {
+    const replacementArtist = document.getElementById("replace-artist-input").value;
+    console.log(replacementArtist);
+  }
+  hideModifyMenu();
+}
+
+
