@@ -1,5 +1,6 @@
 // CRESCENDO SCRIPT.JS //
 
+
 // DOCUMENT ELEMENTS //
 
 /* Files */
@@ -17,6 +18,8 @@ const audioEl = document.getElementById("audio-el");
 const kebabMenu = document.getElementById("kebab-menu");
 const modifyMenu = document.getElementById("modify-menu");
 const addPlaylistMenu = document.getElementById("add-to-playlist-menu");
+
+
 
 // GLOBAL VARIABLES & CLASSES //
 
@@ -96,6 +99,8 @@ let [kebabMenuOpen, modifyMenuOpen, addPlaylistMenuOpen] = [
 ];
 let currentKebabMenuAnchor = null;
 
+
+
 // EVENT LISTENERS //
 
 // Updates the allPlaylists and songs once the document and script have loaded in
@@ -144,6 +149,8 @@ document.addEventListener("click", (e) => {
     )
         hideAddPlaylistMenu();
 });
+
+
 
 // FUNCTIONS //
 
