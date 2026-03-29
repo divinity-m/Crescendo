@@ -24,6 +24,10 @@
     class="w-full h-screen flex flex-col pb-1
            text-center font-[outfit] bg-linear-to-br from-blue-500 to-white bg-cover bg-fixed"
   >
+    <!-- file inputs -->
+    <input id="audio-file-input" type="file" multiple hidden />
+    <input id="image-file-input" type="file" hidden />
+      
     <header class="flex justify-around items-center gap-40">
       <!-- Logo -->
       <img id="logo" src="Images/crescendo_logo.png" class="w-80" />
@@ -40,7 +44,6 @@
           Drag and drop files here or click to browse
         </p>
       </div>
-      <input id="audio-file-input" type="file" multiple hidden />
 
       <!-- Music Visualizer (Not Started Yet)-->
       <div
@@ -52,36 +55,34 @@
     </header>
 
     <!-- kebab menu connecting to the editBtn -->
-    <div
+    <aside
       id="kebab-menu"
       class="w-48 z-90 py-2 hidden absolute text-blue-600/80
              bg-linear-to-br from-[#3F81FE] to-[#75A4FE] shadow-lg rounded-md
              transition-all duration-200 opacity-0 -translate-x-2"
-    ></div>
+    ></aside>
       
     <!-- menu overlay for changing aspects of songs and playlists -->
-    <div
+    <aside
       id="modify-menu"
-      class="w-100 h-100 z-100 py-2 pz-4 hidden flex justify-center items-center
+      class="w-100 h-100 z-100 py-2 pz-4 hidden
              fixed top-[50%] left-[50%] -translate-1/2
              bg-linear-to-br from-blue-600 to-white shadow-lg rounded-lg
              transition-all duration-200 opacity-0"
     >
-      <img src="Images/music_note.png" class="w-30" />
-      <input id="image-file-input" type="file" hidden />
-    </div>
+    </aside>
 
     <!-- menu overlay for adding songs to playlists-->
-    <div
+    <aside
       id="add-to-playlist-menu"
       class="w-175 z-100 py-2 pz-4 hidden overflow-auto flex flex-col items-center gap-y-2
              fixed top-[50%] left-[50%] -translate-1/2
              bg-linear-to-br from-blue-600 to-white shadow-lg rounded-lg
              transition-all duration-200 opacity-0"
-    ></div>
+    ></aside>
 
     <!-- 3-Box Flexbox Layout -->
-    <div class="flex-1 flex justify-evenly text-left gap-2.5 ml-2.5 mr-2.5 overflow-hidden mb-1.5">
+    <main class="flex-1 flex justify-evenly text-left gap-2.5 ml-2.5 mr-2.5 overflow-hidden mb-1.5">
       <!-- Playlists -->
       <section
         id="playlists-el"
@@ -89,15 +90,16 @@
       >
         <header class="h-20 sticky top-0 z-10 bg-linear-to-b from-blue-600 to-inherit flex items-center gap-3">
           <h2 class="mb-5 pl-5 pt-2.5
-                     text-5xl text-blue-700 hover:text-blue-700/80 font-bold">
+                     text-5xl text-blue-700 font-bold">
               Playlists
           </h2>
           <img id="add-btn" src="Images/addBtn.png"
-               class="w-10 h-10 hover:w-10.5 hover:h-10.5 hover:-ml-px hover:-mt-px"
+               class="w-10 hover:w-11 hover:-ml-0.5"
                onclick="addNewPlaylist()"
                onmousedown = "fadeBtn('add-btn')"
                onmouseup="unfadeBtn('add-btn')"
-               ondragleave="unfadeBtn('add-btn')">
+               ondragleave="unfadeBtn('add-btn')"
+               ondrop="unfadeBtn('add-btn')">
         </header>
       </section>
 
@@ -108,7 +110,7 @@
       >
         <header class="h-20 sticky top-0 z-10 bg-linear-to-b from-blue-600 to-inherit">
           <h2 class="mb-5 pl-5 pt-2.5
-                     text-5xl text-blue-700 hover:text-blue-700/80 font-bold">
+                     text-5xl text-blue-700 font-bold">
               Songs
           </h2>
         </header>
@@ -121,7 +123,7 @@
       >
         <header class="h-20 sticky top-0 z-10 bg-linear-to-b from-blue-600 to-inherit rounded-xl">
           <h2 class="mb-5 pl-5 pt-2.5
-                     text-5xl text-blue-700 hover:text-blue-700/80 font-bold">
+                     text-5xl text-blue-700 font-bold">
               Now Playing
           </h2>
         </header>
@@ -131,7 +133,7 @@
         ></div>
         <audio id="audio-el" src="" class="hidden"></audio>
       </section>
-    </div>
+    </main>
 
     <!-- Main Script -->
     <script defer src="script.js"></script>
