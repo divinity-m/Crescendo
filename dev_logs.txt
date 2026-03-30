@@ -82,3 +82,5 @@ Right now the slider's design is still very unfinished but I've made a little pr
 # Day 8 - Monday | At home work #
 It took a few hours, but after using the website above as a template, filtering out the css-logic I couldn't make sense of, then mixing in javascript into the styling, I made a functional and decent looking slider for the audio element.
 I also wanted to put numbers on both sides of the slider to show the current time into the song and the total time of the song. Completing this didn't nearly as long as implementing the slider, but I still did have to do research and borrow code because I didn't know how to convert seconds into a HH:MM:SS format.
+
+I started working on 4 new buttons: shuffle, previous song, next song, and loop. Can't have a music player without them. I also decided to make all of their icons .svg files instead of the typical .png which I've been using this entire project. I only did this because I recently remembered that .svg files scale with the screen, otherwise, I would've made every other one of my images a .svg.
