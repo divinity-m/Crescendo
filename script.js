@@ -180,14 +180,18 @@ dropZone.addEventListener("click", () => audioFileInput.click());
 /* Audio Related Event Listeners*/
 
 audioEl.addEventListener("timeupdate", () => {
+    // prevents slider adjustments if there isn't a song playing
+    if (isNaN(audioEl.duration) || !currentSong) timeSlider.disabled = true;
+    else timeSlider.disabled = false;
+    
     if (!isNaN(audioEl.duration) && !draggingSlider) {
         // calculates percentage of audio played then adjusts the timeSlider
-        const percentage = (audioEl.currentTime / audioEl.duration) * 100;
-        timeSlider.value = percentage;
+        const value = (audioEl.currentTime / audioEl.duration) * 1000;
+        timeSlider.value = value;
     
-        // ends, loops the current song, or moves onto the next song
-        if (percentage === 100) {
-            console.log("done")
+        // ends the playback, loops the current song, or moves onto the next song
+        if (value === 1000) {
+            console.log("slider value is 1000");
         }
     }
 });
@@ -195,7 +199,7 @@ audioEl.addEventListener("timeupdate", () => {
 timeSlider.addEventListener('click', () => {
     if (!isNaN(audioEl.duration)) {
         // calculates the time from the sliders value then adjusts the current time
-        const time = (timeSlider.value / 100) * audioEl.duration;
+        const time = (timeSlider.value / 1000) * audioEl.duration;
         audioEl.currentTime = time;
 
         
@@ -205,11 +209,6 @@ timeSlider.addEventListener('click', () => {
 // prevents bugs caused by the audio element updating while the user drags the slider
 timeSlider.addEventListener('mousedown', () => draggingSlider = true);
 timeSlider.addEventListener('mouseup', () => draggingSlider = false);
-
-// prevents slider adjustments if there isn't a song
-timeSlider.addEventListener('input', () => {
-    if (isNaN(audioEl.duration)) timeSlider.value = 0;
-})
 
     
 // FUNCTIONS //
@@ -266,9 +265,13 @@ function processFiles(files) {
         const newSong = new Song(file, createNewId(true));
         allSongs.songs.push(newSong);
 
-        // updates the songs flexbox if the currently open playlist is the default allSongs playlist
-        const newSongDiv = createSongDiv(newSong);
-        if (viewingPlaylist.identifier === allSongs.identifier) songsEl.appendChild(newSongDiv);
+        // swaps the playlist, resseting the page if the viewingPlaylist isn't allsongs
+        if (viewingPlaylist.identifier !== allSongs.identifier) swapPlaylist(allSongs.identifier);
+        else {
+            // otherwisem just adds a new div
+            const newSongDiv = createSongDiv(newSong);
+            songsEl.appendChild(newSongDiv);
+        }
     });
 }
 
@@ -318,24 +321,17 @@ function createPlaylistDiv(playlist) {
     div.innerHTML = `
                             <img src="${playlist.picture}" class="w-15 p-1 rounded-md">
 
-                            <p class="text-3xl text-blue-700 hover:text-blue-700/60 hover:cursor-default"
+                            <p class="text-3xl text-blue-700 hover:underline active:opacity-75 hover:cursor-default"
                                 onclick="swapPlaylist(${playlist.identifier})">${playlist.name}</p>
                                 
 
                             <img id="${playlist.elementId}-play-btn"  src="${playlist._playImg}"
-                                class="w-7.5 hover:w-8.5 hover:-ml-0.5"
-                                
-                                onclick="playPlaylist(${playlist.identifier})"
-                                
-                                onmousedown="fadeBtn('${playlist.elementId}-play-btn')"
-                                
-                                ondragleave="unfadeBtn('${playlist.elementId}-play-btn')"
-                                
-                                ondrop="unfadeBtn('${playlist.elementId}-play-btn')">
+                                class="w-7.5 hover:w-8.5 hover:-ml-0.5 active:opacity-75 active:w-7.5 active:ml-0 transition-all duration-200"
+                                onclick="playPlaylist(${playlist.identifier})">
                                 
 
                             <img src="Images/kebabBtn.png"
-                                class="w-5 h-8 ml-auto mr-1 hover:bg-[#0000FF1A] rounded-3xl "
+                                class="w-5 h-8 ml-auto mr-1 rounded-3xl hover:bg-[#0000FF1A] active:opacity-75"
                                 onclick="openPlaylistMenu(${playlist.identifier}, this)">`;
     return div;
 }
@@ -353,7 +349,7 @@ function createSongDiv(song) {
 
                             <p class="flex flex-col justify-center text-left">
 
-                                <span class="text-2xl text-blue-700 hover:text-blue-700/60 hover:cursor-default"
+                                <span class="text-2xl text-blue-700 hover:underline active:opacity-75 hover:cursor-default"
                                     onclick="playSong(${song.identifier})">
                                         ${song.name}</span>
 
@@ -364,19 +360,12 @@ function createSongDiv(song) {
 
 
                             <img id="${song.elementId}-play-btn" src="${song._playImg}"
-                                class="w-7.5 hover:w-8.5 hover:-ml-0.5"
-                                
-                                onclick="playSong(${song.identifier})"
-                                
-                                onmousedown="fadeBtn('${song.elementId}-play-btn')"
-                                
-                                ondragleave="unfadeBtn('${song.elementId}-play-btn')"
-                                
-                                ondrop="unfadeBtn('${song.elementId}-play-btn')">
+                                class="w-7.5 hover:w-8.5 hover:-ml-0.5 active:opacity-75 active:w-7.5 active:ml-0 transition-all duration-200"
+                                onclick="playSong(${song.identifier})">
 
 
                             <img src="Images/kebabBtn.png"
-                                class="w-5 h-8 ml-auto mr-1 hover:bg-[#0000FF1A] rounded-3xl"
+                                class="w-5 h-8 ml-auto mr-1 rounded-3xl hover:bg-[#0000FF1A] active:opacity-75"
                                 onclick="openSongMenu(${song.identifier}, this)">`;
 
     return div;
@@ -393,7 +382,7 @@ function updatePlaylistsSection() {
         const playlistDiv = createPlaylistDiv(object);
         playlistsEl.appendChild(playlistDiv);
 
-        // bolds the playlist if it's the current playlist
+        // bolds the playlist if it's the viewingPlaylist
         if (object.identifier === viewingPlaylist.identifier) {
             const p = playlistDiv.querySelector("p");
             p.classList.add("font-semibold", "underline");
@@ -551,22 +540,6 @@ function createNewId(isSong) {
     return id;
 }
 
-function fadeBtn(objectId) {
-    const img = document.getElementById(objectId);
-
-    ["play", "pause", "add"].forEach((type) => {
-        if (img.src.includes(type)) img.src = `Images/${type}Btn75Percent.png`;
-    });
-}
-
-function unfadeBtn(objectId) {
-    const img = document.getElementById(objectId);
-
-    ["play", "pause", "add"].forEach((type) => {
-        if (img.src.includes(type)) img.src = `Images/${type}Btn.png`;
-    });
-}
-
 
 /* Play And Pause Functions */
 
@@ -643,7 +616,7 @@ function playSong(songId, restart = false) {
     else songClicked.pause();
     
 
-    // updates the play button image of the current playlist while ensuring every other playlist gets the default play button
+    // updates the play button image of the viewingPlaylist while ensuring every other playlist gets the default play button
     allPlaylists.forEach((playlist) => {
         if (playlist.identifier === viewingPlaylist.identifier)
             playlist.playImg = songClicked._playImg;
@@ -672,7 +645,7 @@ function openPlaylistMenu(playlistId, element) {
     // removes option two if allSongs is the chosen playlist
     if (playlistId === allSongs.identifier) options.splice(1, 1);
 
-    toggleMenu(element, options);
+    toggleKebabMenu(element, options);
 }
 
 function openSongMenu(songId, element) {
@@ -698,10 +671,10 @@ function openSongMenu(songId, element) {
     // removes option two if allSongs is currently open
     if (viewingPlaylist.identifier === allSongs.identifier) options.splice(1, 1);
 
-    toggleMenu(element, options);
+    toggleKebabMenu(element, options);
 }
 
-function toggleMenu(element, options) {
+function toggleKebabMenu(element, options) {
     // flag to prevent the menu from clipping
     if (kebabMenuTransitioning) return;
     
@@ -718,6 +691,7 @@ function toggleMenu(element, options) {
     // clears the menu
     kebabMenu.replaceChildren();
 
+    let lengthenMenu = false;
     // adds options
     options.forEach((option) => {
         const para = document.createElement("p");
@@ -729,8 +703,20 @@ function toggleMenu(element, options) {
             hideKebabMenu();
         };
 
+        if (option.label === "Remove from this playlist") lengthenMenu = true;
+
         kebabMenu.appendChild(para);
     });
+
+    // lengthens the kebabMenu when necessary
+    if (lengthenMenu) {
+        kebabMenu.classList.remove("w-48");
+        kebabMenu.classList.add("w-60");
+    }
+    else {
+        kebabMenu.classList.remove("w-60");
+        kebabMenu.classList.add("w-48");
+    }
 
     // positions the menu next to the clicked element
     const rect = element.getBoundingClientRect();
@@ -792,10 +778,11 @@ function deleteSong(songId) {
     // checks if the currently playing song is the song to be deleted
     if (currentSong) {
         if (currentSong.identifier === songId) {
-            if (!audioEl.paused) playSong(songId);
-            currentSong = null;
-
+            if (!audioEl.paused) playSong(currentSong.identifier);
             playingPlaylist.playImg = "Images/playBtn.png";
+            currentSong = null;
+            playingPlaylist = null;
+            audioEl.currentTime = 0;
         }
     }
 
@@ -814,7 +801,16 @@ function deletePlaylist(playlistId) {
     const index = findIndexByIdentifier(allPlaylists, playlistId);
     const playlist = allPlaylists[index];
 
-    // if the playlist to be deleted is currenly open, changes the current playlist to the default allSongs playlist
+    // checks if the playlist to be deleted is playing a song
+    if (playingPlaylist) {
+        if (playingPlaylist.identifier === playlistId) {
+            if (!audioEl.paused) playSong(currentSong.identifier);
+            currentSong = null;
+            playingPlaylist = null;
+            audioEl.currentTime = 0;
+        }
+    }
+    // checks if the playlist to be deleted is currenly open
     if (viewingPlaylist.identifier === playlistId) swapPlaylist(allSongs.identifier);
 
     // deletes the playlist's div
@@ -861,7 +857,7 @@ function toggleAddPlaylistMenu(songId) {
             div.innerHTML = `
                                 <img src="${playlist.picture}" class="w-15 h-15 p-1 bg-blue-600/60 rounded-md">
 
-                                <p class="text-3xl text-blue-700 hover:text-blue-700/60 hover:cursor-default">${playlist.name}</p>`;
+                                <p class="text-3xl text-blue-700 hover:cursor-default">${playlist.name}</p>`;
 
             // the code-block that actually adds the song into the playlist
             div.onclick = () => {
