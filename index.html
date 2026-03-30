@@ -16,46 +16,104 @@
                 user-select: none;
             }
 
-            /* styling for audio slider */
+            /* base styling for audio slider */
+            input[type="range"] {
+            	font-size: 1.5rem;
+            	width: 60%;
+            	color: #154CEA;
+            
+            	--thumb-height: 0.5em; /* size of the circle */
+            	--track-height: 0.125em; /* thickness of the line */
+            	--track-color: rgba(0, 0, 0, 0.2); /* background track color */
+            
+            	--brightness-hover: 130%;
+            	--brightness-down: 110%;
+            
+            	position: relative;
+            	background: #fff0;
+            	overflow: visible;
+
+            	filter: grayscale(0);
+            }
+
+            /* modifications for hover, active, and disabled */
+            input[type="range"]:hover {
+            	--thumb-height: 0.75em;
+            	--track-height: 0.18em;
+                cursor: pointer;
+            }
+
+            input[type="range"]:active {
+            	cursor: pointer;
+            }
+
+            input[type="range"]:disabled {
+            	filter: grayscale(1);
+            	opacity: 0.3;
+            	cursor: not-allowed;
+            }
+
+            /* base styling for every component */
             input[type="range"],
             input[type="range"]::-webkit-slider-runnable-track,
             input[type="range"]::-webkit-slider-thumb {
             	-webkit-appearance: none;
             	transition: all ease 100ms;
-            	/* height: var(--thumb-height); */
+            	height: var(--thumb-height);
             }
-            
-            input[type="range"] {
-                -webkit-appearance: none;
-                appearance: none;
-            
-                width: 50%;
-                background: transparent;
-                cursor: pointer;
-            }
-            
-            
-            input[type="range"]::-webkit-slider-runnable-track {
-                height: 8px;
-                background: #FFFFFF40;
-                border-radius: 4px;
-            }
-            
+
+            /* styling for the thumb and the progress bar */
             input[type="range"]::-webkit-slider-thumb {
-                appearance: none;
-                margin-top: -4px;
-                height: 16px;
-                width: 16px;
-                background: #154CEA;
-                border-radius: 50%;
-                cursor: pointer;
+
+            	background: linear-gradient(currentColor 0 0) 
+                    scroll no-repeat left center /
+            		50% calc(var(--track-height) + 1px);
+            
+                width: var(--thumb-height);
+            	background-color: currentColor;
+            	border-radius: var(--thumb-height);
+            	filter: brightness(100%);
+
+                /* variables for drawing the progress bar */
+            	--thumb-radius: calc((var(--thumb-height) * 0.5) - 1px);
+            	--clip-edges: 0.125em;
+            	--clip-top: calc((var(--thumb-height) - var(--track-height)) * 0.5 - 0.5px);
+            	--clip-bottom: calc(var(--thumb-height) - var(--clip-top));
+            	--clip-further: calc(100% + 1px);
+
+            	/* where the progress bar is filled */
+                --box-fill: calc(-100vmax - var(--thumb-height)) 0 0
+            		100vmax currentColor;
+            	box-shadow: var(--box-fill);
+            
+                /* where the progress bar is drawn */
+            	clip-path: polygon(
+            		100% -1px,
+            		var(--clip-edges) -1px,
+            		0 var(--clip-top),
+            		-100vmax var(--clip-top),
+            		-100vmax var(--clip-bottom),
+            		0 var(--clip-bottom),
+            		var(--clip-edges) 100%,
+            		var(--clip-further) var(--clip-further)
+            	);
+            }
+
+            /* modifications for hover, active, and disabled*/
+            input[type="range"]:hover::-webkit-slider-thumb {
+            	filter: brightness(var(--brightness-hover));
             }
             
-            input[type="range"]::-moz-range-progress {
-	            background: #fff0;
+            input[type="range"]:active::-webkit-slider-thumb {
+            	filter: brightness(var(--brightness-down));
             }
-                
-            
+
+            /* styling for the track */
+            input[type="range"]::-webkit-slider-runnable-track {
+            	background: linear-gradient(var(--track-color) 0 0) /* solid line */
+                    scroll no-repeat center /
+            		100% calc(var(--track-height) + 1px); /* full width, thin height */
+            }
             
         </style>
         <!-- color needed for later #154CEA -->
@@ -151,13 +209,8 @@
                     <img
                         id="add-btn"
                         src="Images/addBtn.png"
-                        class="w-10 hover:w-11 hover:-ml-0.5"
-                        onclick="addNewPlaylist()"
-                        
-                        onmousedown="fadeBtn('add-btn')"
-                        onmouseup="unfadeBtn('add-btn')"
-                        ondragleave="unfadeBtn('add-btn')"
-                        ondrop="unfadeBtn('add-btn')"
+                        class="w-10 hover:w-11 hover:-ml-0.5 active:opacity-75 active:w-10 active:ml-0 transition-all duration-150"
+                        onclick="addNewPlaylist()""
                     />
                     
                 </header>
@@ -195,26 +248,21 @@
                     
                     <img id="playing-song-img" src="Images/music_note.png" class="w-60">
                     
-                    <p id="playing-song-name" class="font-medium text-3xl text-blue-700">No Song Selected</p>
+                    <p id="playing-song-name" class="font-medium text-3xl text-blue-700 active:opacity-75"
+                            onclick="playSong('playing-song-play-btn')">No Song Selected</p>
                 
                     <p id="playing-song-artist" class="font-medium text-xl text-blue-600">...</p>
 
-                    <div class="flex w-full h-10 mt-2 pb-2 justify-center items-center">
+                    <div class="w-full h-10 py-2 flex justify-center items-center">
                         <!-- ADD THE SHUFFLE BUTTON, NEXT/PREVIOUS SONG BUTTONS, AND LOOP BUTTON HERE -->
                         <!-- LOOK AT SPOTIFY FOR REFERENCE -->
                         
                         <img id="playing-song-play-btn" src="Images/playBtn.png"
-                            class="w-7.5 hover:w-8.5 hover:-mt-0.25"
-                            
-                            onclick="playSong(this.id)"
-                            onmousedown="fadeBtn(this.id)"
-                            ondragleave="unfadeBtn(this.id)"
-                            ondrop="unfadeBtn(this.id)">
+                            class="w-7.5 hover:w-8.5 hover:-mt-0.25 active:opacity-75 active:w-7.5 active:mt-0 transition-all duration-200"
+                            onclick="playSong(this.id)">
     
                     </div>
-                    
-                    <input type="range" id="time-slider" min="0" max="100" value="0" step="0">
-                    
+                    <input type="range" id="time-slider" min="0" max="1000" value="0" step="0">
                     
                 </div>
                 
