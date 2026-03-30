@@ -12,7 +12,7 @@
         <style type="text/tailwindcss">
             
             /* prevents bugs with the audio slider */
-            #now-playing-container {
+            #now-playing-el {
                 user-select: none;
             }
 
@@ -30,10 +30,10 @@
             	--brightness-down: 110%;
             
             	position: relative;
-            	background: #fff0;
+            	background: transparent;
             	overflow: visible;
 
-            	filter: grayscale(0);
+            	filter: brightness(100%);
             }
 
             /* modifications for hover, active, and disabled */
@@ -41,10 +41,12 @@
             	--thumb-height: 0.75em;
             	--track-height: 0.18em;
                 cursor: pointer;
+            	filter: brightness(var(--brightness-hover));
             }
 
             input[type="range"]:active {
             	cursor: pointer;
+            	filter: brightness(var(--brightness-down));
             }
 
             input[type="range"]:disabled {
@@ -62,57 +64,12 @@
             	height: var(--thumb-height);
             }
 
-            /* styling for the thumb and the progress bar */
+            /* styling for the thumb */
             input[type="range"]::-webkit-slider-thumb {
-
-            	background: linear-gradient(currentColor 0 0) 
-                    scroll no-repeat left center /
-            		50% calc(var(--track-height) + 1px);
-            
+                /* styles the thumb */
                 width: var(--thumb-height);
             	background-color: currentColor;
             	border-radius: var(--thumb-height);
-            	filter: brightness(100%);
-
-                /* variables for drawing the progress bar */
-            	--thumb-radius: calc((var(--thumb-height) * 0.5) - 1px);
-            	--clip-edges: 0.125em;
-            	--clip-top: calc((var(--thumb-height) - var(--track-height)) * 0.5 - 0.5px);
-            	--clip-bottom: calc(var(--thumb-height) - var(--clip-top));
-            	--clip-further: calc(100% + 1px);
-
-            	/* where the progress bar is filled */
-                --box-fill: calc(-100vmax - var(--thumb-height)) 0 0
-            		100vmax currentColor;
-            	box-shadow: var(--box-fill);
-            
-                /* where the progress bar is drawn */
-            	clip-path: polygon(
-            		100% -1px,
-            		var(--clip-edges) -1px,
-            		0 var(--clip-top),
-            		-100vmax var(--clip-top),
-            		-100vmax var(--clip-bottom),
-            		0 var(--clip-bottom),
-            		var(--clip-edges) 100%,
-            		var(--clip-further) var(--clip-further)
-            	);
-            }
-
-            /* modifications for hover, active, and disabled*/
-            input[type="range"]:hover::-webkit-slider-thumb {
-            	filter: brightness(var(--brightness-hover));
-            }
-            
-            input[type="range"]:active::-webkit-slider-thumb {
-            	filter: brightness(var(--brightness-down));
-            }
-
-            /* styling for the track */
-            input[type="range"]::-webkit-slider-runnable-track {
-            	background: linear-gradient(var(--track-color) 0 0) /* solid line */
-                    scroll no-repeat center /
-            		100% calc(var(--track-height) + 1px); /* full width, thin height */
             }
             
         </style>
@@ -226,7 +183,9 @@
                 <header class="h-20 sticky top-0 z-10 bg-linear-to-b from-blue-600 to-inherit">
                     
                     <h2 class="mb-5 pl-5 pt-2.5 text-5xl text-blue-700 font-bold">Songs</h2>
-                    
+
+                    <!-- ADD A SEARCH BAR HERE -->
+                    <!-- <input id="search-bar" type="text" /> -->
                 </header>
                 
             </section>
@@ -246,7 +205,7 @@
                 
                 <div id="now-playing-el" class="flex-1 flex flex-col items-center">
                     
-                    <img id="playing-song-img" src="Images/music_note.png" class="w-60">
+                    <img id="playing-song-img" src="Images/music_note.png" class="w-60"/>
                     
                     <p id="playing-song-name" class="font-medium text-3xl text-blue-700 active:opacity-75"
                             onclick="playSong('playing-song-play-btn')">No Song Selected</p>
@@ -256,14 +215,22 @@
                     <div class="w-full h-10 py-2 flex justify-center items-center">
                         <!-- ADD THE SHUFFLE BUTTON, NEXT/PREVIOUS SONG BUTTONS, AND LOOP BUTTON HERE -->
                         <!-- LOOK AT SPOTIFY FOR REFERENCE -->
+                        <!-- <img id="suffle-btn or somethin idfk" /> -->
                         
                         <img id="playing-song-play-btn" src="Images/playBtn.png"
                             class="w-7.5 hover:w-8.5 hover:-mt-0.25 active:opacity-75 active:w-7.5 active:mt-0 transition-all duration-200"
-                            onclick="playSong(this.id)">
+                            onclick="playSong(this.id)"/>
     
                     </div>
-                    <input type="range" id="time-slider" min="0" max="1000" value="0" step="0">
-                    
+                    <div id="time-slider-container" class="w-[80%] h-10 flex justify-around items-center relative">
+                        
+                        <p id="current-time-text" class="text-gray-500 absolute left-[5%] top-[50%] -translate-1/2">0</p>
+                        
+                        <input type="range" width="50%" id="time-slider" min="0" max="1000" value="0" step="0" disabled/>
+                        
+                        <p id="duration-text" class="text-gray-500 absolute left-[95%] top-[50%] -translate-1/2">0</p>
+                        
+                    </div>
                 </div>
                 
                 <audio id="audio-el" src="" class="mt-5"></audio>
