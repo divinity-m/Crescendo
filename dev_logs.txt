@@ -77,3 +77,7 @@ I finished up all of the logic for `setObjectValues`, the inputs were pretty eas
 Just hit one thousand lines of code! I guess that could be both good and bad. I added a backdrop blur to the img-element in the modify menu which appears when the cursor hovers over it
 I've also started to work on a custom slider for the audio element that syncs with the songs current time. I got the logic working, but getting the styling to look right has been a real pain, it includes working with `-webkit` in CSS which is almost foreign to me.
 Right now the slider's design is still very unfinished but I've made a little progress after finding a this website which provides a basic template on how to design input's that are range types "https://codepen.io/ShadowShahriar/pen/zYPPYrQ".
+
+
+# Day 8 - Monday | At home work #
+It took a few hours, but after using the website above as a template, filtering out the css-logic I couldn't make sense of, then mixing in javascript into the styling, I made a functional and decent looking slider for the audio element.
