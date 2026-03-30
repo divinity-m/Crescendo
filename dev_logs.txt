@@ -72,3 +72,5 @@ That logic would clash heavily with renaming songs, so I took it upon myself to 
 I also had to update `validateFiles` to check for duplicates by comparing file name, file size, and file type. I'm aware that this also has it's limits, but it's an improvement in its own right.
 
 I finished up all of the logic for `setObjectValues`, the inputs were pretty easy to get working, and the image-replacement functionality didn't take too long either, mainly because of my experience working with audio files at the start of this project. I think I got done this in under 30 minutes.
+
+Just hit one thousand lines of code! I added a backdrop blur to the img-element in the modify menu which appears when the cursor hovers over it. I've also started to work on a custom slider for the audio element which syncs with the songs current time.
