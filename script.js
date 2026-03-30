@@ -1,7 +1,7 @@
 // CRESCENDO SCRIPT.JS //
 // NAME: DIVINE MUSTAFA
-// Assignment: CSE Project B/D
-// What i made: An audio player. You throw in your own audio files. It plays them right back at you. Similar functionality to spotify.
+// ASSIGNMENT: CSE Project B/D
+// WHAT I MADE: An audio player. You throw in your own audio files. It plays them right back at you. Similar functionality to spotify.
 
 // DOCUMENT ELEMENTS //
 
