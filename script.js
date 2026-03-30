@@ -1,7 +1,7 @@
 // CRESCENDO SCRIPT.JS //
 // NAME: DIVINE MUSTAFA
-// ASSIGNMENT: CSE Project B/D
-// WHAT I MADE: An audio player. You throw in your own audio files. It plays them right back at you. Similar functionality to spotify.
+// Assignment: CSE Project B/D
+// What i made: An audio player. You throw in your own audio files. It plays them right back at you. Similar functionality to spotify.
 
 // DOCUMENT ELEMENTS //
 
@@ -49,7 +49,7 @@ class Song {
     play(restart) {
         this.playImg = "Images/pauseBtn.png";
 
-        let songEnded = audioEl.currentTime === audioEl.duration;
+        const songEnded = audioEl.currentTime === audioEl.duration;
         
         // resets the song if it has already ended or the restart is true
         if (songEnded || restart) audioEl.currentTime = 0;
