@@ -121,6 +121,7 @@ let [viewingPlaylist, playingPlaylist, currentSong] = [allSongs, null, null];
 let loopState = "all"; // 3 states: none, one, and all 
 let shuffleOn = false;
 let draggingSlider = false;
+let sliderHeight = 4;
 
 let [kebabMenuOpen, modifyMenuOpen, addPlaylistMenuOpen] = [ false, false, false, ];
 let [kebabMenuTransitioning, innerMenuTransitioning, blurTransitioning] = [ false, false, false, ];
@@ -133,6 +134,7 @@ let currentKebabMenuAnchor = null;
 // Updates the 3-box flexbox sections once the document and script have loaded in
 window.addEventListener("load", () => {
     updateWebsite();
+    updateSliderProgress();
 });
 
 // Hides pop up menus when the page is clicked
@@ -188,7 +190,8 @@ audioEl.addEventListener("timeupdate", () => {
         // calculates percentage of audio played then adjusts the timeSlider
         const value = (audioEl.currentTime / audioEl.duration) * 1000;
         timeSlider.value = value;
-    
+        updateSliderProgress();
+        
         // ends the playback, loops the current song, or moves onto the next song
         if (value === 1000) {
             console.log("slider value is 1000");
@@ -201,15 +204,30 @@ timeSlider.addEventListener('click', () => {
         // calculates the time from the sliders value then adjusts the current time
         const time = (timeSlider.value / 1000) * audioEl.duration;
         audioEl.currentTime = time;
-
         
-    } else timeSlider.value = 0;
+    } else {
+        timeSlider.value = 0;
+        updateSliderProgress();
+    }
 });
 
 // prevents bugs caused by the audio element updating while the user drags the slider
 timeSlider.addEventListener('mousedown', () => draggingSlider = true);
 timeSlider.addEventListener('mouseup', () => draggingSlider = false);
 
+// updates the sliders progress bar on user input
+timeSlider.addEventListener("input", updateSliderProgress);
+
+// updates the sliders height
+timeSlider.addEventListener("mouseenter", () => {
+    sliderHeight = 6;
+    updateSliderProgress();
+});
+timeSlider.addEventListener("mouseleave", () => {
+    sliderHeight = 4;
+    updateSliderProgress();
+});
+    
     
 // FUNCTIONS //
 
@@ -447,7 +465,7 @@ function updateCurrentlyPlayingSongSection() {
 }
 
 function updateWebsite() {
-    // these three functions, including updateWebsite() are only used as last resorts due to the fact that they reset entire portions of the page
+    // these three functions, including updateWebsite() are only to be used as last resorts due to the fact that they reset entire portions of the page
     updatePlaylistsSection();
     updateSongsSection();
     updateCurrentlyPlayingSongSection();
@@ -507,6 +525,48 @@ function swapPlaylist(playlistId) {
     }
 }
 
+function updateSliderProgress() {
+    const percent = (timeSlider.value / 1000) * 100;
+    
+    const padding = 7.5;
+    
+    // creates the sliders progress bar with a gradient
+    timeSlider.style.background = `
+        linear-gradient(to right, #154CEA ${percent}%, rgba(0, 0, 0, 0.2) ${percent}%)
+        center / calc(100% - ${padding * 2}px) ${sliderHeight}px no-repeat
+    `;
+
+    
+    // updates the time paragraphs
+    const currentTimePara = document.getElementById("current-time-text");
+    const durationPara = document.getElementById("duration-text");
+
+    if (!isNaN(audioEl.duration)) {
+        const currentTime = (percent / 100) * audioEl.duration;
+
+        const formattedCurrentTime = formatSongTime(currentTime);
+        const formattedDuration = formatSongTime(audioEl.duration);
+        
+        currentTimePara.innerHTML = formattedCurrentTime;
+        durationPara.innerHTML = formattedDuration;
+        
+        currentTimePara.classList.remove("text-gray-500");
+        durationPara.classList.remove("text-gray-500");
+        
+        currentTimePara.classList.add("text-blue-700");
+        durationPara.classList.add("text-blue-700");
+    } else {
+        currentTimePara.innerHTML = `0:00`;
+        durationPara.innerHTML = `0:00`;
+
+        currentTimePara.classList.remove("text-blue-700");
+        durationPara.classList.remove("text-blue-700");
+        
+        currentTimePara.classList.add("text-gray-500");
+        durationPara.classList.add("text-gray-500");
+    }
+}
+
 
 /* Utility functions for songs and playlists */
 
@@ -538,6 +598,24 @@ function createNewId(isSong) {
         if (id === object.identifier) id++;
     })
     return id;
+}
+
+function formatSongTime(totalSeconds) {
+    const hours = Math.floor(totalSeconds / 3600);
+    const minutes = Math.floor((totalSeconds % 3600) / 60);
+    const seconds = Math.floor(totalSeconds % 60);
+
+    // formats seconds with leading zeros
+    const formattedSeconds = String(seconds).padStart(2, '0');
+    const formattedMinutes = String(minutes);
+
+    // returns M:SS or MM:SS if no hours, otherwise H:MM:SS or HH:MM:SS
+    if (hours === 0) return `${formattedMinutes}:${formattedSeconds}`;
+    else {
+        // formats hours without a leading zero if it's a single digit
+        const formattedHours = String(hours); 
+        return `${formattedHours}:${formattedMinutes}:${formattedSeconds}`;
+    }
 }
 
 
