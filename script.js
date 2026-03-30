@@ -1,5 +1,5 @@
 // CRESCENDO SCRIPT.JS //
-
+// NAME: DIVINE MUSTAFA
 
 
 // DOCUMENT ELEMENTS //
@@ -82,13 +82,11 @@ class Playlist {
         
         this.picture = "Images/music_note.png";
         this._playImg = "Images/playBtn.png";
-        
-        this.loopState = "all"; // 3 states: none, one, and all 
-        this.shuffleOn = false;
     }
 
     nextSong() {
         // moves onto the next song in the playlist or loops the current song
+        console.log("song ended, move to the next one")
     }
 
     loop() {
@@ -114,6 +112,9 @@ class Playlist {
 const allSongs = new Playlist("Songs", 0); // necessary to keep track of every song
 const allPlaylists = [allSongs];
 let [viewingPlaylist, playingPlaylist, currentSong] = [allSongs, null, null];
+
+let loopState = "all"; // 3 states: none, one, and all 
+let shuffleOn = false;
 
 let [kebabMenuOpen, modifyMenuOpen, addPlaylistMenuOpen] = [ false, false, false, ];
 let [kebabMenuTransitioning, innerMenuTransitioning, blurTransitioning] = [ false, false, false, ];
@@ -142,11 +143,6 @@ dropZone.addEventListener("drop", getAudioFiles.bind(null, true));
 dropZone.addEventListener("click", () => {
     audioFileInput.click();
 });
-audioFileInput.addEventListener("change", getAudioFiles.bind(null, false));
-
-
-// Reacts to picture-replacement clicks
-imageFileInput.addEventListener("change", getImageFile);
 
 
 // Hides pop up menus when the page is clicked
@@ -176,7 +172,9 @@ document.addEventListener("click", (e) => {
 
 
 // reacts to the audio element finishing its song
-audioEl.addEventListener("ended", current)
+audioEl.addEventListener("ended", () => {
+    playingPlaylist.nextSong();
+})
 
 
 
@@ -346,7 +344,7 @@ function createSongDiv(song) {
                                 
                                 ondragleave="unfadeBtn('${song.elementId}-play-btn')"
                                 
-                                ondragleave="unfadeBtn('${song.elementId}-play-btn')">
+                                ondrop="unfadeBtn('${song.elementId}-play-btn')">
 
 
                             <img src="Images/kebabBtn.png"
@@ -403,22 +401,36 @@ function updateSongsSection() {
 
 function updateCurrentlyPlayingSongSection() {
     // sets up the image and text of the currently playing song
-    let potentialSong = {
+    const fakeSong = {
+        identifier: null,
+        elementId: "playing-song-play-btn",
         picture: "Images/music_note.png",
         name: "No Song Selected",
         artist: "...",
+        _playImg: "Images/playBtn.png",
     };
+
+    let potentialSong = fakeSong;
 
     // checks if a song has been chosen
     if (currentSong != null) potentialSong = currentSong;
 
-    // updates the inner html
-    nowPlayingEl.innerHTML = `
-                        <img src="${potentialSong.picture}" class="w-60">
+    
+    // gets the HTML elements in the now playing flexbox
+    const playingSongImg = document.getElementById("playing-song-img");
+    const playingSongName = document.getElementById("playing-song-name");
+    const playingSongArtist = document.getElementById("playing-song-artist");
+    const playingSongPlayBtn = document.getElementById("playing-song-play-btn");
 
-                        <p class="font-medium text-3xl text-blue-700">${potentialSong.name}</p>
 
-                        <p class="font-medium text-xl text-blue-600">${potentialSong.artist}</p>`;
+    // updates the elements
+    playingSongImg.src = potentialSong.picture;
+    
+    playingSongName.innerHTML = potentialSong.name;
+    
+    playingSongArtist.innerHTML = potentialSong.artist; 
+    
+    playingSongPlayBtn.src = potentialSong._playImg;
 }
 
 function updateWebsite() {
@@ -508,6 +520,22 @@ function createNewId(isSong) {
     return id;
 }
 
+function fadeBtn(objectId) {
+    let img = document.getElementById(objectId);
+
+    ["play", "pause", "add"].forEach((type) => {
+        if (img.src.includes(type)) img.src = `Images/${type}Btn75Percent.png`;
+    });
+}
+
+function unfadeBtn(objectId) {
+    let img = document.getElementById(objectId);
+
+    ["play", "pause", "add"].forEach((type) => {
+        if (img.src.includes(type)) img.src = `Images/${type}Btn.png`;
+    });
+}
+
 
 /* Play And Pause Functions */
 
@@ -519,12 +547,13 @@ function playPlaylist(playlistId) {
         // prevents errors caused by currentSong being null by default
         if (currentSong === null) currentSong = playlistClicked.songs[0];
 
-        // swaps the playlists
+        // swaps the playlists if the playlist clicked isn't already open
         if (viewingPlaylist.identifier !== playlistId) swapPlaylist(playlistId);
 
         // plays the first song in the songs array
         playSong(playlistClicked.songs[0].identifier, true);
-    } else {
+    }
+    else {
         // resets the playlist's image if it's empty
         const img = document.getElementById(
             `${playlistClicked.elementId}-play-btn`,
@@ -534,13 +563,25 @@ function playPlaylist(playlistId) {
 }
 
 function playSong(songId, restart = false) {
-    playingPlaylist = currentPlaylist;
+    // Checks if the function was called by the button in the "Now Playing" flexbox
+    if (songId === "playing-song-play-btn") {
+        if (currentSong) songId = currentSong.identifier;
+        
+        else {
+            let placeHolderBtn = document.getElementById("playing-song-play-btn");
+            placeHolderBtn.src = "Images/playBtn.png";
+            return;
+        }
+    }
 
-    // prevents errors caused by currentSong being null by default
+
+    
     const songClicked = findObjectByIdentifier(viewingPlaylist.songs, songId);
     
+    // prevents errors caused by currentSong being null by default
     if (currentSong === null) currentSong = songClicked;
     
+    playingPlaylist = viewingPlaylist;
 
     // pauses and unbolds the previously playing song
     if (currentSong.identifier !== songId) {
@@ -562,10 +603,13 @@ function playSong(songId, restart = false) {
 
     newSongsSpan.classList.add("font-semibold", "underline");
     currentSong = songClicked;
+    
 
     // plays or pauses the song based on if the audioEl is paused
     if (audioEl.paused || restart) songClicked.play(restart);
+        
     else songClicked.pause();
+    
 
     // updates the play button image of the current playlist while ensuring every other playlist gets the default play button
     allPlaylists.forEach((playlist) => {
@@ -576,22 +620,6 @@ function playSong(songId, restart = false) {
 
     // updates the html
     updateCurrentlyPlayingSongSection();
-}
-
-function fadeBtn(objectId) {
-    let img = document.getElementById(objectId);
-
-    ["play", "pause", "add"].forEach((png) => {
-        if (img.src.includes(png)) img.src = `Images/${png}Btn75Percent.png`;
-    });
-}
-
-function unfadeBtn(objectId) {
-    let img = document.getElementById(objectId);
-
-    ["play", "pause", "add"].forEach((png) => {
-        if (img.src.includes(png)) img.src = `Images/${png}Btn.png`;
-    });
 }
 
 
