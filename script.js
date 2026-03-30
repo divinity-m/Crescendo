@@ -27,6 +27,7 @@ const addPlaylistMenu = document.getElementById("add-to-playlist-menu");
 
 
 // GLOBAL VARIABLES & CLASSES //
+const playBtnSrc = "Images/playBtn.svg"; // must be defined before the classes
 
 /* Classes */
 class Song {
@@ -41,13 +42,13 @@ class Song {
         this.artist = "unknown artist";
         
         this.picture = "Images/music_note.png";
-        this._playImg = "Images/playBtn.png";
+        this._playImg = playBtnSrc;
         
         this.promise = null;
     }
 
     play(restart) {
-        this.playImg = "Images/pauseBtn.png";
+        this.playImg = "Images/pauseBtn.svg";
 
         const songEnded = audioEl.currentTime === audioEl.duration;
         
@@ -63,7 +64,7 @@ class Song {
     }
 
     pause() {
-        this.playImg = "Images/playBtn.png";
+        this.playImg = playBtnSrc;
         audioEl.pause();
     }
 
@@ -86,7 +87,7 @@ class Playlist {
         this.shuffledSongs = [];
         
         this.picture = "Images/music_note.png";
-        this._playImg = "Images/playBtn.png";
+        this._playImg = playBtnSrc;
     }
 
     nextSong() {
@@ -337,7 +338,7 @@ function createPlaylistDiv(playlist) {
     div.className = "h-18 pl-5 flex items-center gap-3 hover:bg-blue-600/20";
     // creates the div's content
     div.innerHTML = `
-                            <img src="${playlist.picture}" class="w-15 p-1 rounded-md">
+                            <img src="${playlist.picture}" class="w-15 p-1 rounded-md"/>
 
                             <p class="text-3xl text-blue-700 hover:underline active:opacity-75 hover:cursor-default"
                                 onclick="swapPlaylist(${playlist.identifier})">${playlist.name}</p>
@@ -345,12 +346,12 @@ function createPlaylistDiv(playlist) {
 
                             <img id="${playlist.elementId}-play-btn"  src="${playlist._playImg}"
                                 class="w-7.5 hover:w-8.5 hover:-ml-0.5 active:opacity-75 active:w-7.5 active:ml-0 transition-all duration-200"
-                                onclick="playPlaylist(${playlist.identifier})">
+                                onclick="playPlaylist(${playlist.identifier})"/>
                                 
 
                             <img src="Images/kebabBtn.png"
                                 class="w-5 h-8 ml-auto mr-1 rounded-3xl hover:bg-[#0000FF1A] active:opacity-75"
-                                onclick="openPlaylistMenu(${playlist.identifier}, this)">`;
+                                onclick="openPlaylistMenu(${playlist.identifier}, this)"/>`;
     return div;
 }
 
@@ -363,7 +364,7 @@ function createSongDiv(song) {
 
     // creates the div's content
     div.innerHTML = `
-                            <img src="${song.picture}" class="w-15 p-1 rounded-md">
+                            <img src="${song.picture}" class="w-15 p-1 rounded-md"/>
 
                             <p class="flex flex-col justify-center text-left">
 
@@ -379,12 +380,12 @@ function createSongDiv(song) {
 
                             <img id="${song.elementId}-play-btn" src="${song._playImg}"
                                 class="w-7.5 hover:w-8.5 hover:-ml-0.5 active:opacity-75 active:w-7.5 active:ml-0 transition-all duration-200"
-                                onclick="playSong(${song.identifier})">
+                                onclick="playSong(${song.identifier})"/>
 
 
                             <img src="Images/kebabBtn.png"
                                 class="w-5 h-8 ml-auto mr-1 rounded-3xl hover:bg-[#0000FF1A] active:opacity-75"
-                                onclick="openSongMenu(${song.identifier}, this)">`;
+                                onclick="openSongMenu(${song.identifier}, this)"/>`;
 
     return div;
 }
@@ -442,7 +443,7 @@ function updateCurrentlyPlayingSongSection() {
         picture: "Images/music_note.png",
         name: "No Song Selected",
         artist: "...",
-        _playImg: "Images/playBtn.png",
+        _playImg: playBtnSrc,
     };
 
     // checks if a song has been chosen
@@ -570,14 +571,6 @@ function updateSliderProgress() {
 
 /* Utility functions for songs and playlists */
 
-function findIndexByIdentifier(array, identifier) {
-    // finds the object's index through a findIndex search
-    const index = array.findIndex((object) => object.identifier === identifier);
-    
-    // returns the index
-    return index;
-}
-
 function findObjectByIdentifier(array, identifier) {
     // finds the object's index through a findIndex search
     const index = array.findIndex((object) => object.identifier === identifier);
@@ -640,7 +633,7 @@ function playPlaylist(playlistId) {
         const img = document.getElementById(
             `${playlistClicked.elementId}-play-btn`,
         );
-        img.src = "Images/playBtn.png";
+        img.src = playBtnSrc;
     }
 }
 
@@ -652,7 +645,7 @@ function playSong(songId, restart = false) {
         else {
             // if it was called by that button, but no song is playing, end the function
             const placeHolderBtn = document.getElementById("playing-song-play-btn");
-            placeHolderBtn.src = "Images/playBtn.png";
+            placeHolderBtn.src = playBtnSrc;
             return;
         }
     }
@@ -698,11 +691,18 @@ function playSong(songId, restart = false) {
     allPlaylists.forEach((playlist) => {
         if (playlist.identifier === viewingPlaylist.identifier)
             playlist.playImg = songClicked._playImg;
-        else playlist.playImg = "Images/playBtn.png";
+        else playlist.playImg = playBtnSrc;
     });
 
     // updates the html
     updateCurrentlyPlayingSongSection();
+}
+
+function playNextSong() {
+    if (playingPlaylist) {
+        const currentSongIndex = playingPlaylist.songs.findIndex((song) => song.identifier === currentSong.identifier);
+        console.log(currentSongIndex);
+    }
 }
 
 
@@ -848,7 +848,8 @@ function removeFromPlaylist(songId) {
     songsEl.removeChild(div);
 
     // targets the index, then splices the song
-    const index = findIndexByIdentifier(viewingPlaylist.songs, songId);
+    const index = viewingPlaylist.songs.findIndex((song) => song.identifier === songId);
+    
     viewingPlaylist.songs.splice(index, 1);
 }
 
@@ -857,7 +858,7 @@ function deleteSong(songId) {
     if (currentSong) {
         if (currentSong.identifier === songId) {
             if (!audioEl.paused) playSong(currentSong.identifier);
-            playingPlaylist.playImg = "Images/playBtn.png";
+            playingPlaylist.playImg = playBtnSrc;
             currentSong = null;
             playingPlaylist = null;
             audioEl.currentTime = 0;
@@ -866,7 +867,7 @@ function deleteSong(songId) {
 
     // searches every array for the songs index, if the index exists, the song is spliced from the playlist
     allPlaylists.forEach((playlist) => {
-        const index = findIndexByIdentifier(playlist.songs, songId);
+        const index = playlist.songs.findIndex((song) => song.identifier === songId);
         if (index > -1) playlist.songs.splice(index, 1);
     });
 
@@ -876,7 +877,7 @@ function deleteSong(songId) {
 }
 
 function deletePlaylist(playlistId) {
-    const index = findIndexByIdentifier(allPlaylists, playlistId);
+    const index = allPlaylist.findIndex((list) => list.identifier === playlistId);
     const playlist = allPlaylists[index];
 
     // checks if the playlist to be deleted is playing a song
@@ -933,7 +934,7 @@ function toggleAddPlaylistMenu(songId) {
             div.className =
                 "flex items-center w-98/100 h-20 px-5 gap-3 hover:bg-blue-600/20 rounded-md";
             div.innerHTML = `
-                                <img src="${playlist.picture}" class="w-15 h-15 p-1 bg-blue-600/60 rounded-md">
+                                <img src="${playlist.picture}" class="w-15 h-15 p-1 bg-blue-600/60 rounded-md"/>
 
                                 <p class="text-3xl text-blue-700 hover:cursor-default">${playlist.name}</p>`;
 
@@ -1010,7 +1011,7 @@ function toggleModifyMenu(objectId, isSong) {
                     
                     <img id="edit-btn-img" src="Images/editBtn.png"
                     class="w-5 absolute top-2 right-2 z-92
-                    transition-all duration-500 opacity-0">
+                    transition-all duration-500 opacity-0"/>
                     
                 </div>
 
