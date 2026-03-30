@@ -1,6 +1,7 @@
 // CRESCENDO SCRIPT.JS //
 // NAME: DIVINE MUSTAFA
-
+// Assignment: CSE Project B/D
+// What i made: An audio player. You throw in your own audio files. It plays them right back at you. Similar functionality to spotify.
 
 // DOCUMENT ELEMENTS //
 
@@ -13,7 +14,10 @@ const imageFileInput = document.getElementById("image-file-input");
 const playlistsEl = document.getElementById("playlists-el");
 const songsEl = document.getElementById("songs-el");
 const nowPlayingEl = document.getElementById("now-playing-el");
+
+/* Audio Related */
 const audioEl = document.getElementById("audio-el");
+const timeSlider = document.getElementById("time-slider");
 
 /* Inner Menus */
 const kebabMenu = document.getElementById("kebab-menu");
@@ -24,7 +28,7 @@ const addPlaylistMenu = document.getElementById("add-to-playlist-menu");
 
 // GLOBAL VARIABLES & CLASSES //
 
-/* Songs & Playlist Classes */
+/* Classes */
 class Song {
     constructor(file, identifier) {
         this.file = file;
@@ -66,7 +70,8 @@ class Song {
     // changes the elements play button image whenever playImg changes
     set playImg(value) {
         this._playImg = value;
-        let playBtnEl = document.getElementById(`${this.elementId}-play-btn`);
+        
+        const playBtnEl = document.getElementById(`${this.elementId}-play-btn`);
         if (playBtnEl) playBtnEl.src = value;
     }
 }
@@ -86,7 +91,6 @@ class Playlist {
 
     nextSong() {
         // moves onto the next song in the playlist or loops the current song
-        console.log("song ended, move to the next one")
     }
 
     loop() {
@@ -103,18 +107,20 @@ class Playlist {
     // changes the elements play button image whenever playImg changes
     set playImg(value) {
         this._playImg = value;
+        
         const playBtnEl = document.getElementById(`${this.elementId}-play-btn`);
         if (playBtnEl) playBtnEl.src = value;
     }
 }
 
-/* global variables */
+/* Global Variables */
 const allSongs = new Playlist("Songs", 0); // necessary to keep track of every song
 const allPlaylists = [allSongs];
 let [viewingPlaylist, playingPlaylist, currentSong] = [allSongs, null, null];
 
 let loopState = "all"; // 3 states: none, one, and all 
 let shuffleOn = false;
+let draggingSlider = false;
 
 let [kebabMenuOpen, modifyMenuOpen, addPlaylistMenuOpen] = [ false, false, false, ];
 let [kebabMenuTransitioning, innerMenuTransitioning, blurTransitioning] = [ false, false, false, ];
@@ -128,22 +134,6 @@ let currentKebabMenuAnchor = null;
 window.addEventListener("load", () => {
     updateWebsite();
 });
-
-// Prevents default browser behavior for drag events considering the dropZone and the whole window
-["dragenter", "dragover", "dragleave", "drop"].forEach((eventName) => {
-    dropZone.addEventListener(eventName, preventDefaults);
-    window.addEventListener(eventName, preventDefaults);
-});
-
-
-// Handles dropped files
-dropZone.addEventListener("drop", getAudioFiles.bind(null, true));
-
-// Handles dropZone clicks
-dropZone.addEventListener("click", () => {
-    audioFileInput.click();
-});
-
 
 // Hides pop up menus when the page is clicked
 document.addEventListener("click", (e) => {
@@ -171,13 +161,57 @@ document.addEventListener("click", (e) => {
 });
 
 
-// reacts to the audio element finishing its song
-audioEl.addEventListener("ended", () => {
-    playingPlaylist.nextSong();
+/* Drop Zone Related Event Listeners */
+
+// Prevents default browser behavior for drag events considering the dropZone and the whole window
+["dragenter", "dragover", "dragleave", "drop"].forEach((eventName) => {
+    dropZone.addEventListener(eventName, preventDefaults);
+    window.addEventListener(eventName, preventDefaults);
+    timeSlider.addEventListener(eventName, preventDefaults);
+});
+
+// Handles dropped files
+dropZone.addEventListener("drop", getAudioFiles.bind(null, true));
+
+// Handles dropZone clicks
+dropZone.addEventListener("click", () => audioFileInput.click());
+
+
+/* Audio Related Event Listeners*/
+
+audioEl.addEventListener("timeupdate", () => {
+    if (!isNaN(audioEl.duration) && !draggingSlider) {
+        // calculates percentage of audio played then adjusts the timeSlider
+        const percentage = (audioEl.currentTime / audioEl.duration) * 100;
+        timeSlider.value = percentage;
+    
+        // ends, loops the current song, or moves onto the next song
+        if (percentage === 100) {
+            console.log("done")
+        }
+    }
+});
+
+timeSlider.addEventListener('click', () => {
+    if (!isNaN(audioEl.duration)) {
+        // calculates the time from the sliders value then adjusts the current time
+        const time = (timeSlider.value / 100) * audioEl.duration;
+        audioEl.currentTime = time;
+
+        
+    } else timeSlider.value = 0;
+});
+
+// prevents bugs caused by the audio element updating while the user drags the slider
+timeSlider.addEventListener('mousedown', () => draggingSlider = true);
+timeSlider.addEventListener('mouseup', () => draggingSlider = false);
+
+// prevents slider adjustments if there isn't a song
+timeSlider.addEventListener('input', () => {
+    if (isNaN(audioEl.duration)) timeSlider.value = 0;
 })
 
-
-
+    
 // FUNCTIONS //
 
 
@@ -189,14 +223,8 @@ function preventDefaults(e) {
 }
 
 function getAudioFiles(dropped, e) {
-    let files;
-    
-    // gets the FileList object through dataTransfer if a file is dropped
-    if (dropped) files = e.dataTransfer.files;
-        
-    // gets the FileList object through target if the drop zone is clicked
-    else files = e.target.files;
-    
+    // gets the FileList object
+    const files = dropped ? e.dataTransfer.files : e.target.files;
 
     // checks file validity
     const validatedFiles = validateFiles(Array.from(files));
@@ -410,18 +438,14 @@ function updateCurrentlyPlayingSongSection() {
         _playImg: "Images/playBtn.png",
     };
 
-    let potentialSong = fakeSong;
-
     // checks if a song has been chosen
-    if (currentSong != null) potentialSong = currentSong;
-
+    const potentialSong = currentSong != null ? currentSong : fakeSong;
     
     // gets the HTML elements in the now playing flexbox
     const playingSongImg = document.getElementById("playing-song-img");
     const playingSongName = document.getElementById("playing-song-name");
     const playingSongArtist = document.getElementById("playing-song-artist");
     const playingSongPlayBtn = document.getElementById("playing-song-play-btn");
-
 
     // updates the elements
     playingSongImg.src = potentialSong.picture;
@@ -444,14 +468,23 @@ function addNewPlaylist() {
     let index = 1;
 
     // iterate through the allPlaylists to find one with the basic 'Playlist #' format
-    // if a playlist with the default format exists, the index becomes a number higher than it
     allPlaylists.forEach((playlist) => {
         if (playlist.name.startsWith("Playlist ")) {
-            let playlistNum = Number(playlist.name.split(" ")[1]);
+            
+            // verifies the validity of the format
+            let playlistSplit = playlist.name.split(" ");
+            if (playlistSplit.length === 2) {
 
-            if (!Number.isNaN(playlistNum) && Number.isInteger(playlistNum)) {
-                if (playlistNum >= index) index = playlistNum + 1;
+                // further verifies format
+                let playlistNum = Number(playlist.name.split(" ")[1]);
+                if (!Number.isNaN(playlistNum) && Number.isInteger(playlistNum)) {
+                    
+                    // makes the index one higher that that of the playlist with the highest number
+                    if (playlistNum >= index) index = playlistNum + 1;
+                }
             }
+            
+            
         }
     });
 
@@ -500,18 +533,16 @@ function findObjectByIdentifier(array, identifier) {
     // finds the object's index through a findIndex search
     const index = array.findIndex((object) => object.identifier === identifier);
 
-    // returns the object
+    // returns the object if it exists
     if (array[index]) return array[index];
     else return null;
 }
 
 function createNewId(isSong) {
-    let id = 0;
-    let array;
+    let id = 1;
 
-    // an if-else statement to verify the id is for a song or playlist (a song and a playlist can have the same id)
-    if (isSong) array = allSongs.songs;
-    else array = allPlaylists;
+    // verifies if the id is for a song or a playlist (a song and a playlist can have the same id)
+    const array = isSong ? allSongs.songs : allPlaylists;
 
     // a simple loop to create new id's
     array.forEach((object) => {
@@ -521,7 +552,7 @@ function createNewId(isSong) {
 }
 
 function fadeBtn(objectId) {
-    let img = document.getElementById(objectId);
+    const img = document.getElementById(objectId);
 
     ["play", "pause", "add"].forEach((type) => {
         if (img.src.includes(type)) img.src = `Images/${type}Btn75Percent.png`;
@@ -529,7 +560,7 @@ function fadeBtn(objectId) {
 }
 
 function unfadeBtn(objectId) {
-    let img = document.getElementById(objectId);
+    const img = document.getElementById(objectId);
 
     ["play", "pause", "add"].forEach((type) => {
         if (img.src.includes(type)) img.src = `Images/${type}Btn.png`;
@@ -563,12 +594,13 @@ function playPlaylist(playlistId) {
 }
 
 function playSong(songId, restart = false) {
-    // Checks if the function was called by the button in the "Now Playing" flexbox
+    // checks if the function was called by the button in the "Now Playing" flexbox
     if (songId === "playing-song-play-btn") {
         if (currentSong) songId = currentSong.identifier;
         
         else {
-            let placeHolderBtn = document.getElementById("playing-song-play-btn");
+            // if it was called by that button, but no song is playing, end the function
+            const placeHolderBtn = document.getElementById("playing-song-play-btn");
             placeHolderBtn.src = "Images/playBtn.png";
             return;
         }
@@ -626,7 +658,7 @@ function playSong(songId, restart = false) {
 /* Kebab Menu Functions */
 
 function openPlaylistMenu(playlistId, element) {
-    let options = [
+    const options = [
         {
             label: "Change details",
             action: () => toggleModifyMenu(playlistId, false),
@@ -644,7 +676,7 @@ function openPlaylistMenu(playlistId, element) {
 }
 
 function openSongMenu(songId, element) {
-    let options = [
+    const options = [
         {
             label: "Add to playlist",
             action: () => toggleAddPlaylistMenu(songId),
@@ -762,6 +794,8 @@ function deleteSong(songId) {
         if (currentSong.identifier === songId) {
             if (!audioEl.paused) playSong(songId);
             currentSong = null;
+
+            playingPlaylist.playImg = "Images/playBtn.png";
         }
     }
 
@@ -778,7 +812,7 @@ function deleteSong(songId) {
 
 function deletePlaylist(playlistId) {
     const index = findIndexByIdentifier(allPlaylists, playlistId);
-    const playlist = allPlaylists[playlistId];
+    const playlist = allPlaylists[index];
 
     // if the playlist to be deleted is currenly open, changes the current playlist to the default allSongs playlist
     if (viewingPlaylist.identifier === playlistId) swapPlaylist(allSongs.identifier);
@@ -786,7 +820,6 @@ function deletePlaylist(playlistId) {
     // deletes the playlist's div
     const div = document.getElementById(playlist.elementId);
     playlistsEl.removeChild(div);
-
 
     // deletes the playlist from the playlists array
     allPlaylists.splice(index, 1);
@@ -874,18 +907,18 @@ function toggleModifyMenu(objectId, isSong) {
     modifyMenu.replaceChildren();
 
     // chooses between the object being a song or playlist
-    let object;
-    if (isSong) object = findObjectByIdentifier(viewingPlaylist.songs, objectId);
-    else object = findObjectByIdentifier(allPlaylists, objectId);
+    const object = isSong ? findObjectByIdentifier(viewingPlaylist.songs, objectId) : findObjectByIdentifier(allPlaylists, objectId);
 
     // creates the content
     const div = document.createElement("div");
     div.className =
         "w-full h-full flex flex-col justify-center items-center gap-y-2";
 
-    // decides on making the image a white music note
-    let src = object.picture;
-    if (object.picture.includes("Images/music_note.png")) src = "Images/music_note_white.png";
+    // makes the image a white music note if there isn't a custom image in place
+    const includesDefaultImage = object.picture.includes("Images/music_note.png");
+    
+    const src = includesDefaultImage ? "Images/music_note_white.png" : object.picture;
+    
 
     // base content
     div.innerHTML = `
@@ -975,10 +1008,8 @@ function hideModifyMenu() {
 
 function setObjectValues(objectId, isSong) {
     // gets the object
-    let object;
-    if (isSong) object = findObjectByIdentifier(viewingPlaylist.songs, objectId);
-    else object = findObjectByIdentifier(allPlaylists, objectId);
-
+    const object = isSong ? findObjectByIdentifier(viewingPlaylist.songs, objectId) : findObjectByIdentifier(allPlaylists, objectId);
+    
     // gets the objects corresponding HTML elements
     const objectDiv = document.getElementById(object.elementId);
     const objectPara = objectDiv.querySelector("p");
@@ -994,13 +1025,11 @@ function setObjectValues(objectId, isSong) {
         const songSpanName = objectPara.querySelector("span");
         songSpanName.innerHTML = replacementName;
     }
-    else {
-        objectPara.innerHTML = replacementName;
-    }
+    else objectPara.innerHTML = replacementName;
     
 
     if (isSong) {
-        // replaces the object's artist (if it's a song)
+        // replaces the object's artist if it's a song
         const replacementArtist = document.getElementById("replace-artist-input").value;
         object.artist = replacementArtist;
 
@@ -1014,7 +1043,7 @@ function setObjectValues(objectId, isSong) {
     const replacementPicture = document.getElementById("replace-picture-img").src;
     if (!replacementPicture.includes("Images/music_note_white.png")) {
 
-        // replaces the object's picture (if the image was changed)
+        // replaces the object's picture if the image isn't the default
         object.picture = replacementPicture;
 
         // replaces the HTML element's picture
