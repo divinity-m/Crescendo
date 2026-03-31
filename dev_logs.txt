@@ -27,7 +27,10 @@ At home I contacted Gavin and he gave me a more in depth guide on how to recolor
 
 # Day 5 - Friday | In class & At home work #
 I wanted to implement a scroll feature into the "Playlists" and "Songs" sections of the website, but I couldn't figure out how to make the header tags stay in place when the div element scrolled up and down. None of my friends could figure it out either so I asked Mr. Durstling and found out that I needed to use a property called 'sticky' in css to keep the header in place and also increase the z-index to position the header over every other element.
-At home, I encountered a couple bugs while polishing my code to make it more consice and readable. I wanted to create a single audio element that played a song one at a time, rather than keep track of multiple audio elements in multiple divs. When I started this, I quickly came in contact with an error, when I pause the previously playing song so safely replace the audio's src and play a new song (all in one function), the console presented me with this error message:
+
+At home, I discovered a very useful feature in google called 'override', allowing you to override web content locally with your own scripts. This breakthrough made coding with github 100x faster for me. Although, I still need to periodically update the github files themselves to keep the website up to date on the serverside and to backup my code.
+
+While polishing my code to make it more concise and readable, I encountered a couple bugs. I wanted to create a single audio element that played a song one at a time, rather than keep track of multiple audio elements in multiple divs. When I started this, I quickly came in contact with an error, when I pause the previously playing song so safely replace the audio's src and play a new song (all in one function), the console presented me with this error message:
 ` The play() request was interrupted by a call to pause(). `
 I threw whatever I think of at my script but nothing stopped that error message from popping up. I tried playing the song first then pausing the previous one. I tried seperating the pause and play into seperate functions. Then finally, I tried asking chatGPT what I could possibly be doing wrong.
 
