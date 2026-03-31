@@ -10,6 +10,10 @@
         <!-- Tailwind CSS -->
         <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
         <style type="text/tailwindcss">
+            /* variables */ /* #154CEA */
+            :root {
+                --color-blue-700: oklch(48.8% 0.243 264.376);
+            }
             
             /* prevents bugs with the audio slider */
             #now-playing-el {
@@ -73,7 +77,6 @@
             }
             
         </style>
-        <!-- color needed for later #154CEA -->
 
         <!-- Outfit Font-Family Link -->
         <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -159,7 +162,8 @@
                 class="basis-1/4 min-h-0 overflow-auto bg-blue-600/40 rounded-xl"
             >
                 
-                <header class="w-full h-20 sticky top-0 left-0 z-10 bg-linear-to-b from-blue-600 to-inherit flex items-center gap-3">
+                <header class="w-full h-20 sticky top-0 left-0 z-10 bg-linear-to-b from-blue-600 to-inherit
+                    flex items-center gap-3">
                     
                     <h2 class="mb-5 pl-5 pt-2.5 text-5xl text-blue-700 font-bold">Playlists</h2>
                     
@@ -182,12 +186,16 @@
                 class="basis-1/2 min-h-0 overflow-auto bg-blue-600/40 rounded-xl"
             >
                 
-                <header class="w-full h-20 sticky top-0 left-0 z-10 bg-linear-to-b from-blue-600 to-inherit">
+                <header class="w-full h-20 sticky top-0 left-0 z-10 bg-linear-to-b from-blue-600 to-inherit
+                    flex items-center gap-5">
                     
                     <h2 class="mb-5 pl-5 pt-2.5 text-5xl text-blue-700 font-bold">Songs</h2>
 
-                    <!-- ADD A SEARCH BAR HERE -->
-                    <!-- <input id="search-bar" type="text" /> -->
+                    <input id="search-bar" type="text"
+                        class="w-full h-10 px-2 mr-5 focus:outline-none
+                        text-xl text-white/75 font-medium
+                        bg-white/30 rounded-full"/>
+                    
                 </header>
                 
             </section>
@@ -246,11 +254,11 @@
                     </div>
                     <div id="time-slider-container" class="w-[80%] h-10 flex justify-around items-center relative">
                         
-                        <p id="current-time-text" class="text-gray-500 absolute left-[5%] top-[50%] -translate-1/2">0</p>
+                        <p id="current-time-text" class="text-blue-700 grayscale absolute left-[5%] top-[50%] -translate-1/2">0</p>
                         
                         <input type="range" width="50%" id="time-slider" min="0" max="1000" value="0" step="0" disabled/>
                         
-                        <p id="duration-text" class="text-gray-500 absolute left-[95%] top-[50%] -translate-1/2">0</p>
+                        <p id="duration-text" class="text-blue-700 grayscale absolute left-[95%] top-[50%] -translate-1/2">0</p>
                         
                     </div>
                 </div>
