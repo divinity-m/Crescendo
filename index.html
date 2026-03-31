@@ -166,8 +166,10 @@
                     <img
                         id="add-btn"
                         src="Images/addBtn.svg"
-                        class="w-10 hover:w-11 hover:-ml-0.5 active:opacity-75 active:w-10 active:ml-0 transition-all duration-150"
-                        onclick="addNewPlaylist()""
+                        onclick="addNewPlaylist()"
+                        class="w-10 hover:w-11 hover:-ml-0.5 hover:cursor-pointer
+                        active:opacity-75 active:w-10 active:ml-0
+                        transition-all duration-150"
                     />
                     
                 </header>
@@ -207,26 +209,39 @@
                     <img id="playing-song-img" src="Images/music_note.png" class="h-60"/>
                     
                     <p id="playing-song-name" onclick="playSong('playing-song-play-btn')"
-                        class="font-medium text-3xl text-blue-700 active:opacity-75">No Song Selected</p>
+                        class="font-medium text-3xl text-blue-700 active:opacity-75 hover:cursor-pointer">No Song Selected</p>
                 
                     <p id="playing-song-artist" class="font-medium text-xl text-blue-600">...</p>
 
-                    <div class="w-full h-10 py-2 flex justify-center items-center">
+                    <div id="control-buttons" class="w-full h-10 py-2 flex justify-center items-center gap-2.5">
                         <!-- ADD THE SHUFFLE BUTTON, NEXT/PREVIOUS SONG BUTTONS, AND LOOP BUTTON HERE -->
                         <!-- LOOK AT SPOTIFY FOR REFERENCE -->
                         
-                        <!-- <img id="suffle-btn" src="Images/shuffleBtn.svg" onclick="enableShuffle()"/> -->
+                        <img id="shuffle-btn" src="Images/shuffleBtn.svg" onclick="toggleShuffle()"
+                            class="w-7.5 hover:w-8.5 hover:-ml-0.2 hover:cursor-pointer grayscale
+                            active:opacity-75 active:w-7.5 active:mt-0
+                            transition-all duration-200" />
                         
-                        <!-- <img id="previous-btn" src="Images/previousBtn.svg" onclick="playPreviousSong()"/> -->
+                        <img id="previous-btn" src="Images/previousBtn.svg" onclick="playPreviousSong()"
+                            class="w-7.5 hover:w-8.5 hover:cursor-pointer
+                            active:opacity-75 active:w-7.5 active:mt-0
+                            transition-all duration-200"/>
                         
-                        <img id="playing-song-play-btn" src="Images/playBtn.png" onclick="playSong(this.id)"
-                            class="w-7.5 hover:w-8.5 hover:-mt-0.25 active:opacity-75 active:w-7.5 active:mt-0 transition-all duration-200"
+                        <img id="playing-song-play-btn" src="Images/playBtn.svg" onclick="playSong(this.id)"
+                            class="w-7.5 hover:w-8.5 hover:-mt-0.1 hover:cursor-pointer
+                            active:opacity-75 active:w-7.5 active:mt-0
+                            transition-all duration-200"
                         />
                         
                         <img id="next-btn" src="Images/nextBtn.svg" onclick="playNextSong()"
-                            class="w-7.5"/>
+                            class="w-7.5 hover:w-8.5 hover:cursor-pointer
+                            active:opacity-75 active:w-7.5 active:mt-0
+                            transition-all duration-200"/>
 
-                        <!-- <img id="loop-btn" src="Images/loopBtn.svg" onclick="enableLoop()"/> -->
+                        <img id="loop-btn" src="Images/loopBtn.svg" onclick="changeLoopState()"
+                            class="w-7.5 hover:w-8.5 hover:-ml-0.1 hover:cursor-pointer grayscale
+                            active:opacity-75 active:w-7.5 active:mt-0
+                            transition-all duration-200"/>
     
                     </div>
                     <div id="time-slider-container" class="w-[80%] h-10 flex justify-around items-center relative">
