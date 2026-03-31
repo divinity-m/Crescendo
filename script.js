@@ -113,6 +113,8 @@ class Playlist {
                 // Swap elements array[i] and array[j] using destructuring assignment
                 [songs[i], songs[j]] = [songs[j], songs[i]];
             }
+
+            this.shuffled = true; // turns on the flag
         }
     }
 
@@ -146,7 +148,7 @@ let currentKebabMenuAnchor = null;
 // Updates the 3-box flexbox sections once the document and script have loaded in
 window.addEventListener("load", () => {
     updateWebsite();
-    updateSliderProgress();
+    updateSliderProgressBar();
 });
 
 // Hides pop up menus when the page is clicked
@@ -193,56 +195,24 @@ dropZone.addEventListener("click", () => audioFileInput.click());
 
 /* Audio Related Event Listeners*/
 
-audioEl.addEventListener("timeupdate", () => {
-    // prevents slider adjustments if there isn't a song playing
-    if (isNaN(audioEl.duration) || !currentSong) timeSlider.disabled = true;
-    else timeSlider.disabled = false;
-    
-    if (!isNaN(audioEl.duration) && !draggingSlider) {
-        // calculates percentage of audio played then adjusts the timeSlider
-        const value = (audioEl.currentTime / audioEl.duration) * 1000;
-        timeSlider.value = value;
-        updateSliderProgress();
-        
-        // when the song is over, ends the playback, loops the current song, or moves onto the next song
-        if (audioEl.currentTime === audioEl.duration) {
-            if (loopState === "none") return;
-            else if (loopState === "one") playSong(currentSong.identifier);
-            else if (loopState === "all") {
-                if (shuffleOn) playingPlaylist.shuffle();
-                playNextSong();
-            }
-        }
-    }
-});
+// changes to either to slider, or the 
+audioEl.addEventListener("timeupdate", timeUpdateHandler);
+timeSlider.addEventListener('click', sliderAdjusted);
+timeSlider.addEventListener("input", updateSliderProgressBar);
 
-timeSlider.addEventListener('click', () => {
-    if (!isNaN(audioEl.duration)) {
-        // calculates the time from the sliders value then adjusts the current time
-        const time = (timeSlider.value / 1000) * audioEl.duration;
-        audioEl.currentTime = time;
-        
-    } else {
-        timeSlider.value = 0;
-        updateSliderProgress();
-    }
-});
 
 // prevents bugs caused by the audio element updating while the user drags the slider
 timeSlider.addEventListener('mousedown', () => draggingSlider = true);
 timeSlider.addEventListener('mouseup', () => draggingSlider = false);
 
-// updates the sliders progress bar on user input
-timeSlider.addEventListener("input", updateSliderProgress);
-
 // updates the sliders height
 timeSlider.addEventListener("mouseenter", () => {
     sliderHeight = 6;
-    updateSliderProgress();
+    updateSliderProgressBar();
 });
 timeSlider.addEventListener("mouseleave", () => {
     sliderHeight = 4;
-    updateSliderProgress();
+    updateSliderProgressBar();
 });
     
     
@@ -299,6 +269,7 @@ function processFiles(files) {
         // initializes a new song object containing the audio file then adds it to the allSongs object
         const newSong = new Song(file, createNewId(true));
         allSongs.songs.push(newSong);
+        allSongs.shuffled = false;
 
         // swaps the playlist, resseting the page if the viewingPlaylist isn't allsongs
         if (viewingPlaylist.identifier !== allSongs.identifier) swapPlaylist(allSongs.identifier);
@@ -352,7 +323,8 @@ function createPlaylistDiv(playlist) {
     // sets div's id and class
     div.id = `${playlist.elementId}`;
     div.className = "h-18 pl-5 flex items-center gap-3 hover:bg-blue-600/20";
-    // creates the div's content
+    
+    // creates the div's content in a [picture, name, play button, kebab button] format
     div.innerHTML = `
                             <img src="${playlist.picture}" class="w-15 p-1 rounded-md hover:cursor-pointer"
                                 onclick="toggleModifyMenu(${playlist.identifier}, false)"/>
@@ -376,12 +348,12 @@ function createPlaylistDiv(playlist) {
 
 function createSongDiv(song) {
     const div = document.createElement("div");
-
+    
     // sets div's id and class
     div.id = `${song.elementId}`;
     div.className = "h-18 pl-5 flex items-center gap-3 hover:bg-blue-600/20";
 
-    // creates the div's content
+    // creates the div's content in a [picture, name & artist, play button, kebab button] format
     div.innerHTML = `
                             <img src="${song.picture}" class="w-15 p-1 rounded-md hover:cursor-pointer"
                             onclick="toggleModifyMenu(${song.identifier}, true)"/>
@@ -389,7 +361,7 @@ function createSongDiv(song) {
                             <p class="flex flex-col justify-center text-left">
 
                                 <span class="text-2xl text-blue-700 hover:underline active:opacity-75 hover:cursor-pointer"
-                                    onclick="playSong(${song.identifier})">${song.name}</span>
+                                    onclick="playSong(${song.identifier}, ${viewingPlaylist.identifier})">${song.name}</span>
 
                                 <span class="text-md text-blue-600">${song.artist}</span>
 
@@ -400,7 +372,7 @@ function createSongDiv(song) {
                                 class="w-7.5 hover:w-8.5 hover:-ml-0.5 hover:cursor-pointer
                                 active:opacity-75 active:w-7.5 active:ml-0
                                 transition-all duration-200"
-                                onclick="playSong(${song.identifier})"/>
+                                onclick="playSong(${song.identifier}, ${viewingPlaylist.identifier})"/>
 
 
                             <img src="Images/kebabBtn.png"
@@ -475,7 +447,7 @@ function updateCurrentlyPlayingSongSection() {
     const playingSongArtist = document.getElementById("playing-song-artist");
     const playingSongPlayBtn = document.getElementById("playing-song-play-btn");
 
-    // updates the elements
+    // updates the elements to match whatever song is playing
     playingSongImg.src = potentialSong.picture;
     
     playingSongName.innerHTML = potentialSong.name;
@@ -546,48 +518,6 @@ function swapPlaylist(playlistId) {
     }
 }
 
-function updateSliderProgress() {
-    const percent = (timeSlider.value / 1000) * 100;
-    
-    const padding = 7.5;
-    
-    // creates the sliders progress bar with a gradient
-    timeSlider.style.background = `
-        linear-gradient(to right, #154CEA ${percent}%, rgba(0, 0, 0, 0.2) ${percent}%)
-        center / calc(100% - ${padding * 2}px) ${sliderHeight}px no-repeat
-    `;
-
-    
-    // updates the time paragraphs
-    const currentTimePara = document.getElementById("current-time-text");
-    const durationPara = document.getElementById("duration-text");
-
-    if (!isNaN(audioEl.duration)) {
-        const currentTime = (percent / 100) * audioEl.duration;
-
-        const formattedCurrentTime = formatSongTime(currentTime);
-        const formattedDuration = formatSongTime(audioEl.duration);
-        
-        currentTimePara.innerHTML = formattedCurrentTime;
-        durationPara.innerHTML = formattedDuration;
-        
-        currentTimePara.classList.remove("text-gray-500");
-        durationPara.classList.remove("text-gray-500");
-        
-        currentTimePara.classList.add("text-blue-700");
-        durationPara.classList.add("text-blue-700");
-    } else {
-        currentTimePara.innerHTML = `0:00`;
-        durationPara.innerHTML = `0:00`;
-
-        currentTimePara.classList.remove("text-blue-700");
-        durationPara.classList.remove("text-blue-700");
-        
-        currentTimePara.classList.add("text-gray-500");
-        durationPara.classList.add("text-gray-500");
-    }
-}
-
 
 /* Utility functions for songs and playlists */
 
@@ -603,7 +533,7 @@ function findObjectByIdentifier(array, identifier) {
 function createNewId(isSong) {
     let id = 1;
 
-    // verifies if the id is for a song or a playlist (a song and a playlist can have the same id)
+    // if the id is for a song, use the allSongs array, else, use the allPlaylists array
     const array = isSong ? allSongs.songs : allPlaylists;
 
     // a simple loop to create new id's
@@ -614,6 +544,7 @@ function createNewId(isSong) {
 }
 
 function formatSongTime(totalSeconds) {
+    // gets the times
     const hours = Math.floor(totalSeconds / 3600);
     const minutes = Math.floor((totalSeconds % 3600) / 60);
     const seconds = Math.floor(totalSeconds % 60);
@@ -625,7 +556,6 @@ function formatSongTime(totalSeconds) {
     // returns M:SS or MM:SS if no hours, otherwise H:MM:SS or HH:MM:SS
     if (hours === 0) return `${formattedMinutes}:${formattedSeconds}`;
     else {
-        // formats hours without a leading zero if it's a single digit
         const formattedHours = String(hours); 
         return `${formattedHours}:${formattedMinutes}:${formattedSeconds}`;
     }
@@ -639,59 +569,55 @@ function playPlaylist(playlistId) {
 
     // only proceeds with the logic if the playlist has songs
     if (playlistClicked.songs.length > 0) {
-        // prevents errors caused by currentSong being null by default
-        if (currentSong === null) currentSong = playlistClicked.songs[0];
-
+        
         // swaps the playlists if the playlist clicked isn't already open
         if (viewingPlaylist.identifier !== playlistId) swapPlaylist(playlistId);
 
         
         // plays the first song in the songs array if shuffle is off
-        if (!shuffleOn) playSong(playlistClicked.songs[0].identifier, true);
+        if (!shuffleOn) playSong(playlistClicked.songs[0].identifier, playlistId, true);
         else {
-            // sets shuffled to false so it's allowed to shuffle, then shuffles the playlist
+            
+            // sets shuffled to false so the playlist is allowed to shuffle, then shuffles the playlist
             playlistClicked.shuffled = false;
             playlistClicked.shuffle();
 
             // obtains a random index from the shuffled array then plays the song in it
             let i = Math.floor(Math.random() * playlistClicked.shuffledSongs.length);
-            playSong(playlistClicked.shuffledSongs[i].identifier, true, true);
+            
+            playSong(playlistClicked.shuffledSongs[i].identifier, playlistId, true, true);
         }
     }
     else {
         // resets the playlist's image if it's empty
-        const img = document.getElementById(
-            `${playlistClicked.elementId}-play-btn`,
-        );
+        const img = document.getElementById(`${playlistClicked.elementId}-play-btn`);
         img.src = playBtnSrc;
     }
 }
 
-function playSong(songId, restart = false, preshuffled = false) {
+function playSong(songId, playlistId = null, restart = false, preshuffled = false) {
     // checks if the function was called by the button in the "Now Playing" flexbox
     if (songId === "playing-song-play-btn") {
         if (currentSong) songId = currentSong.identifier;
         
         else {
-            // if it was called by that button, but no song is playing, end the function
+            // if it was called by that play button, but no song is playing, end the function
             const placeHolderBtn = document.getElementById("playing-song-play-btn");
             placeHolderBtn.src = playBtnSrc;
             return;
         }
     }
-
-
-    // resets the shuffled properties if a song in a different playlist was clicked
+    
     if (playingPlaylist) {
+        // resets the shuffled properties of the newly and previously playing playlists
         if (viewingPlaylist.identifier !== playingPlaylist.identifier && !preshuffled) {
             viewingPlaylist.shuffled = false;
             playingPlaylist.shuffled = false;
         }
-
-        // determines if the viewingPlaylist is still the playingPlaylist
-        
     }
-    else playingPlaylist = viewingPlaylist;
+    
+    // redefines playingPlaylist if the function is given it's ID
+    if (playlistId || playlistId === 0) playingPlaylist = findObjectByIdentifier(allPlaylists, playlistId);
 
     
     // prevents errors caused by currentSong being null by default
@@ -703,7 +629,7 @@ function playSong(songId, restart = false, preshuffled = false) {
     if (currentSong.identifier !== songId) {
         if (!currentSong.paused) currentSong.pause();
 
-        // first checks if the songs element exists (cause of playlist swapping)
+        // first checks if the songs element exists then unbolds it
         const oldSongsDiv = document.getElementById(currentSong.elementId);
 
         if (oldSongsDiv) {
@@ -712,14 +638,15 @@ function playSong(songId, restart = false, preshuffled = false) {
         }
     }
 
-    // bolds the new song and redifines currentSong (if the viewingPlaylist hasn't changed)
-    if (playingPlaylist.identifier === viewingPlaylist.identifier) {
-            
-        const newSongsDiv = document.getElementById(songClicked.elementId);
+    // bolds the new song if it's div exists
+    const newSongsDiv = document.getElementById(songClicked.elementId);
+
+    if (newSongsDiv) {
         const newSongsSpan = newSongsDiv.querySelector("p").firstElementChild;
-    
         newSongsSpan.classList.add("font-semibold", "underline");
     }
+
+    // finally redifines the current song
     currentSong = songClicked;
     
 
@@ -741,40 +668,55 @@ function playSong(songId, restart = false, preshuffled = false) {
 
 function playNextSong() {
     if (playingPlaylist) {
-        const currentSongIndex = playingPlaylist.songs.findIndex((song) => song.identifier === currentSong.identifier);
+        playingPlaylist.shuffle(); // ensures the shuffled playlist is up to date
         
-        const nextSongIndex = playingPlaylist.songs[currentSongIndex + 1] ? currentSongIndex + 1 : 0;
-        const nextSong = playingPlaylist.songs[nextSongIndex];
+        // if shuffle is on, get the shuffled songs, else, get the normal songs
+        const songs = shuffleOn ? playingPlaylist.shuffledSongs : playingPlaylist.songs;
+        
+        // gets the current songs index
+        const index = songs.findIndex((song) => song.identifier === currentSong.identifier);
 
+        // if the next index exists, get it, else, reset back to zero
+        const nextIndex = songs[index + 1] ? index + 1: 0;
+        
+        const nextSong = songs[nextIndex];
         playSong(nextSong.identifier);
     }
 }
 
 function playPreviousSong() {
     if (playingPlaylist) {
-        const currentSongIndex = playingPlaylist.songs.findIndex((song) => song.identifier === currentSong.identifier);
+        playingPlaylist.shuffle();
         
-        const previousSongIndex = playingPlaylist.songs[currentSongIndex - 1] ? currentSongIndex - 1 : playingPlaylist.songs.length - 1;
-        const previousSong = playingPlaylist.songs[previousSongIndex];
+        const songs = shuffleOn ? playingPlaylist.shuffledSongs : playingPlaylist.songs;
 
+        const index = songs.findIndex((song) => song.identifier === currentSong.identifier);
+
+        // if the previous index exists, get it, else, reset back to the last index
+        const previousIndex = songs[index - 1] ? index - 1 : songs.length - 1;
+        
+        const previousSong = songs[previousIndex];
         playSong(previousSong.identifier);
     }
 }
 
 function changeLoopState() {
-    let loopBtn = document.getElementById("loop-btn"); // "Images/loopBtn.svg"
+    let loopBtn = document.getElementById("loop-btn");
     
     if (loopState === "none") {
         loopState = "one";
+        
         loopBtn.classList.remove("grayscale");
         loopBtn.src = "Images/loopBtn1.svg";
     }
     else if (loopState === "one") {
         loopState = "all";
+        
         loopBtn.src = "Images/loopBtn.svg";
     }
     else if (loopState === "all") {
         loopState = "none";
+        
         loopBtn.classList.add("grayscale");
     }
 }
@@ -789,6 +731,94 @@ function toggleShuffle() {
     else {
         shuffleOn = true;
         shuffleBtn.classList.remove("grayscale");
+        if (playingPlaylist) playingPlaylist.shuffled = false;
+    }
+}
+
+
+/* Slider Functions */
+
+function updateSliderProgressBar() {
+    const percent = (timeSlider.value / 1000) * 100;
+    
+    const padding = 7.5;
+    
+    // creates the sliders progress bar with a gradient
+    timeSlider.style.background = `
+        linear-gradient(to right, #154CEA ${percent}%, rgba(0, 0, 0, 0.2) ${percent}%)
+        center / calc(100% - ${padding * 2}px) ${sliderHeight}px no-repeat
+    `;
+
+    
+    // updates the time paragraphs
+    const currentTimePara = document.getElementById("current-time-text");
+    const durationPara = document.getElementById("duration-text");
+
+    if (!isNaN(audioEl.duration) && currentSong) {
+        const currentTime = (percent / 100) * audioEl.duration;
+
+        // formats the times
+        const formattedCurrentTime = formatSongTime(currentTime);
+        const formattedDuration = formatSongTime(audioEl.duration);
+        
+        currentTimePara.innerHTML = formattedCurrentTime;
+        durationPara.innerHTML = formattedDuration;
+
+        // ungrayscales the text
+        currentTimePara.classList.remove("grayscale");
+        durationPara.classList.remove("grayscale");
+    } else {
+        // resets the times
+        currentTimePara.innerHTML = `0:00`;
+        durationPara.innerHTML = `0:00`;
+
+        // grayscales the text
+        currentTimePara.classList.add("grayscale");
+        durationPara.classList.add("grayscale");
+    }
+}
+
+function sliderAdjusted() {
+    if (!isNaN(audioEl.duration)) {
+        // calculates the time by using by dividing the sliders current value by its max
+        const time = (timeSlider.value / timeSlider.max) * audioEl.duration;
+        
+        audioEl.currentTime = time;
+    } else {
+        timeSlider.value = 0;
+        updateSliderProgressBar();
+    }
+}
+
+
+function timeUpdateHandler() {
+    // prevents slider adjustments if there isn't a song playing
+    if (isNaN(audioEl.duration) || !currentSong) timeSlider.disabled = true;
+    else timeSlider.disabled = false;
+    
+    if (!isNaN(audioEl.duration) && !draggingSlider) {
+        // calculates percentage of audio played then adjusts the timeSlider
+        const value = (audioEl.currentTime / audioEl.duration) * timeSlider.max;
+        timeSlider.value = value;
+        updateSliderProgressBar();
+        
+        // checks when the song ends
+        if (audioEl.currentTime === audioEl.duration) {
+            
+            if (loopState === "none") {
+                // updates every play button if looping is off
+                currentSong.playImg = playBtnSrc;
+                playingPlaylist.playImg = playBtnSrc;
+                document.getElementById("playing-song-play-btn").src = playBtnSrc;
+            }
+
+            // repeats the current song if looping (1) is on
+            else if (loopState === "one") playSong(currentSong.identifier, null, true);
+
+            // plays the next song if looping (all) is on 
+            else if (loopState === "all") playNextSong();
+            
+        }
     }
 }
 
@@ -929,15 +959,31 @@ function hideKebabMenu() {
 /* Functions For The Kebab Menu Options */
 
 function removeFromPlaylist(songId) {
+    // checks if the currently playing song is the song to be removed
+    if (currentSong) {
+        if (currentSong.identifier === songId) {
+            if (!audioEl.paused) playSong(currentSong.identifier);
+            
+            playingPlaylist.playImg = playBtnSrc;
+            currentSong = null;
+            playingPlaylist = null;
+            
+            audioEl.currentTime = 0;
+            
+            updateCurrentlyPlayingSongSection();
+        }
+    }
+    
     // removes the song's div from the songsEl
-    const songToDelete = findObjectByIdentifier(viewingPlaylist.songs, songId);
-    const div = document.getElementById(songToDelete.elementId);
-    songsEl.removeChild(div);
+    const songToRemove = findObjectByIdentifier(viewingPlaylist.songs, songId);
+    const div = document.getElementById(songToRemove.elementId);
+    if (div) songsEl.removeChild(div);
 
     // targets the index, then splices the song
     const index = viewingPlaylist.songs.findIndex((song) => song.identifier === songId);
-    
     viewingPlaylist.songs.splice(index, 1);
+
+    viewingPlaylist.shuffled = false;
 }
 
 function deleteSong(songId) {
@@ -945,28 +991,33 @@ function deleteSong(songId) {
     if (currentSong) {
         if (currentSong.identifier === songId) {
             if (!audioEl.paused) playSong(currentSong.identifier);
+            
             playingPlaylist.playImg = playBtnSrc;
             currentSong = null;
             playingPlaylist = null;
+            
             audioEl.currentTime = 0;
+            
+            updateCurrentlyPlayingSongSection();
         }
     }
 
-    // searches every array for the songs index, if the index exists, the song is spliced from the playlist
+    // gets the song's object then deletes it's div
+    const songToDelete = findObjectByIdentifier(viewingPlaylist.songs, songId);
+    const div = document.getElementById(songToDelete.elementId);
+    if (div) songsEl.removeChild(div);
+    
+    // searches every array for the song's index, if the index exists, the song is spliced from the playlist
     allPlaylists.forEach((playlist) => {
         const index = playlist.songs.findIndex((song) => song.identifier === songId);
-        if (index > -1) playlist.songs.splice(index, 1);
+        if (index > -1) {
+            playlist.songs.splice(index, 1);
+            viewingPlaylist.shuffled = false;
+        }
     });
-
-    // updates the html
-    updateSongsSection();
-    updateCurrentlyPlayingSongSection();
 }
 
 function deletePlaylist(playlistId) {
-    const index = allPlaylist.findIndex((list) => list.identifier === playlistId);
-    const playlist = allPlaylists[index];
-
     // checks if the playlist to be deleted is playing a song
     if (playingPlaylist) {
         if (playingPlaylist.identifier === playlistId) {
@@ -976,14 +1027,17 @@ function deletePlaylist(playlistId) {
             audioEl.currentTime = 0;
         }
     }
-    // checks if the playlist to be deleted is currenly open
+    
+    // if the playlist to be deleted is currenly open, swap to the default allSongs playlist
     if (viewingPlaylist.identifier === playlistId) swapPlaylist(allSongs.identifier);
 
-    // deletes the playlist's div
+    // gets the playlist's object then deletes it's div
+    const playlist = findObjectByIdentifier(allPlaylists, playlistId);
     const div = document.getElementById(playlist.elementId);
-    playlistsEl.removeChild(div);
+    if (div) playlistsEl.removeChild(div);
 
     // deletes the playlist from the playlists array
+    const index = allPlaylists.findIndex((list) => list.identifier === playlistId);
     allPlaylists.splice(index, 1);
 }
 
@@ -1036,6 +1090,8 @@ function toggleAddPlaylistMenu(songId) {
                     // pushes the song into the playlist, then updates the html
                     playlist.songs.push(song);
                     swapPlaylist(playlist.identifier);
+                    
+                    playlist.shuffled = false;
                 }
 
                 hideAddPlaylistMenu();
@@ -1068,7 +1124,7 @@ function toggleModifyMenu(objectId, isSong) {
     // clears the menu
     modifyMenu.replaceChildren();
 
-    // chooses between the object being a song or playlist
+    // if the object is a song, find it in the viewingPlaylist array, else, find the playlist in the allPlaylists array
     const object = isSong ? findObjectByIdentifier(viewingPlaylist.songs, objectId) : findObjectByIdentifier(allPlaylists, objectId);
 
     // creates the content
@@ -1082,12 +1138,12 @@ function toggleModifyMenu(objectId, isSong) {
     const src = includesDefaultImage ? "Images/music_note_white.png" : object.picture;
     
 
-    // base content
+    // base content with the objects image, blur mechanics, and tiny little edit button
     div.innerHTML = `
                 <div class="w-40 h-40 z-93 relative inline-block overflow-hidden rounded-md"
-                    onclick="(() => { imageFileInput.click() })()"
                     onmouseover="showBlur()"
-                    onmouseleave="hideBlur()">
+                    onmouseleave="hideBlur()"
+                    onclick="(() => { imageFileInput.click() })()">
                             
                     <img id="replace-picture-img" src="${src}"
                     class="w-9/10 absolute top-[50%] left-[50%] -translate-1/2"/>
@@ -1106,11 +1162,12 @@ function toggleModifyMenu(objectId, isSong) {
                 <input id="replace-name-input" type="text" value="${object.name}" placeholder="${object.originalName}"
                     class="px-2 text-white bg-white/10 border-2 border-white rounded-md focus:outline-white"/>`;
 
-    // decides on whether to add the artist input
-    if (isSong)
+    // if the object is a song, add the option to change the songs artists
+    if (isSong) {
         div.innerHTML += `
                 <input id="replace-artist-input" type="text" value="${object.artist}" placeholder="${object.originalArtist}"
                     class="px-2 text-white bg-white/10 border-2 border-white rounded-md focus:outline-white"/>`;
+    }
 
     // adds in the buttons
     div.innerHTML += `
@@ -1182,48 +1239,51 @@ function hideModifyMenu() {
 /* Modify Menu Related Values */
 
 function setObjectValues(objectId, isSong) {
-    // gets the object
+    // if the object is a song, find it in the viewingPlaylist array, else, find the playlist in the allPlaylists array
     const object = isSong ? findObjectByIdentifier(viewingPlaylist.songs, objectId) : findObjectByIdentifier(allPlaylists, objectId);
     
-    // gets the objects corresponding HTML elements
+    // gets the objects corresponding HTML div then checks if it exists
     const objectDiv = document.getElementById(object.elementId);
-    const objectPara = objectDiv.querySelector("p");
-    const objectImg = objectDiv.querySelector("img");
 
-    // replaces the object's name
-    const replacementName = document.getElementById("replace-name-input").value;
-    object.name = replacementName;
-
-
-    // replaces the HTML element's name
-    if (isSong) {
-        const songSpanName = objectPara.querySelector("span");
-        songSpanName.innerHTML = replacementName;
-    }
-    else objectPara.innerHTML = replacementName;
+    if (objectDiv) {
+        // gets the divs paragraph and img tag to replace their values
+        const objectPara = objectDiv.querySelector("p");
+        const objectImg = objectDiv.querySelector("img");
     
+        // replaces the object's name
+        const replacementName = document.getElementById("replace-name-input").value;
+        object.name = replacementName;
 
-    if (isSong) {
-        // replaces the object's artist if it's a song
-        const replacementArtist = document.getElementById("replace-artist-input").value;
-        object.artist = replacementArtist;
-
-        // replaces the HTML element's artist
-        const songSpanArtist = objectPara.querySelectorAll("span")[1];
-        songSpanArtist.innerHTML = replacementArtist;
-    }
-
+        // replaces the paragraph/span element's name
+        if (isSong) {
+            const songSpanName = objectPara.querySelector("span");
+            songSpanName.innerHTML = replacementName;
+        }
+        else objectPara.innerHTML = replacementName;
+        
     
-    const replacementPicture = document.getElementById("replace-picture-img").src;
-    if (!replacementPicture.includes("Images/music_note_white.png")) {
-
-        // replaces the object's picture if the image isn't the default
-        object.picture = replacementPicture;
-
-        // replaces the HTML element's picture
-        objectImg.src = replacementPicture;
+        if (isSong) {
+            // replaces the object's artist if it's a song
+            const replacementArtist = document.getElementById("replace-artist-input").value;
+            object.artist = replacementArtist;
+    
+            // replaces the span element's artist
+            const songSpanArtist = objectPara.querySelectorAll("span")[1];
+            songSpanArtist.innerHTML = replacementArtist;
+        }
+    
+        
+        const replacementPicture = document.getElementById("replace-picture-img").src;
+        if (!replacementPicture.includes("Images/music_note_white.png")) {
+    
+            // replaces the object's picture if the image isn't the default
+            object.picture = replacementPicture;
+    
+            // replaces the img element's picture
+            objectImg.src = replacementPicture;
+        }
     }
-
+    
     // updates the html for the currently playing song
     if (isSong) updateCurrentlyPlayingSongSection();
 
@@ -1232,7 +1292,7 @@ function setObjectValues(objectId, isSong) {
 }
 
 function resetObjectValues(objectId, isSong) {
-    // gets the object
+    // if the object is a song, find it in the viewingPlaylist array, else, find the playlist in the allPlaylists array
     const object = isSong ? findObjectByIdentifier(viewingPlaylist.songs, objectId) : findObjectByIdentifier(allPlaylists, objectId);
     
     // resets it's values
@@ -1240,24 +1300,26 @@ function resetObjectValues(objectId, isSong) {
     object.picture = object.originalPicture;
     if (isSong) object.artist = object.originalArtist;
 
-    // gets the objects corresponding HTML elements
+    // gets the objects corresponding HTML div then checks if it exists
     const objectDiv = document.getElementById(object.elementId);
-    const objectPara = objectDiv.querySelector("p");
-    const objectImg = objectDiv.querySelector("img");
 
-    // resets their values
-    objectImg.src = object.picture;
-
-    if (isSong) {
-        const songSpanName = objectPara.querySelector("span");
-        const songSpanArtist = objectPara.querySelectorAll("span")[1];
-
-        songSpanName.innerHTML = object.name;
-        songSpanArtist.innerHTML = object.artist;
-        
-    }
-    else objectPara.innerHTML = object.name;
+    if (objectDiv) {
+        // gets the div paragraph and img tag to replace their values
+        const objectPara = objectDiv.querySelector("p");
+        const objectImg = objectDiv.querySelector("img");
     
+        objectImg.src = object.picture;
+    
+        if (isSong) {
+            const songSpanName = objectPara.querySelector("span");
+            const songSpanArtist = objectPara.querySelectorAll("span")[1];
+    
+            songSpanName.innerHTML = object.name;
+            songSpanArtist.innerHTML = object.artist;
+            
+        }
+        else objectPara.innerHTML = object.name;
+    }
 
     // updates the html for the currently playing song
     if (isSong) updateCurrentlyPlayingSongSection();
