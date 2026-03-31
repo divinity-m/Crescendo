@@ -1073,7 +1073,7 @@ function toggleAddPlaylistMenu(songId) {
 
             const div = document.createElement("div");
             div.className =
-                "flex items-center w-98/100 h-20 px-5 gap-3 hover:bg-blue-600/20 rounded-md";
+                "w-98/100 h-20 px-5 flex items-center gap-3 hover:bg-blue-600/20 rounded-md";
             div.innerHTML = `
                                 <img src="${playlist.picture}" class="w-15 h-15 p-1 bg-blue-600/60 rounded-md"/>
 
