@@ -1,7 +1,7 @@
 Starting Date: March 23, 2026
 # Day 1 - Monday | In class & At home work #
 I spent the entire day working on the basic UI and i chose to use tailwind css to style everything. I decided to go with a blue theme simply because it's my favourite color. On a whim, I chose to name the website Crescendo, mainly because the word 'crescendo' is music-related and I think it sounds cool. Crescendo just means a gradual increase in the loudness of a song.
-At home, I created a `Songs` class, `Playlist` class, and a default `allSongs` object (from the `Playlist` class) to keep track of every existing song. I also completed a little bit of the file-implementation code at home, it doesn't work just yet but I plan to fix it up later.
+At home, I created a `Songs` class, `Playlist` class, and a default `allSongs` object (from the `Playlist` class) to keep track of every existing song. I also completed a little bit of the file-uploading code at home, it doesn't work just yet but I plan to fix it up later.
 
 
 # Day 2 - Tuesday | In class & At home work #
@@ -21,7 +21,7 @@ I didn't feel like adding anything more to the after struggling with this so I s
 
 
 # Day 4 - Thursday | In class & At home work #
-With the little time I had left in class due to the lesson on spreadsheets, I decided to focus more on designing the website than implementing new logic. I had trouble recoloring icons such as a black play button image to match of my website. Gavin gave me a short lesson on photoshop and the skills he learned from digital arts.
+With the little time I had left in class due to the lesson on spreadsheets, I decided to focus more on designing the website than writing new logic. I had trouble recoloring icons such as a black play button image to match of my website. Gavin gave me a short lesson on photoshop and the skills he learned from digital arts.
 At home I contacted Gavin and he gave me a more in depth guide on how to recolor images with photoshop. His tips helped a ton and I can definitely see myself using them in future projects.
 
 
@@ -84,15 +84,16 @@ Right now the slider's design is still very unfinished but I've made a little pr
 
 # Day 8 - Monday | At home work #
 It took a few hours, but after using the website above as a template, filtering out the css-logic I couldn't make sense of, then mixing in javascript into the styling, I made a functional and decent looking slider for the audio element.
-I also wanted to put numbers on both sides of the slider to show the current time into the song and the total time of the song. Completing this didn't nearly as long as implementing the slider, but I still had to do research because I didn't know how to convert seconds into a HH:MM:SS format.
+I also wanted to put numbers on both sides of the slider to show the current time into the song and the total time of the song. Completing this didn't nearly as long as it did for the slider the slider, but I still had to do a bit of research because I didn't know how to convert seconds into a HH:MM:SS format.
 
 I started working on 4 new buttons: shuffle, previous song, next song, and loop. Can't have a music player without them. I also decided to make all of their icons .svg files instead of the typical .png which I've been using this entire project. I only did this because I recently remembered that .svg files scale with the screen, otherwise, I would've made every other one of my images a .svg.
 
 The previous song, next song, and loop buttons were very straightforward, it was only the shuffle button I had to do research to figure out how to get working. It's still incomplete right now, but I have a Fisher-Yates shuffle algorithm in place for it's basic functionality.
 
 # Day 9 - Tuesday | At home work #
-Okay. Implementing the shuffle button was a lot more of a pain than I originally thought it would be. The shuffle button's logic itself wasn't the issue, it was while I was testing it's logic that I discovered a fundamentally website breaking bug which took me from yesterday until today to find a solution for.
+Okay. Coding the shuffle button was a lot more of a pain than I originally thought it would be. The shuffle button's logic itself wasn't the issue, rather, it was while I was testing it's logic that I discovered a fundamentally website breaking bug which took me from yesterday until today to find a solution for.
 When a user looks into another playlist while a song is playing in a different playlist, the song continues playing on it's own without any issues, but if 'looping' is enabled and that song ends, what should happen is that the playlist which was playing the song should simply move onto the next song in it's array. But what was happening, was that the playlist the user is currently viewing would try to play the next song actual playlist's array, then an error would be thrown if that song didn't exist in the viewing playlists array. This issue makes it impossible to look through other playlists while listening to music, so I couldn't just overlook it.
-To fix it, I was very lost, in fact, I didn't even touch my code until today. I spent around 30 minutes to an hour just thinking of possible solutions and deciding not to implement them either because they would create more issues or they would be very inefficient and severely reduce code-readability. Nonetheless, I found something that worked. One new parameter.
+To fix it, I was very lost, in fact, I didn't even touch my code until today. I spent around 30 minutes to an hour just thinking of possible solutions then never going about using them them either because they would create more issues or they would be very inefficient and severely reduce code-readability. Nonetheless, I found something that worked. One new parameter.
 My playSong() function sounds simple but it does several checks and redefines a couple global variables before even touching `.play()`. It had 3 parameters, `songId`, `restart`, and `preshuffled`, the most important one here is songId, which is necessary for deciding what song is to be played. But the songId just tells the function what song to interact with, it doesn't give the function and information on what playlist is playing that song, to figure that out I originally just inserted this line into the function: `playingPlaylist === viewingPlaylist`. I honestly have no idea how I never saw any issues with that up until now, after all, the playing playlist isn't always the playlist the user is looking at. So I removed that line and instead gave the function a `playlistId` parameter so it can properly define `playingPlaylist`.
-I thought of implementing the solution yesterday but I avoided it because I thought giving one function 4 parameters was unnecessary and overkill, but right now, see it as one of the best and probably most effective solutions with minimal drawbacks.
+I thought of implementing the solution yesterday but I avoided it because I believed that giving one function 4 parameters was unnecessary and overkill, but right now, see it as one of the best and probably most effective solutions with minimal drawbacks.
+After finally fixed this issue, I spent a short while getting the shuffle logic to integrate correctly with the rest of the code.
