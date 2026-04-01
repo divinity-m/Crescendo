@@ -1,19 +1,20 @@
-// CRESCENDO SCRIPT.JS //
+/// CRESCENDO SCRIPT.JS ///
 // NAME: DIVINE MUSTAFA
 // Assignment: CSE Project B/D
 // What i made: An audio player. You throw in your own audio files. It plays them right back at you. Similar functionality to spotify.
 
-// DOCUMENT ELEMENTS //
+/// DOCUMENT ELEMENTS ///
 
 /* Files */
 const dropZone = document.getElementById("drop-zone");
 const audioFileInput = document.getElementById("audio-file-input");
 const imageFileInput = document.getElementById("image-file-input");
 
-/* Containers */
+/* Main Flexbox */
 const playlistsEl = document.getElementById("playlists-el");
 const songsEl = document.getElementById("songs-el");
 const nowPlayingEl = document.getElementById("now-playing-el");
+const searchBar = document.getElementById("search-bar");
 
 /* Audio Related */
 const audioEl = document.getElementById("audio-el");
@@ -26,7 +27,7 @@ const addPlaylistMenu = document.getElementById("add-to-playlist-menu");
 
 
 
-// GLOBAL VARIABLES & CLASSES //
+/// GLOBAL VARIABLES & CLASSES ///
 const playBtnSrc = "Images/playBtn.svg"; // must be defined before the classes
 
 /* Classes */
@@ -143,38 +144,27 @@ let currentKebabMenuAnchor = null;
 
 
 
-// EVENT LISTENERS //
+/// EVENT LISTENERS ///
 
-// Updates the 3-box flexbox sections once the document and script have loaded in
+// Updates the certain parts of the site onces it's fully loaded
 window.addEventListener("load", () => {
     updateWebsite();
     updateSliderProgressBar();
+
+    // gives the search bar a random placeholder
+    const random = Math.random();
+    
+    if (random > 0.75) searchBar.placeholder = "What genre are you think of right now?";
+    else if (random > 0.5) searchBar.placeholder = "I'm feeling EDM";
+    else if (random > 0.25) searchBar.placeholder = "Phonk genuinely isn't even that bad, the hate is unwarranted.";
+    else searchBar.placeholder = "Want to find good music? Download geometry dash.";
 });
 
 // Hides pop up menus when the page is clicked
-document.addEventListener("click", (e) => {
-    if (
-        !kebabMenu.contains(e.target) &&
-        kebabMenuOpen &&
-        e.target !== currentKebabMenuAnchor
-    )
-        hideKebabMenu();
+document.addEventListener("click", hideMenusHandler);
 
-    if (
-        !modifyMenu.contains(e.target) &&
-        modifyMenuOpen &&
-        !kebabMenu.contains(e.target) &&
-        !imageFileInput.contains(e.target)
-    )
-        hideModifyMenu();
-
-    if (
-        !addPlaylistMenu.contains(e.target) &&
-        addPlaylistMenuOpen &&
-        !kebabMenu.contains(e.target)
-    )
-        hideAddPlaylistMenu();
-});
+// Handles search bar inputs
+searchBar.addEventListener("input", searchBarHandler);
 
 
 /* Drop Zone Related Event Listeners */
@@ -193,7 +183,7 @@ dropZone.addEventListener("drop", getAudioFiles.bind(null, true));
 dropZone.addEventListener("click", () => audioFileInput.click());
 
 
-/* Audio Related Event Listeners*/
+/* Audio Related Event Listeners */
 
 // changes to either to slider, or the 
 audioEl.addEventListener("timeupdate", timeUpdateHandler);
@@ -216,7 +206,7 @@ timeSlider.addEventListener("mouseleave", () => {
 });
     
     
-// FUNCTIONS //
+/// FUNCTIONS ///
 
 
 /* Drop Zone Related Functions */
@@ -414,13 +404,12 @@ function updateSongsSection() {
 
         
         if (currentSong && playingPlaylist) {
-            // bolds the song if its the currently playing song and its in the currently playing playlist
             const songIsPlaying = currentSong.identifier === song.identifier;
             const playlistIsPlaying = playingPlaylist.identifier === viewingPlaylist.identifier;
             
+            // bolds the song if its the currently playing song and it's in the currently playing playlist
             if (songIsPlaying && playlistIsPlaying) {
                 const span = songDiv.querySelector("p").firstElementChild;
-
                 span.classList.add("font-semibold", "underline");
             }
         }
@@ -516,6 +505,32 @@ function swapPlaylist(playlistId) {
         p = document.getElementById(viewingPlaylist.elementId).querySelector("p");
         p.classList.add("font-semibold", "underline");
     }
+}
+
+function searchBarHandler() {
+    // clears the songsEl
+    songsEl.querySelectorAll("div").forEach((div) => {
+        songsEl.removeChild(div);
+    });
+
+    viewingPlaylist.songs.forEach((song) => {
+        
+        // checks for if the searchBar.value is in the songs name before proceeding with the same logic as updateSongsSection()
+        if (song.name.includes(searchBar.value)) {
+            const songDiv = createSongDiv(song);
+            songsEl.appendChild(songDiv);
+
+            if (currentSong && playingPlaylist) {
+                const songIsPlaying = currentSong.identifier === song.identifier;
+                const playlistIsPlaying = playingPlaylist.identifier === viewingPlaylist.identifier;
+
+                if (songIsPlaying && playlistIsPlaying) {
+                    const span = songDiv.querySelector("p").firstElementChild;
+                    span.classList.add("font-semibold", "underline");
+                }
+            }
+        }
+    })
 }
 
 
@@ -680,7 +695,7 @@ function playNextSong() {
         const nextIndex = songs[index + 1] ? index + 1: 0;
         
         const nextSong = songs[nextIndex];
-        playSong(nextSong.identifier);
+        playSong(nextSong.identifier, null, true); // restarts the song
     }
 }
 
@@ -692,11 +707,10 @@ function playPreviousSong() {
 
         const index = songs.findIndex((song) => song.identifier === currentSong.identifier);
 
-        // if the previous index exists, get it, else, reset back to the last index
         const previousIndex = songs[index - 1] ? index - 1 : songs.length - 1;
         
         const previousSong = songs[previousIndex];
-        playSong(previousSong.identifier);
+        playSong(previousSong.identifier, null, true);
     }
 }
 
@@ -825,6 +839,34 @@ function timeUpdateHandler() {
 
 /* Kebab Menu Functions */
 
+function hideMenusHandler(e) {
+    // if the kabab menu is open, the click wasn't inside the kebab menu, then hide the kebab menu
+    if (
+        kebabMenuOpen &&
+        !kebabMenu.contains(e.target)
+    )
+        hideKebabMenu();
+    
+    // if the modify menu is open and the click wasn't inside it and the click wasn't inside the kebab menu
+    // and the click wasn't inside the modify menu's image, then hide the modify menu
+    if (
+        modifyMenuOpen &&
+        !modifyMenu.contains(e.target) &&
+        !kebabMenu.contains(e.target) &&
+        !imageFileInput.contains(e.target)
+    )
+        hideModifyMenu();
+
+    // if the add playlist menu is open and the click wasn't inside it
+    // and e.target wasn't inside the kebab menu, then close the add playlist menu
+    if (
+        addPlaylistMenuOpen &&
+        !addPlaylistMenu.contains(e.target) &&
+        !kebabMenu.contains(e.target)
+    )
+        hideAddPlaylistMenu();
+}
+
 function openPlaylistMenu(playlistId, element) {
     const options = [
         {
@@ -920,10 +962,10 @@ function toggleKebabMenu(element, options) {
     kebabMenu.style.left = `${rect.right + 5}px`;
 
     
-    // provides classes so the menu slides outward and fades in
     kebabMenu.classList.remove("hidden");
 
     setTimeout(() => {
+        // removes classes so the menu slides outward and fades in
         kebabMenu.classList.remove("opacity-0", "-translate-x-2");
 
         // sets the global variables to sync with the timer
@@ -941,7 +983,7 @@ function hideKebabMenu() {
     kebabMenuTransitioning = true;
     
     
-    // provides classes so the menu slides inward and fades out
+    // sets up the classes that make menu slide inward and fade out
     kebabMenu.classList.add("opacity-0", "-translate-x-2");
 
     setTimeout(() => {
