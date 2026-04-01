@@ -176,11 +176,16 @@ searchBar.addEventListener("input", searchBarHandler);
     timeSlider.addEventListener(eventName, preventDefaults);
 });
 
-// Handles dropped files
-dropZone.addEventListener("drop", getAudioFiles.bind(null, true));
+// Handles dropped audio files
+dropZone.addEventListener("drop", getAudioFiles);
 
 // Handles dropZone clicks
 dropZone.addEventListener("click", () => audioFileInput.click());
+audioFileInput.addEventListener("change", getAudioFiles);
+
+// Handles the modify menu's Image clicks
+imageFileInput.addEventListener("change", getImageFile);
+
 
 
 /* Audio Related Event Listeners */
@@ -216,10 +221,29 @@ function preventDefaults(e) {
     e.stopPropagation();
 }
 
-function getAudioFiles(dropped, e) {
-    // gets the FileList object
-    const files = dropped ? e.dataTransfer.files : e.target.files;
+function getImageFile(e) {
+    // if e.dataTranfer (used for drop events) exists, then get it's fileList,
+    // else, get the files from e.target (used for clicks)
+    const files = e.dataTransfer ? e.dataTransfer.files : e.target.files;
+    
+    // checks if there are any files before proceeding 
+    if (files && files.length > 0) {
+        const file = files[0];
+        
+        // confirms the file is an image
+        if (file.type.startsWith("image/")) {
+            const src = URL.createObjectURL(file);
 
+            const replacementImage = document.getElementById("replace-picture-img");
+            replacementImage.src = src;
+        }
+    }
+}
+
+function getAudioFiles(e) {
+    // same as the first line in getImageFiles()
+    const files = e.dataTransfer ? e.dataTransfer.files : e.target.files;
+    
     // checks file validity
     const validatedFiles = validateFiles(Array.from(files));
 
@@ -285,23 +309,6 @@ function checkForDuplicateFiles(file, songsList) {
     })
     
     return sameFile;
-}
-
-function getImageFile(e) {
-    const files = e.target.files;
-
-    // checks if there are any files before proceeding 
-    if (files && files.length > 0) {
-        const file = files[0];
-        
-        // confirms the file is an image
-        if (file.type.startsWith("image/")) {
-            const src = URL.createObjectURL(file);
-
-            const replacementImage = document.getElementById("replace-picture-img");
-            replacementImage.src = src;
-        }
-    }
 }
 
 
@@ -407,7 +414,7 @@ function updateSongsSection() {
             const songIsPlaying = currentSong.identifier === song.identifier;
             const playlistIsPlaying = playingPlaylist.identifier === viewingPlaylist.identifier;
             
-            // bolds the song if its the currently playing song and it's in the currently playing playlist
+            // bolds the song if it's playing and it's in the currently playing playlist
             if (songIsPlaying && playlistIsPlaying) {
                 const span = songDiv.querySelector("p").firstElementChild;
                 span.classList.add("font-semibold", "underline");
@@ -508,28 +515,39 @@ function swapPlaylist(playlistId) {
 }
 
 function searchBarHandler() {
-    // clears the songsEl
-    songsEl.querySelectorAll("div").forEach((div) => {
-        songsEl.removeChild(div);
-    });
+    const searchQuery = searchBar.value.toLowerCase();
 
+    // empty query searches have nigh-identical logic to updateSongsSection();
+    if (searchQuery === "") {
+        updateSongsSection();
+        return;
+    }
+    
     viewingPlaylist.songs.forEach((song) => {
-        
-        // checks for if the searchBar.value is in the songs name before proceeding with the same logic as updateSongsSection()
-        if (song.name.includes(searchBar.value)) {
-            const songDiv = createSongDiv(song);
-            songsEl.appendChild(songDiv);
 
+        // checks if the song's name in lower case contains the query
+        const queryInSongName = song.name.toLowerCase().includes(searchQuery); // uses .includes() instead of .startsWith() on purpose
+    
+        const songDiv = document.getElementById(song.elementId);
+
+        // if the song name is in the query and it's div doesn't exist, add it to the songsEl
+        if (queryInSongName && !songDiv) {
+            const songToAdd = createSongDiv(song);
+            songsEl.appendChild(songToAdd);
+
+            // bolds the songs title if its currently playing
             if (currentSong && playingPlaylist) {
                 const songIsPlaying = currentSong.identifier === song.identifier;
                 const playlistIsPlaying = playingPlaylist.identifier === viewingPlaylist.identifier;
 
                 if (songIsPlaying && playlistIsPlaying) {
-                    const span = songDiv.querySelector("p").firstElementChild;
+                    const span = songToAdd.querySelector("p").firstElementChild;
                     span.classList.add("font-semibold", "underline");
                 }
             }
         }
+        // if the song name isn't in the query and it's div exists, remove it from the songsEl
+        else if (!queryInSongName && songDiv) songsEl.removeChild(songDiv);
     })
 }
 
@@ -1185,7 +1203,8 @@ function toggleModifyMenu(objectId, isSong) {
                 <div class="w-40 h-40 z-93 relative inline-block overflow-hidden rounded-md"
                     onmouseover="showBlur()"
                     onmouseleave="hideBlur()"
-                    onclick="(() => { imageFileInput.click() })()">
+                    onclick="(() => { imageFileInput.click() })()"
+                    ondrop="getImageFile(event)">
                             
                     <img id="replace-picture-img" src="${src}"
                     class="w-9/10 absolute top-[50%] left-[50%] -translate-1/2"/>
