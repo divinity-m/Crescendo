@@ -125,7 +125,7 @@
             
         </header>
 
-        <!-- kebab menu connecting to the kebabBtn -->
+        <!-- Kebab Menu connecting to the kebabBtn -->
         <aside
             id="kebab-menu"
             class="w-48 z-90 py-2 hidden absolute
@@ -134,7 +134,7 @@
             transition-all duration-200 opacity-0 -translate-x-2"
         ></aside>
 
-        <!-- menu overlay for changing aspects of songs and playlists -->
+        <!-- Modify Menu for changing aspects of songs and playlists -->
         <aside
             id="modify-menu"
             class="w-100 h-100 z-100 py-2 pz-4 hidden
@@ -143,7 +143,7 @@
             transition-all duration-200 opacity-0"
         ></aside>
 
-        <!-- menu overlay for adding songs to playlists-->
+        <!-- Add Playlist Menu for adding songs to playlists-->
         <aside
             id="add-to-playlist-menu"
             class="w-175 z-100 py-2 pz-4 hidden overflow-auto whitespace-nowrap
@@ -154,7 +154,8 @@
         ></aside>
 
         <!-- 3-Box Flexbox Layout -->
-        <main class="flex-1 flex justify-evenly gap-2.5 ml-2.5 mr-2.5 mb-1.5 text-left whitespace-nowrap overflow-hidden">
+        <main class="flex-1 flex justify-evenly gap-2.5 ml-2.5 mr-2.5 mb-1.5 text-left
+            whitespace-nowrap overflow-hidden">
             
             <!-- Playlists -->
             <section
@@ -167,6 +168,7 @@
                     
                     <h2 class="mb-5 pl-5 pt-2.5 text-5xl text-blue-700 font-bold">Playlists</h2>
                     
+                    <!-- Add Button -->
                     <img
                         id="add-btn"
                         src="Images/addBtn.svg"
@@ -191,9 +193,10 @@
                     
                     <h2 class="mb-5 pl-5 pt-2.5 text-5xl text-blue-700 font-bold">Songs</h2>
 
-                    <input id="search-bar" type="text"
+                    <!-- Search Bar -->
+                    <input id="search-bar" type="text" placeholder=""
                         class="w-full h-10 px-2 mr-5 focus:outline-none
-                        text-xl text-white/75 font-medium
+                        text-lg text-white/75 font-medium
                         bg-white/30 rounded-full"/>
                     
                 </header>
@@ -221,9 +224,8 @@
                 
                     <p id="playing-song-artist" class="font-medium text-xl text-blue-600">...</p>
 
+                    <!-- Control Buttons -->
                     <div id="control-buttons" class="w-full h-10 py-2 flex justify-center items-center gap-2.5">
-                        <!-- ADD THE SHUFFLE BUTTON, NEXT/PREVIOUS SONG BUTTONS, AND LOOP BUTTON HERE -->
-                        <!-- LOOK AT SPOTIFY FOR REFERENCE -->
                         
                         <img id="shuffle-btn" src="Images/shuffleBtn.svg" onclick="toggleShuffle()"
                             class="w-7.5 hover:w-8.5 hover:-ml-0.2 hover:cursor-pointer grayscale
@@ -252,6 +254,7 @@
                             transition-all duration-200"/>
     
                     </div>
+                    
                     <div id="time-slider-container" class="w-[80%] h-10 flex justify-around items-center relative">
                         
                         <p id="current-time-text" class="text-blue-700 grayscale absolute left-[5%] top-[50%] -translate-1/2">0</p>
@@ -261,6 +264,7 @@
                         <p id="duration-text" class="text-blue-700 grayscale absolute left-[95%] top-[50%] -translate-1/2">0</p>
                         
                     </div>
+                    
                 </div>
                 
                 <audio id="audio-el" src="" class="mt-5"></audio>
