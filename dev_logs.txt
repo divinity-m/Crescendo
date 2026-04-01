@@ -99,3 +99,6 @@ I thought of implementing the solution yesterday but I avoided it because I beli
 After finally fixed this issue, I spent a short while getting the shuffle logic to integrate correctly with the rest of the code.
 
 The website is basically complete now. There are just 2 more features I want to add. A search bar, and a music visualizer which uses an API.
+I started working on a handler for the search bar's event listener, it's structurally very similar to one function I already made `updateSongsSection` which fully refreshes a portion of the page, but it had a few key differences for locating specific songs.
+
+# Day 10 - Wednesday | At home work #
