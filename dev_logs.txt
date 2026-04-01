@@ -98,8 +98,9 @@ My playSong() function sounds simple but it does several checks and redefines a 
 I thought of implementing the solution yesterday but I avoided it because I believed that giving one function 4 parameters was unnecessary and overkill, but right now, see it as one of the best and probably most effective solutions with minimal drawbacks.
 After finally fixed this issue, I spent a short while getting the shuffle logic to integrate correctly with the rest of the code.
 
-The website is basically complete now. There are just 2 more features I want to add. A search bar, and a music visualizer which uses an API.
+The website is basically complete now. There are just 3 more features I want to add. A search bar, a music visualizer which uses an API, and local data saving.
 I started working on a `searchBarHandler` function for the search bar's event listener, and I found out that it's structurally very similar to one function I already made `updateSongsSection` which fully refreshes a portion of the page, but it had a few key differences needed locating specific songs.
 
 # Day 10 - Wednesday | At home work #
-I finished up the `searchBarHandler` function fairly quickly, and I made sure to make it avoid refreshing song-divs that fit the searches query and already exist in the page. 
+I finished up the `searchBarHandler` function fairly quickly, and I made sure to make it avoid recreating song-divs that fit the searches query and already exist in the page. 
+I made an 'ondrop' event handler attribute for the `<img>` tag in the modify menu, allowing users to drop image files into the tag if they want to.
