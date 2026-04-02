@@ -169,6 +169,7 @@ Things Added:
 # Day 11 - Thursday | At home work #
 I started working on data saving and since I've already worked with saving local data in old projects, I thought it wouldn't be much of a issue. Then I encountered an issue. Javascript's `localStorage` API can't handle large files, it can barely handle 5MB, so there's no way I could get it to save audio files. Due to this, I had to learn about a whole new way to save data locally.
 I chose to learn how to work with `indexedDB`. At first, it was incredibly difficult to understand how it functions and it's methods. Even just `indexedDB.open("DB", 1)` made zero sense to me, but that's just how learning new things is. I had to use a lot of Youtube, Stackoverflow, and ChatGPT before things started making sense.
+Right now, the database only stores one items, a variable called `allPlaylists` which contains every playlist, and so by extension, every song, which is all I think actually matters.
 
 Things Added:
  - A local auto save system
