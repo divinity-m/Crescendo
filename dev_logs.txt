@@ -5,8 +5,8 @@ At home, I created a `Songs` class, `Playlist` class, and a default `allSongs` o
 
 Things Added:
  - Basic UI (via Tailwind CSS)
- - a `Songs` and `Playlist` class
- - some file-uploading code complete
+ - A `Songs` and `Playlist` class
+ - Some file-uploading code complete
 
 
 
@@ -20,7 +20,7 @@ I felt very condifent that this concise method would work perfectly, but it didn
 Things Added:
  - File-uploading system
  - UI improvements
- - tiny progress on an anti-duplicate file system
+ - Tiny progress on an anti-duplicate file system
  - A play-pause system
 
 
@@ -171,4 +171,4 @@ I started working on data saving and since I've already worked with saving local
 I chose to learn how to work with `indexedDB`. At first, it was incredibly difficult to understand how it functions and it's methods. Even just `indexedDB.open("DB", 1)` made zero sense to me, but that's just how learning new things is. I had to use a lot of Youtube, Stackoverflow, and ChatGPT before things started making sense.
 
 Things Added:
- - Local auto save system
+ - A local auto save system
