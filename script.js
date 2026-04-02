@@ -263,8 +263,10 @@ function saveData() {
 
     // assigns the values
     store.put({
-        id: "All Playlists",
-        data: allPlaylistsClone,
+        id: "User Data",
+        userPlaylists: allPlaylistsClone,
+        userLoopState: loopState,
+        userShuffleState: shuffleOn,
     })
 }
 
@@ -274,48 +276,90 @@ function loadData() {
     const store = tx.objectStore("CrescendoData");
 
     // finds the data via its ID
-    const request = store.get("All Playlists");
+    const request = store.get("User Data");
 
     // sets up the values
     request.onsuccess = () => {
-        allPlaylists = request.result.data;
-        allSongs = allPlaylists[0];
-        viewingPlaylist = allPlaylists[0];
-
+        // updates the loop state
+        loopState = request.result.userLoopState;
+        const loopBtn = document.getElementById("loop-btn");
         
-        allPlaylists.forEach((playlist) => {
-            // fixes the playlist's pictures
-            if (playlist.pictureFile) playlist.picture = URL.createObjectURL(playlist.pictureFile);
+        if (loopState === "none") loopBtn.classList.add("grayscale");
 
+        else if (loopState === "one") {
+            loopBtn.classList.remove("grayscale");
+            loopBtn.src = "Images/loopBtn1.svg";
+        }
+
+        else if (loopState === "all") {
+            loopBtn.classList.remove("grayscale");
+            loopBtn.src = "Images/loopBtn.svg";
+        }
+        
+
+        // updates the shuffle state
+        shuffleOn = request.result.userShuffleState;
+        
+        if (shuffleOn) shuffleOn = false;
+        else shuffleOn = true
+        
+        toggleShuffle();
+        
+        
+        // Updates the playlists and songs
+        allPlaylists = request.result.userPlaylists;
+        
+        for (let i in allPlaylists) {
+            // saves the original playlist's data in a copy
+            const playlistCopy = structuredClone(allPlaylists[i]);
+
+            // reset the playlist to regain it's methods
+            allPlaylists[i] = new Playlist(playlistCopy.name, playlistCopy.identifier);
+            
+            allPlaylists[i].songs = playlistCopy.songs;
+            
+            // fixes the playlist's picture
+            if (playlistCopy.pictureFile) {
+                allPlaylists[i].pictureFile = playlistCopy.pictureFile;
+                allPlaylists[i].picture = URL.createObjectURL(playlistCopy.pictureFile);
+            }
+
+            const playlist = allPlaylists[i];
+        
             // scans every song in every playlist to reset them
-            for (let index in playlist.songs) {
+            for (let j in playlist.songs) {
                 
-                // saves the original songs data in a copy
-                const songCopy = structuredClone(playlist.songs[index]);
+                // saves the original song's data in a copy
+                const songCopy = structuredClone(playlist.songs[j]);
 
-                // resets the song, necessary for playability
-                playlist.songs[index] = new Song(songCopy.file, songCopy.identifier);
+                // resets the song to regain it's methods
+                playlist.songs[j] = new Song(songCopy.file, songCopy.identifier);
+                const song = playlist.songs[j];
                 
                 // provides the song it's modifiable data
-                playlist.songs[index].name = songCopy.name;
-                playlist.songs[index].artist = songCopy.artist;
+                song.name = songCopy.name;
+                song.artist = songCopy.artist;
 
                 // fixes the song's picture
                 if (songCopy.pictureFile) {
-                    playlist.songs[index].pictureFile = songCopy.pictureFile;
-                    playlist.songs[index].picture = URL.createObjectURL(songCopy.pictureFile);
+                    song.pictureFile = songCopy.pictureFile;
+                    song.picture = URL.createObjectURL(songCopy.pictureFile);
                 }
             }
-        })
+        }
+        
+        allSongs = allPlaylists[0];
+        viewingPlaylist = allPlaylists[0];
 
         // updates the html
-        updateSongsSection();
-        updatePlaylistsSection();
+        updateWebsite();
+
+        saveData();
     }
 }
 
 function resetDB() {
-    // resets everything (cuz i mess up a lot, working with data is hard)
+    // resets everything (cuz i mess up a lot, working with local data is hard)
     indexedDB.deleteDatabase("CrescendoDB");
     location.reload();
 }
@@ -846,7 +890,7 @@ function playPreviousSong() {
 }
 
 function changeLoopState() {
-    let loopBtn = document.getElementById("loop-btn");
+    const loopBtn = document.getElementById("loop-btn");
     
     if (loopState === "none") {
         loopState = "one";
@@ -864,6 +908,8 @@ function changeLoopState() {
         
         loopBtn.classList.add("grayscale");
     }
+
+    saveData();
 }
 
 function toggleShuffle() {
@@ -878,6 +924,8 @@ function toggleShuffle() {
         shuffleBtn.classList.remove("grayscale");
         if (playingPlaylist) playingPlaylist.shuffled = false;
     }
+
+    saveData();
 }
 
 
