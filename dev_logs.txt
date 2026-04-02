@@ -104,3 +104,7 @@ I started working on a `searchBarHandler` function for the search bar's event li
 # Day 10 - Wednesday | At home work #
 I finished up the `searchBarHandler` function fairly quickly, and I made sure to make it avoid recreating song-divs that fit the searches query and already exist in the page. 
 I made an 'ondrop' event handler attribute for the `<img>` tag in the modify menu, allowing users to drop image files into the tag if they want to.
+
+# Day 11 - Thursday | At home work #
+I started working on data saving and since I've already worked with saving local data in old projects, I thought it wouldn't be much of a issue. Then I encountered an issue. Javascript's `localStorage` API can't handle large files, it can barely handle 5MB, so there's no way I could get it to save audio files. Due to this, I had to learn about a whole new way to save data locally.
+I chose to learn how to work with `indexedDB`. At first, it was incredibly difficult to understand how it functions and it's methods. Even just `indexedDB.open("DB", 1)` made zero sense to me, but that's just how learning new things is. I had to use a lot of Youtube, Stackoverflow, and ChatGPT before things started making sense.
