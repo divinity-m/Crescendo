@@ -29,6 +29,7 @@ const addPlaylistMenu = document.getElementById("add-to-playlist-menu");
 
 /// GLOBAL VARIABLES & CLASSES ///
 const playBtnSrc = "Images/playBtn.svg"; // must be defined before the classes
+let promise = null;
 
 /* Classes */
 class Song {
@@ -42,13 +43,13 @@ class Song {
         this.name = file.name.split(".")[0];
         this.artist = "unknown artist";
         this.picture = "Images/music_note.png";
+        this.pictureFile = null;
 
         this.originalName = this.name;
         this.originalArtist = this.artist;
         this.originalPicture = this.picture;
         
         this._playImg = playBtnSrc;
-        this.promise = null;
     }
 
     play(restart) {
@@ -59,10 +60,11 @@ class Song {
         // resets the song if it has already ended or the restart is true
         if (songEnded || restart) audioEl.currentTime = 0;
         
-        // changes the audio elements src then plays it, storing the .play() in a promise
+        // changes the audio elements src to match the songs
         if (audioEl.src !== this.src) audioEl.src = this.src;
-        
-        this.promise = audioEl.play().catch((err) => {
+
+        // stores the .play() method in a promise
+        promise = audioEl.play().catch((err) => {
             console.warn("Play interrupted:", err);
         });
     }
@@ -88,6 +90,7 @@ class Playlist {
         
         this.name = name;
         this.picture = "Images/music_note.png";
+        this.pictureFile = null;
 
         this.originalName = this.name;
         this.originalPicture = this.picture;
@@ -129,8 +132,10 @@ class Playlist {
 }
 
 /* Global Variables */
-const allSongs = new Playlist("Songs", 0); // necessary to keep track of every song
-const allPlaylists = [allSongs];
+let database = null;
+
+let allSongs = new Playlist("Songs", 0); // necessary to keep track of every song
+let allPlaylists = [allSongs];
 let [viewingPlaylist, playingPlaylist, currentSong] = [allSongs, null, null];
 
 let loopState = "none"; // 3 states: none, one, and all 
@@ -141,12 +146,12 @@ let sliderHeight = 4;
 let [kebabMenuOpen, modifyMenuOpen, addPlaylistMenuOpen] = [ false, false, false, ];
 let [kebabMenuTransitioning, innerMenuTransitioning, blurTransitioning] = [ false, false, false, ];
 let currentKebabMenuAnchor = null;
-
+let modifyMenuImageFile = null;
 
 
 /// EVENT LISTENERS ///
 
-// Updates the certain parts of the site onces it's fully loaded
+// Updates the certain parts of the site once index.html and script.js have fully loaded
 window.addEventListener("load", () => {
     updateWebsite();
     updateSliderProgressBar();
@@ -192,13 +197,13 @@ imageFileInput.addEventListener("change", getImageFile);
 
 // changes to either to slider, or the 
 audioEl.addEventListener("timeupdate", timeUpdateHandler);
-timeSlider.addEventListener('click', sliderAdjusted);
+timeSlider.addEventListener("click", sliderAdjusted);
 timeSlider.addEventListener("input", updateSliderProgressBar);
 
 
 // prevents bugs caused by the audio element updating while the user drags the slider
-timeSlider.addEventListener('mousedown', () => draggingSlider = true);
-timeSlider.addEventListener('mouseup', () => draggingSlider = false);
+timeSlider.addEventListener("mousedown", () => draggingSlider = true);
+timeSlider.addEventListener("mouseup", () => draggingSlider = false);
 
 // updates the sliders height
 timeSlider.addEventListener("mouseenter", () => {
@@ -212,6 +217,108 @@ timeSlider.addEventListener("mouseleave", () => {
     
     
 /// FUNCTIONS ///
+
+/* Data Related Functions */
+
+function loadDatabase() {
+    // flag to prevent loading non-existant data
+    let databaseExists = true;
+    
+    // requests the data (asynchronous)
+    const request = indexedDB.open("CrescendoDB", 1);
+    
+    // if the database doesn't exist for the user, set it up
+    request.onupgradeneeded = (event) => {
+        database = event.target.result;
+        database.createObjectStore("CrescendoData", { keyPath: "id" });
+        
+        databaseExists = false
+    };
+
+    // once the request as finished, store the opened database
+    request.onsuccess = (event) => {
+        database = event.target.result;
+        if (databaseExists) loadData();
+        else saveData();
+    };
+}
+loadDatabase();
+
+function saveData() {
+    // requests the data's location
+    const tx = database.transaction("CrescendoData", "readwrite");
+    const store = tx.objectStore("CrescendoData");
+
+    
+    const allPlaylistsClone = structuredClone(allPlaylists);
+
+    // resets certains properties of every playlist and song before saving
+    allPlaylistsClone.forEach((playlist) => {
+        playlist.songs.forEach((song) => {
+            song._playImg = playBtnSrc;
+        })
+        playlist._playImg = playBtnSrc;
+    
+    })
+
+    // assigns the values
+    store.put({
+        id: "All Playlists",
+        data: allPlaylistsClone,
+    })
+}
+
+function loadData() {
+    // requests the data's location
+    const tx = database.transaction("CrescendoData", "readonly");
+    const store = tx.objectStore("CrescendoData");
+
+    // finds the data via its ID
+    const request = store.get("All Playlists");
+
+    // sets up the values
+    request.onsuccess = () => {
+        allPlaylists = request.result.data;
+        allSongs = allPlaylists[0];
+        viewingPlaylist = allPlaylists[0];
+
+        
+        allPlaylists.forEach((playlist) => {
+            // fixes the playlist's pictures
+            if (playlist.pictureFile) playlist.picture = URL.createObjectURL(playlist.pictureFile);
+
+            // scans every song in every playlist to reset them
+            for (let index in playlist.songs) {
+                
+                // saves the original songs data in a copy
+                const songCopy = structuredClone(playlist.songs[index]);
+
+                // resets the song, necessary for playability
+                playlist.songs[index] = new Song(songCopy.file, songCopy.identifier);
+                
+                // provides the song it's modifiable data
+                playlist.songs[index].name = songCopy.name;
+                playlist.songs[index].artist = songCopy.artist;
+
+                // fixes the song's picture
+                if (songCopy.pictureFile) {
+                    playlist.songs[index].pictureFile = songCopy.pictureFile;
+                    playlist.songs[index].picture = URL.createObjectURL(songCopy.pictureFile);
+                }
+            }
+        })
+
+        // updates the html
+        updateSongsSection();
+        updatePlaylistsSection();
+    }
+}
+
+function resetDB() {
+    // resets everything (cuz i mess up a lot, working with data is hard)
+    indexedDB.deleteDatabase("CrescendoDB");
+    location.reload();
+}
 
 
 /* Drop Zone Related Functions */
@@ -232,6 +339,7 @@ function getImageFile(e) {
         
         // confirms the file is an image
         if (file.type.startsWith("image/")) {
+            modifyMenuImageFile = file;
             const src = URL.createObjectURL(file);
 
             const replacementImage = document.getElementById("replace-picture-img");
@@ -247,8 +355,11 @@ function getAudioFiles(e) {
     // checks file validity
     const validatedFiles = validateFiles(Array.from(files));
 
-    // turns files into songs
-    if (validatedFiles !== null) processFiles(validatedFiles);
+    // turns files into songs and saves the new songs
+    if (validatedFiles !== null) {
+        processFiles(validatedFiles);
+        saveData();
+    }
 }
 
 function validateFiles(files) {
@@ -491,6 +602,8 @@ function addNewPlaylist() {
     // makes a new div for the playlist
     const playlistDiv = createPlaylistDiv(newPlaylist);
     playlistsEl.appendChild(playlistDiv);
+
+    saveData();
 }
 
 function swapPlaylist(playlistId) {
@@ -1044,6 +1157,8 @@ function removeFromPlaylist(songId) {
     viewingPlaylist.songs.splice(index, 1);
 
     viewingPlaylist.shuffled = false;
+
+    saveData();
 }
 
 function deleteSong(songId) {
@@ -1075,6 +1190,8 @@ function deleteSong(songId) {
             viewingPlaylist.shuffled = false;
         }
     });
+
+    saveData();
 }
 
 function deletePlaylist(playlistId) {
@@ -1099,6 +1216,8 @@ function deletePlaylist(playlistId) {
     // deletes the playlist from the playlists array
     const index = allPlaylists.findIndex((list) => list.identifier === playlistId);
     allPlaylists.splice(index, 1);
+
+    saveData();
 }
 
 
@@ -1152,6 +1271,8 @@ function toggleAddPlaylistMenu(songId) {
                     swapPlaylist(playlist.identifier);
                     
                     playlist.shuffled = false;
+
+                    saveData();
                 }
 
                 hideAddPlaylistMenu();
@@ -1302,7 +1423,6 @@ function hideModifyMenu() {
 function setObjectValues(objectId, isSong) {
     // if the object is a song, find it in the viewingPlaylist array, else, find the playlist in the allPlaylists array
     const object = isSong ? findObjectByIdentifier(viewingPlaylist.songs, objectId) : findObjectByIdentifier(allPlaylists, objectId);
-    
     // gets the objects corresponding HTML div then checks if it exists
     const objectDiv = document.getElementById(object.elementId);
 
@@ -1339,17 +1459,23 @@ function setObjectValues(objectId, isSong) {
     
             // replaces the object's picture if the image isn't the default
             object.picture = replacementPicture;
+            object.pictureFile = modifyMenuImageFile;
     
             // replaces the img element's picture
             objectImg.src = replacementPicture;
         }
     }
     
-    // updates the html for the currently playing song
-    if (isSong) updateCurrentlyPlayingSongSection();
+    // updates every song in every playlist and the current song section of the website
+    if (isSong) {
+        changeEverySong(objectId, object);
+        updateCurrentlyPlayingSongSection();
+    }
 
     // hides the menu
     hideModifyMenu();
+
+    saveData();
 }
 
 function resetObjectValues(objectId, isSong) {
@@ -1359,6 +1485,7 @@ function resetObjectValues(objectId, isSong) {
     // resets it's values
     object.name = object.originalName;
     object.picture = object.originalPicture;
+    object.pictureFile = null;
     if (isSong) object.artist = object.originalArtist;
 
     // gets the objects corresponding HTML div then checks if it exists
@@ -1382,12 +1509,35 @@ function resetObjectValues(objectId, isSong) {
         else objectPara.innerHTML = object.name;
     }
 
-    // updates the html for the currently playing song
-    if (isSong) updateCurrentlyPlayingSongSection();
+    // updates every song in every playlist and the current song section of the website
+    if (isSong) {
+        changeEverySong(objectId, object);
+        updateCurrentlyPlayingSongSection();
+    }
     
     // hides the menu
     hideModifyMenu();
+
+    saveData();
 }
+
+
+function changeEverySong(songId, newSong) {
+    allPlaylists.forEach((playlist) => {
+        const index = playlist.songs.findIndex((song) => song.identifier === songId);
+        
+        if (index > -1) {
+            // replaces the following properties
+            ["name", "artist", "picture"].forEach((property) => {
+                playlist.songs[index][property] = newSong[property];
+            })
+
+            // "pictureFile" causes errors when places in the above array
+            if (newSong.pictureFile) playlist.songs[index].pictureFile = newSong.pictureFile;
+        }
+    })
+}
+
 
 function showBlur() {
     // prevents clipping
