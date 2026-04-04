@@ -28,7 +28,10 @@ const addPlaylistMenu = document.getElementById("add-to-playlist-menu");
 
 
 /// GLOBAL VARIABLES & CLASSES ///
-const playBtnSrc = "Images/playBtn.svg"; // must be defined before the classes
+
+/* Global Variables Which Must Be Defined Before The Classes */
+const playBtnSrc = "Images/playBtn.svg";
+const pauseBtnSrc = "Images/pauseBtn.svg";
 let promise = null;
 
 /* Classes */
@@ -53,18 +56,20 @@ class Song {
     }
 
     play(restart) {
-        this.playImg = "Images/pauseBtn.svg";
+        // only changes the song's play button if it's being viewed in the playing playlist
+        if (viewingPlaylist.identifier === playingPlaylist.identifier) this.playImg = pauseBtnSrc;
 
         const songEnded = audioEl.currentTime === audioEl.duration;
         
-        // resets the song if it has already ended or the restart is true
+        // restarts the song if it has already ended or the `restart` parameter is true
         if (songEnded || restart) audioEl.currentTime = 0;
         
         // changes the audio elements src to match the songs
         if (audioEl.src !== this.src) audioEl.src = this.src;
 
-        // stores the .play() method in a promise
+        // stores the .play() method in a promise (ignores abort errors)
         promise = audioEl.play().catch((err) => {
+            if (err.name === "AbortError") return;
             console.warn("Play interrupted:", err);
         });
     }
@@ -604,8 +609,9 @@ function updateCurrentlyPlayingSongSection() {
     playingSongName.innerHTML = potentialSong.name;
     
     playingSongArtist.innerHTML = potentialSong.artist; 
-    
-    playingSongPlayBtn.src = potentialSong._playImg;
+
+    const playButtonImage = audioEl.paused ? playBtnSrc : pauseBtnSrc;
+    playingSongPlayBtn.src = playButtonImage;
 }
 
 function updateWebsite() {
@@ -828,11 +834,13 @@ function playSong(songId, playlistId = null, restart = false, preshuffled = fals
         }
     }
 
-    // bolds the new song if it's div exists
+    
     const newSongsDiv = document.getElementById(songClicked.elementId);
-
-    if (newSongsDiv) {
+    
+    // bolds the new song if it's div exists and the playlist being viewed is the playing playlist
+    if (newSongsDiv &&viewingPlaylist.identifier === playingPlaylist.identifier) {
         const newSongsSpan = newSongsDiv.querySelector("p").firstElementChild;
+        
         newSongsSpan.classList.add("font-semibold", "underline");
     }
 
@@ -843,12 +851,14 @@ function playSong(songId, playlistId = null, restart = false, preshuffled = fals
     // plays or pauses the song based on if the audioEl is paused
     if (audioEl.paused || restart) songClicked.play(restart);
     else songClicked.pause();
-    
 
-    // updates the play button image of the viewingPlaylist while ensuring every other playlist gets the default play button
+    
+    const playButtonImage = audioEl.paused ? playBtnSrc : pauseBtnSrc;
+
+    // changes the play button image of the playingPlaylist while ensuring every other playlist gets the default play button
     allPlaylists.forEach((playlist) => {
-        if (playlist.identifier === viewingPlaylist.identifier)
-            playlist.playImg = songClicked._playImg;
+        if (playlist.identifier === playingPlaylist.identifier) playlist.playImg = playButtonImage;
+            
         else playlist.playImg = playBtnSrc;
     });
 
