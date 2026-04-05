@@ -37,7 +37,7 @@ let dx = 1;
 function draw() {
     ctx.clearRect(0, 0, cnvWidth, cnvHeight);
     
-    /* Gets The Audio Element Frequency Data */
+    /* Gets The Audio Element's Frequency Data */
     analyser.getByteFrequencyData(dataArray);
 
     const gap = 1;
@@ -47,7 +47,7 @@ function draw() {
     // Visualiser Bars
     ctx.fillStyle = "oklch(48.8% 0.243 264.376)";
     for (let i = 0; i < dataArray.length; i++) {
-        // smoothens the erratic nature of the bars
+        // smoothens the erratic movement of the bars
         if (dataArray[i] > smoothData[i]) {
              smoothData[i] = dataArray[i]; // fast rise
         } else {
@@ -55,9 +55,9 @@ function draw() {
         }
         const value = smoothData[i];
 
-        // distance from center
+        // distance from center calculation
         const center = dataArray.length / 2;
-        const distance = Math.abs(i - center) / center;
+        const distance = Math.abs(i - center) / center; // clamp from 0 to 1
     
         // bell curve weight
         const weight = Math.sin((1 - distance) * Math.PI / 2);
