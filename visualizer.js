@@ -59,7 +59,7 @@ function draw() {
         const center = dataArray.length / 2;
         const distance = Math.abs(i - center) / center; // clamp from 0 to 1
     
-        // bell curve weight
+        // bell curve weight to make centered bars larger
         const weight = Math.sin((1 - distance) * Math.PI / 2);
 
         // final height
