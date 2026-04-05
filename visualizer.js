@@ -40,42 +40,47 @@ function draw() {
     /* Gets The Audio Element's Frequency Data */
     analyser.getByteFrequencyData(dataArray);
 
+    // after some testing, i discovered that indexes past index 44 usually are completely inactive
+    const activeData = dataArray.slice(0, 44);
+
     const gap = 1;
-    const barWidth = (cnvWidth - gap * (dataArray.length - 1)) / dataArray.length;
-    const half = dataArray.length / 2;
-    
-    // Visualiser Bars
+    const barWidth = (cnvWidth - gap * (activeData.length - 1)) / activeData.length;
+
+    /* Visualiser Bars */
     ctx.fillStyle = "oklch(48.8% 0.243 264.376)";
-    for (let i = 0; i < dataArray.length; i++) {
+    for (let i = 0; i < activeData.length; i++) {
+        
         // smoothens the erratic movement of the bars
-        if (dataArray[i] > smoothData[i]) {
-             smoothData[i] = dataArray[i]; // fast rise
+        if (activeData[i] > smoothData[i]) {
+             smoothData[i] = activeData[i]; // fast rise
         } else {
-            smoothData[i] += (dataArray[i] - smoothData[i]) * smoothingFactor; // slow fall
+            smoothData[i] += (activeData[i] - smoothData[i]) * smoothingFactor; // slow fall
         }
-        const value = smoothData[i];
 
         // distance from center calculation
-        const center = dataArray.length / 2;
-        const distance = Math.abs(i - center) / center; // clamp from 0 to 1
+        const center = activeData.length / 2;
+        const distance = Math.abs(i - center) / center; // normalize the distance (0-1)
     
-        // bell curve weight to make centered bars larger
-        const weight = Math.sin((1 - distance) * Math.PI / 2);
+        // bell curve weight to make centered bars generally larger
+        let weight = Math.sin((1 - distance) * Math.PI / 2);
 
         // final height
-        const barHeight = cnvHeight * (value / 255) * weight;
+        const barHeight = cnvHeight * (smoothData[i] / 255) * weight;
     
-        const x = i * (barWidth + gap);
+        const barX = i * (barWidth + gap);
     
-        ctx.fillRect(x, (cnvHeight - barHeight) / 2, barWidth - gap, barHeight);
+        ctx.fillRect(barX, (cnvHeight - barHeight) / 2, barWidth - gap, barHeight);
     }
+    
     // Draws a line through the middle
     ctx.fillStyle = "white";
-    ctx.fillRect(0, cnvHeight/2 - 2, cnvWidth, 2);
+    ctx.fillRect(0, cnvHeight/2 - 2.5, cnvWidth, 5);
+    
+    ctx.fillStyle = "oklch(48.8% 0.243 264.376)";
+    ctx.fillRect(2, cnvHeight/2 - 1, cnvWidth-4, 2);
 
     
-    // Moving Square For No Reason
-    ctx.fillStyle = "oklch(48.8% 0.243 264.376)";
+    /* Moving Square For No Reason */
     ctx.fillRect(x, cnvHeight/2 - 6, 10, 10);
     if (x >= cnvWidth - 10) dx = -1;
     if (x <= 0) dx = 1;
