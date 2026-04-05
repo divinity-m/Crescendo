@@ -47,7 +47,6 @@ function draw() {
     const barWidth = (cnvWidth - gap * (activeData.length - 1)) / activeData.length;
 
     /* Visualiser Bars */
-    ctx.fillStyle = "oklch(48.8% 0.243 264.376)";
     for (let i = 0; i < activeData.length; i++) {
         
         // smoothens the erratic movement of the bars
@@ -56,19 +55,16 @@ function draw() {
         } else {
             smoothData[i] += (activeData[i] - smoothData[i]) * smoothingFactor; // slow fall
         }
-
-        // distance from center calculation
-        const center = activeData.length / 2;
-        const distance = Math.abs(i - center) / center; // normalize the distance (0-1)
-    
-        // bell curve weight to make centered bars generally larger
-        let weight = Math.sin((1 - distance) * Math.PI / 2);
-
-        // final height
-        const barHeight = cnvHeight * (smoothData[i] / 255) * weight;
+        
+        const barHeight = calculateBarHeight(activeData, i, smoothData[i]);
     
         const barX = i * (barWidth + gap);
-    
+
+        // draws the bars
+        ctx.fillStyle = "white";
+        ctx.fillRect(barX - gap, 1 + (cnvHeight - barHeight) / 2, barWidth, 1 + barHeight);
+        
+        ctx.fillStyle = "oklch(48.8% 0.243 264.376)";
         ctx.fillRect(barX, (cnvHeight - barHeight) / 2, barWidth - gap, barHeight);
     }
     
@@ -81,7 +77,9 @@ function draw() {
 
     
     /* Moving Square For No Reason */
-    ctx.fillRect(x, cnvHeight/2 - 6, 10, 10);
+    ctx.fillStyle = "oklch(48.8% 0.243 264.376)";
+    ctx.fillRect(x, cnvHeight/2 - 5, 10, 10);
+    
     if (x >= cnvWidth - 10) dx = -1;
     if (x <= 0) dx = 1;
     x += dx;
@@ -91,6 +89,18 @@ function draw() {
 }
 requestAnimationFrame(draw);
 
+function calculateBarHeight(array, index, value) {
+    // distance from center calculation
+    const center = array.length / 2;
+    const distance = Math.abs(index - center) / center; // normalize the distance (0-1)
 
+    // bell curve weight to make centered bars larger
+    let weight = Math.sin((1 - distance) * Math.PI / 2);
+
+    // final height
+    const barHeight = cnvHeight * (value / 255) * weight;
+    
+    return barHeight;
+}
 
 
