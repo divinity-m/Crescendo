@@ -87,7 +87,6 @@ function draw() {
 
     requestAnimationFrame(draw);
 }
-requestAnimationFrame(draw);
 
 function calculateBarHeight(array, index, value) {
     // distance from center calculation
@@ -103,4 +102,4 @@ function calculateBarHeight(array, index, value) {
     return barHeight;
 }
 
-
+requestAnimationFrame(draw);
