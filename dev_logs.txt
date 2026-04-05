@@ -173,3 +173,9 @@ Right now, the database only stores one items, a variable called `allPlaylists` 
 
 Things Added:
  - A local auto save system
+
+# Day 13 - Saturday | At home work #
+I started and finished working on the music visualizer. This was another new concept to me, but I quickly understood the basics setup after this video https://www.youtube.com/watch?v=AQggCuH4QkM. From there I did a lot of extra research on how to make the visualizer more appealing, such as smoothening out the movement of its bars and making the bars near the center larger.
+
+Things Added:
+ - The Music Visualizer
