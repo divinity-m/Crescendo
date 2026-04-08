@@ -72,6 +72,8 @@ class Song {
             if (err.name === "AbortError") return;
             console.warn("Play interrupted:", err);
         });
+        
+        timeSlider.disabled = false;
     }
 
     pause() {
@@ -285,7 +287,7 @@ function loadData() {
 
     // sets up the values
     request.onsuccess = () => {
-        // updates the loop state
+        // updates the loop state to match the save data
         loopState = request.result.userLoopState;
         const loopBtn = document.getElementById("loop-btn");
         
@@ -302,7 +304,7 @@ function loadData() {
         }
         
 
-        // updates the shuffle state
+        // updates the shuffle state to match the save data
         shuffleOn = request.result.userShuffleState;
         
         if (shuffleOn) shuffleOn = false;
@@ -364,7 +366,7 @@ function loadData() {
 }
 
 function resetDB() {
-    // resets everything (cuz i mess up a lot, working with local data is hard)
+    // resets everything (cuz i mess up a lot. working with local data is hard)
     indexedDB.deleteDatabase("CrescendoDB");
     location.reload();
 }
@@ -794,6 +796,8 @@ function playPlaylist(playlistId) {
 function playSong(songId, playlistId = null, restart = false, preshuffled = false) {
     // checks if the function was called by the button in the "Now Playing" flexbox
     if (songId === "playing-song-play-btn") {
+        
+        // only defines the songId if there is a song in the Now Playing section
         if (currentSong) songId = currentSong.identifier;
         
         else {
@@ -946,14 +950,14 @@ function updateSliderProgressBar() {
     
     const padding = 7.5;
     
-    // creates the sliders progress bar with a gradient
+    // this makes the sliders progress bar visible by giving it a background.
     timeSlider.style.background = `
         linear-gradient(to right, #154CEA ${percent}%, rgba(0, 0, 0, 0.2) ${percent}%)
         center / calc(100% - ${padding * 2}px) ${sliderHeight}px no-repeat
     `;
 
     
-    // updates the time paragraphs
+    // updates the time paragraph-elements
     const currentTimePara = document.getElementById("current-time-text");
     const durationPara = document.getElementById("duration-text");
 
@@ -1642,7 +1646,6 @@ function hideBlur() {
         blurTransitioning = false;
     }, 500);
 }
-
 
 
 
