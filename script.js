@@ -461,7 +461,7 @@ function checkForDuplicateFiles(file, songsList) {
 }
 
 
-/* UI Changing Functions */
+/* UI Altering Functions */
 
 function createPlaylistDiv(playlist) {
     const div = document.createElement("div");
@@ -489,6 +489,7 @@ function createPlaylistDiv(playlist) {
                             <img src="Images/kebabBtn.png"
                                 class="w-5 h-8 ml-auto mr-1 rounded-3xl hover:bg-[#0000FF1A] active:opacity-75 hover:cursor-pointer"
                                 onclick="openPlaylistMenu(${playlist.identifier}, this)"/>`;
+
     return div;
 }
 
@@ -524,6 +525,10 @@ function createSongDiv(song) {
                             <img src="Images/kebabBtn.png"
                                 class="w-5 h-8 ml-auto mr-1 rounded-3xl hover:bg-[#0000FF1A] active:opacity-75 hover:cursor-pointer"
                                 onclick="openSongMenu(${song.identifier}, this)"/>`;
+
+    // provides the reordering functionality for the song div
+    div.draggable = "true";
+    div.addEventListener("drag", moveSong.bind(null, div, song.identifier));
 
     return div;
 }
@@ -665,6 +670,26 @@ function swapPlaylist(playlistId) {
         p.classList.add("font-semibold", "underline");
     }
 }
+
+
+function moveSong(songDiv, songId, event) {
+    const songToMove = findObjectByIdentifier(viewingPlaylist.songs, songId);
+    
+    viewingPlaylist.songs.forEach((song) => {
+        const div = document.getElementById(song.elementId);
+        const rect = div.getBoundingClientRect();
+
+        const [x, y] = [event.x, event.y];
+        const isInside = x > rect.left && x < rect.right &&
+                        y > rect.top && y < rect.bottom;
+
+
+        if (isInside) {
+            console.log(div.id);
+        }
+    })
+}
+
 
 function searchBarHandler() {
     const searchQuery = searchBar.value.toLowerCase();
@@ -983,7 +1008,6 @@ function sliderAdjusted() {
         updateSliderProgressBar();
     }
 }
-
 
 function timeUpdateHandler() {
     // prevents slider adjustments if there isn't a song playing
