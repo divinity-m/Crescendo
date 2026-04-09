@@ -181,6 +181,7 @@ I started and finished working on the music visualizer. This was another new con
 
 Things Added:
  - The Music Visualizer
+ - A visualizer.js file
 
 
 
@@ -191,3 +192,11 @@ The fix was incredibly simple, I just had to create an event listener that unsus
 
 Things Fixed:
  - Audio element not playing
+
+
+
+# Day 18 - Wednesday | At school work #
+I decided to shorten the script.js file by creating a seperate file for all of the kebab menu related code. This separated about 600 lines of code.
+
+Things Added:
+ - A kebab-menu.js file
