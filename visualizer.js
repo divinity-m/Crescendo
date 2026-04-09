@@ -31,7 +31,7 @@ source.connect(analyser);
 source.connect(audioCtx.destination);
 
 
-// Resume the audio context on first user interaction 
+/* resume the audio context on first user interaction */
 document.addEventListener("click", () => { 
     if (audioCtx.state === "suspended") {
         audioCtx.resume();
