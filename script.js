@@ -134,11 +134,12 @@ class Playlist {
 }
 
 /* Global Variables */
-let database = null;
+let database;
 
 let allSongs = new Playlist("Songs", 0); // necessary to keep track of every song
 let allPlaylists = [allSongs];
 let [viewingPlaylist, playingPlaylist, currentSong] = [allSongs, null, null];
+let indexSongStartsAt, indexSongMovesTo;
 
 let loopState = "none"; // 3 states: none, one, and all 
 let shuffleOn = false;
@@ -178,13 +179,17 @@ searchBar.addEventListener("input", searchBarHandler);
 // Handles dropped audio files
 dropZone.addEventListener("drop", getAudioFiles);
 
+// songsEl.addEventListener("drop", () => {
+//     // bind refused to work for this so i just used an anonymous function
+//     moveSong(indexSongStartsAt, indexSongMovesTo);
+// });
+
 // Handles dropZone clicks
 dropZone.addEventListener("click", () => audioFileInput.click());
 audioFileInput.addEventListener("change", getAudioFiles);
 
 // Handles the modify menu's Image clicks
 imageFileInput.addEventListener("change", getImageFile);
-
 
 
 /* Audio Related Event Listeners */
@@ -528,7 +533,11 @@ function createSongDiv(song) {
 
     // provides the reordering functionality for the song div
     div.draggable = "true";
-    div.addEventListener("drag", moveSong.bind(null, div, song.identifier));
+    div.addEventListener("drag", dragSong.bind(null, song.identifier));
+    div.addEventListener("drop", () => {
+        // bind refused to work for this so i just used an anonymous function
+        moveSong(indexSongStartsAt, indexSongMovesTo);
+    });
 
     return div;
 }
@@ -671,25 +680,50 @@ function swapPlaylist(playlistId) {
     }
 }
 
+function dragSong(songId, event) {
+    indexSongStartsAt = viewingPlaylist.songs.findIndex((object) => object.identifier === songId);
+    const [x, y] = [event.x, event.y];
 
-function moveSong(songDiv, songId, event) {
-    const songToMove = findObjectByIdentifier(viewingPlaylist.songs, songId);
-    
-    viewingPlaylist.songs.forEach((song) => {
+    for (let i in viewingPlaylist.songs) {
+        const song = viewingPlaylist.songs[i];
         const div = document.getElementById(song.elementId);
         const rect = div.getBoundingClientRect();
 
-        const [x, y] = [event.x, event.y];
+        // checks if the coordinates are inside the song's div
         const isInside = x > rect.left && x < rect.right &&
                         y > rect.top && y < rect.bottom;
 
 
+        // if it is inside, that song's index is marked
         if (isInside) {
-            console.log(div.id);
+            indexSongMovesTo = i;
+            div.classList.add("border-blue-700", "border-2");
         }
-    })
+        else div.classList.remove("border-blue-700", "border-2");
+    }
+
+    const lastSong = viewingPlaylist.songs[viewingPlaylist.songs.length - 1];
+    const lastDiv = document.getElementById(lastSong.elementId);
+    const lastRect = lastDiv.getBoundingClientRect();
+
+    // if the user is dragging the song below the last song, target the final index
+    const isBelowEverySong = x > lastRect.left && x < lastRect.right && y > lastRect.bottom;
+
+    if (isBelowEverySong) indexSongMovesTo = viewingPlaylist.songs.length - 1;
 }
 
+function moveSong(currentIndex, newIndex) {
+    console.log(`Current Index: ${currentIndex} | New Index: ${newIndex}`)
+    // remove and store the song
+    const [songToMove] = viewingPlaylist.songs.splice(currentIndex, 1);
+    console.log(currentIndex)
+    
+    // // re-insert the song at the new index
+    viewingPlaylist.songs.splice(newIndex, 0, songToMove);
+
+    // // update the HTML
+    updateSongsSection();
+}
 
 function searchBarHandler() {
     const searchQuery = searchBar.value.toLowerCase();
