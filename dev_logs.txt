@@ -197,6 +197,7 @@ Things Fixed:
 
 # Day 18 - Wednesday | At school work #
 I decided to shorten the script.js file by creating a seperate file for all of the kebab menu related code. This separated about 600 lines of code.
+I've also began working on a new feature which allows users to drag their songs up and down a playlist.
 
 Things Added:
  - A kebab-menu.js file
