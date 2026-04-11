@@ -201,4 +201,4 @@ I've also added a new feature which allows users to drag their songs up and down
 
 Things Added:
  - A kebab-menu.js file
- - A drag/drop mechanism for moving songs
+ - A drag/drop mechanism for organizing songs
