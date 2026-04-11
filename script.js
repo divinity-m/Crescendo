@@ -139,7 +139,7 @@ let database;
 let allSongs = new Playlist("Songs", 0); // necessary to keep track of every song
 let allPlaylists = [allSongs];
 let [viewingPlaylist, playingPlaylist, currentSong] = [allSongs, null, null];
-let indexSongStartsAt, indexSongMovesTo, isBelowEverySong;
+let indexSongStartsAt, indexSongMovesTo;
 
 let loopState = "none"; // 3 states: none, one, and all 
 let shuffleOn = false;
@@ -168,9 +168,8 @@ searchBar.addEventListener("input", searchBarHandler);
 
 // moves a dragged song to the bottom of the playlist (if its not dragged over another song)
 songsEl.addEventListener("drop", () => {
-    if (isBelowEverySong) {
-        moveSong(indexSongStartsAt, indexSongMovesTo);
-    }
+    // bind refused to work for this so i just used an anonymous function
+    moveSong(indexSongStartsAt, indexSongMovesTo);
 });
 
 
@@ -536,10 +535,6 @@ function createSongDiv(song) {
     // provides the reordering functionality for the song div
     div.draggable = "true";
     div.addEventListener("drag", dragSong.bind(null, song.identifier));
-    div.addEventListener("drop", () => {
-        // bind refused to work for this so i just used an anonymous function
-        moveSong(indexSongStartsAt, indexSongMovesTo);
-    });
 
     return div;
 }
@@ -709,7 +704,7 @@ function dragSong(songId, event) {
     const lastRect = lastDiv.getBoundingClientRect();
 
     // detects if the user is dragging the song in the area below the last song in the playlist
-    isBelowEverySong = x > lastRect.left && x < lastRect.right && y > lastRect.bottom;
+    const isBelowEverySong = x > lastRect.left && x < lastRect.right && y > lastRect.bottom;
 
     // if so, target the last song
     if (isBelowEverySong) {
