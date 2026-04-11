@@ -139,7 +139,7 @@ let database;
 let allSongs = new Playlist("Songs", 0); // necessary to keep track of every song
 let allPlaylists = [allSongs];
 let [viewingPlaylist, playingPlaylist, currentSong] = [allSongs, null, null];
-let indexSongStartsAt, indexSongMovesTo;
+let indexSongStartsAt, indexSongMovesTo, isBelowEverySong;
 
 let loopState = "none"; // 3 states: none, one, and all 
 let shuffleOn = false;
@@ -166,6 +166,13 @@ window.addEventListener("load", () => {
 // Handles search bar inputs
 searchBar.addEventListener("input", searchBarHandler);
 
+// moves a dragged song to the bottom of the playlist (if its not dragged over another song)
+songsEl.addEventListener("drop", () => {
+    if (isBelowEverySong) {
+        moveSong(indexSongStartsAt, indexSongMovesTo);
+    }
+});
+
 
 /* Drop Zone Related Event Listeners */
 
@@ -178,11 +185,6 @@ searchBar.addEventListener("input", searchBarHandler);
 
 // Handles dropped audio files
 dropZone.addEventListener("drop", getAudioFiles);
-
-// songsEl.addEventListener("drop", () => {
-//     // bind refused to work for this so i just used an anonymous function
-//     moveSong(indexSongStartsAt, indexSongMovesTo);
-// });
 
 // Handles dropZone clicks
 dropZone.addEventListener("click", () => audioFileInput.click());
@@ -697,32 +699,37 @@ function dragSong(songId, event) {
         // if it is inside, that song's index is marked
         if (isInside) {
             indexSongMovesTo = i;
-            div.classList.add("border-blue-700", "border-2");
+            div.classList.add("border-blue-700", "border-t-2");
         }
-        else div.classList.remove("border-blue-700", "border-2");
+        else div.classList.remove("border-blue-700", "border-t-2");
     }
 
     const lastSong = viewingPlaylist.songs[viewingPlaylist.songs.length - 1];
     const lastDiv = document.getElementById(lastSong.elementId);
     const lastRect = lastDiv.getBoundingClientRect();
 
-    // if the user is dragging the song below the last song, target the final index
-    const isBelowEverySong = x > lastRect.left && x < lastRect.right && y > lastRect.bottom;
+    // detects if the user is dragging the song in the area below the last song in the playlist
+    isBelowEverySong = x > lastRect.left && x < lastRect.right && y > lastRect.bottom;
 
-    if (isBelowEverySong) indexSongMovesTo = viewingPlaylist.songs.length - 1;
+    // if so, target the last song
+    if (isBelowEverySong) {
+        indexSongMovesTo = viewingPlaylist.songs.length - 1;
+        lastDiv.classList.add("border-blue-700", "border-b-2");
+    }
+    else lastDiv.classList.remove("border-b-2");
 }
 
 function moveSong(currentIndex, newIndex) {
-    console.log(`Current Index: ${currentIndex} | New Index: ${newIndex}`)
     // remove and store the song
     const [songToMove] = viewingPlaylist.songs.splice(currentIndex, 1);
-    console.log(currentIndex)
     
-    // // re-insert the song at the new index
+    // re-insert the song at the new index
     viewingPlaylist.songs.splice(newIndex, 0, songToMove);
 
-    // // update the HTML
+    // update the HTML
     updateSongsSection();
+
+    saveData();
 }
 
 function searchBarHandler() {
