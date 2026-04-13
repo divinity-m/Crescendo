@@ -139,7 +139,7 @@ let database;
 let allSongs = new Playlist("Songs", 0); // necessary to keep track of every song
 let allPlaylists = [allSongs];
 let [viewingPlaylist, playingPlaylist, currentSong] = [allSongs, null, null];
-let indexSongStartsAt, indexSongMovesTo;
+let startingDragIndex, finalDragIndex;
 
 let loopState = "none"; // 3 states: none, one, and all 
 let shuffleOn = false;
@@ -166,10 +166,15 @@ window.addEventListener("load", () => {
 // Handles search bar inputs
 searchBar.addEventListener("input", searchBarHandler);
 
-// moves a dragged song to the bottom of the playlist (if its not dragged over another song)
+// event listener for moving songs around
 songsEl.addEventListener("drop", () => {
     // bind refused to work for this so i just used an anonymous function
-    moveSong(indexSongStartsAt, indexSongMovesTo);
+    relocateDiv(startingDragIndex, finalDragIndex, true);
+});
+
+// event listener for moving playlists around
+playlistsEl.addEventListener("drop", () => {
+    relocateDiv(startingDragIndex, finalDragIndex, false);
 });
 
 
@@ -347,9 +352,11 @@ function loadData() {
                 }
             }
         }
-        
-        allSongs = allPlaylists[0];
-        viewingPlaylist = allPlaylists[0];
+
+        allSongsIndex = allPlaylists.findIndex((playlist) => playlist.identifier === 0);
+
+        allSongs = allPlaylists[allSongsIndex];
+        viewingPlaylist = allPlaylists[allSongsIndex];
 
         // updates the html
         updateWebsite();
@@ -496,6 +503,10 @@ function createPlaylistDiv(playlist) {
                                 class="w-5 h-8 ml-auto mr-1 rounded-3xl hover:bg-[#0000FF1A] active:opacity-75 hover:cursor-pointer"
                                 onclick="openPlaylistMenu(${playlist.identifier}, this)"/>`;
 
+    // provides the reordering functionality for the playlist div
+    div.draggable = "true";
+    div.addEventListener("drag", dragDiv.bind(null, playlist.identifier, false));
+
     return div;
 }
 
@@ -534,7 +545,7 @@ function createSongDiv(song) {
 
     // provides the reordering functionality for the song div
     div.draggable = "true";
-    div.addEventListener("drag", dragSong.bind(null, song.identifier));
+    div.addEventListener("drag", dragDiv.bind(null, song.identifier, true));
 
     return div;
 }
@@ -677,52 +688,59 @@ function swapPlaylist(playlistId) {
     }
 }
 
-function dragSong(songId, event) {
-    indexSongStartsAt = viewingPlaylist.songs.findIndex((object) => object.identifier === songId);
+function dragDiv(objectId, isSong, event) {
+    const array = isSong ? viewingPlaylist.songs : allPlaylists;
+
+    startingDragIndex = array.findIndex((object) => object.identifier === objectId);
     const [x, y] = [event.x, event.y];
 
-    for (let i in viewingPlaylist.songs) {
-        const song = viewingPlaylist.songs[i];
-        const div = document.getElementById(song.elementId);
+    for (let i in array) {
+        const object = array[i];
+        const div = document.getElementById(object.elementId);
         const rect = div.getBoundingClientRect();
 
-        // checks if the coordinates are inside the song's div
+        // checks if the coordinates are inside the object's div
         const isInside = x > rect.left && x < rect.right &&
                         y > rect.top && y < rect.bottom;
 
 
-        // if it is inside, that song's index is marked
+        // if it is inside, that object's index is marked
         if (isInside) {
-            indexSongMovesTo = i;
+            if (i > startingDragIndex) finalDragIndex = i - 1;
+            else finalDragIndex = i;
+
             div.classList.add("border-blue-700", "border-t-2");
         }
         else div.classList.remove("border-blue-700", "border-t-2");
     }
 
-    const lastSong = viewingPlaylist.songs[viewingPlaylist.songs.length - 1];
-    const lastDiv = document.getElementById(lastSong.elementId);
+    const lastObject = array[array.length - 1];
+    const lastDiv = document.getElementById(lastObject.elementId);
     const lastRect = lastDiv.getBoundingClientRect();
 
-    // detects if the user is dragging the song in the area below the last song in the playlist
-    const isBelowEverySong = x > lastRect.left && x < lastRect.right && y > lastRect.bottom;
+    // detects if the user is dragging the div in the area below the last div in the section
+    const isBelowEveryDiv = x > lastRect.left && x < lastRect.right && y > lastRect.bottom;
 
-    // if so, target the last song
-    if (isBelowEverySong) {
-        indexSongMovesTo = viewingPlaylist.songs.length - 1;
+    // if so, target the last div
+    if (isBelowEveryDiv) {
+        finalDragIndex = array.length - 1;
         lastDiv.classList.add("border-blue-700", "border-b-2");
     }
     else lastDiv.classList.remove("border-b-2");
 }
 
-function moveSong(currentIndex, newIndex) {
-    // remove and store the song
-    const [songToMove] = viewingPlaylist.songs.splice(currentIndex, 1);
+function relocateDiv(currentIndex, newIndex, isSong) {
+    const array = isSong ? viewingPlaylist.songs : allPlaylists;
     
-    // re-insert the song at the new index
-    viewingPlaylist.songs.splice(newIndex, 0, songToMove);
+    // remove and store the object
+    const [objectToMove] = array.splice(currentIndex, 1);
+    
+    // re-insert the object at the new index
+    array.splice(newIndex, 0, objectToMove);
 
     // update the HTML
-    updateSongsSection();
+    if (isSong) updateSongsSection();
+    else updatePlaylistsSection();
 
     saveData();
 }
