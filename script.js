@@ -139,7 +139,8 @@ let database;
 let allSongs = new Playlist("Songs", 0); // necessary to keep track of every song
 let allPlaylists = [allSongs];
 let [viewingPlaylist, playingPlaylist, currentSong] = [allSongs, null, null];
-let startingDragIndex, finalDragIndex;
+
+let startingDragIndex, finalDragIndex, draggedItem;
 
 let loopState = "none"; // 3 states: none, one, and all 
 let shuffleOn = false;
@@ -168,13 +169,16 @@ searchBar.addEventListener("input", searchBarHandler);
 
 // event listener for moving songs around
 songsEl.addEventListener("drop", () => {
-    // bind refused to work for this so i just used an anonymous function
-    relocateDiv(startingDragIndex, finalDragIndex, true);
+    if (songsEl.contains(draggedItem)) {
+        relocateDiv(startingDragIndex, finalDragIndex, true);
+    }
 });
 
 // event listener for moving playlists around
 playlistsEl.addEventListener("drop", () => {
-    relocateDiv(startingDragIndex, finalDragIndex, false);
+    if (playlistsEl.contains(draggedItem)) {
+        relocateDiv(startingDragIndex, finalDragIndex, false);
+    }
 });
 
 
@@ -694,6 +698,7 @@ function swapPlaylist(playlistId) {
 }
 
 function dragDiv(objectId, isSong, event) {
+    draggedItem = event.target;
     const array = isSong ? viewingPlaylist.songs : allPlaylists;
 
     startingDragIndex = array.findIndex((object) => object.identifier === objectId);
