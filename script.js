@@ -321,6 +321,7 @@ function loadData() {
             // reset the playlist to regain it's methods
             allPlaylists[i] = new Playlist(playlistCopy.name, playlistCopy.identifier);
             
+            allPlaylists[i].originalName = playlistCopy.originalName;
             allPlaylists[i].songs = playlistCopy.songs;
             
             // fixes the playlist's picture
@@ -343,7 +344,9 @@ function loadData() {
                 
                 // provides the song it's modifiable data
                 song.name = songCopy.name;
+                song.originalName = songCopy.originalName;
                 song.artist = songCopy.artist;
+                song.originalArtist = songCopy.originalArtist;
 
                 // fixes the song's picture
                 if (songCopy.pictureFile) {
@@ -356,6 +359,8 @@ function loadData() {
         allSongsIndex = allPlaylists.findIndex((playlist) => playlist.identifier === 0);
 
         allSongs = allPlaylists[allSongsIndex];
+        allSongs.originalName = "Songs";
+        
         viewingPlaylist = allPlaylists[allSongsIndex];
 
         // updates the html
