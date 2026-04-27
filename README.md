@@ -1,3 +1,2 @@
 # CRESCENDO - DIVINE MUSTAFA
-
-# E
+Crescendo is a website for uploading and enjoying your favourite music. The functionality is programmed entirely out of Javascript while the website formatting and user interface and is built with HTML and Tailwind CSS. Audio files can be uploaded through drag & drop or via clicking on the drag & drop button. When a song is uploaded it's automatically added into a default "Songs" playlist, which collects and stores every song the user uploads. New playlists can be added with the "+" button next to the "Playlist" header and songs can be played by clicking on their names or the play-button within the "Now Playing" section.
