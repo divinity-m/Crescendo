@@ -625,13 +625,10 @@ function updateCurrentlyPlayingSongSection() {
 
     // updates the elements to match whatever song is playing
     playingSongImg.src = potentialSong.picture;
-    
     playingSongName.innerHTML = potentialSong.name;
-    
     playingSongArtist.innerHTML = potentialSong.artist; 
-
-    const playButtonImage = audioEl.paused ? playBtnSrc : pauseBtnSrc;
-    playingSongPlayBtn.src = playButtonImage;
+    
+    playingSongPlayBtn.src = audioEl.paused ? playBtnSrc : pauseBtnSrc;
 }
 
 function updateWebsite() {
