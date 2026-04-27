@@ -6,4 +6,5 @@ I was expecting to put a lot of effort into developing this project as there wer
 ``` javascript
 div = document.createElement("div")
 div.innerHTML = `<p>example text</p>`
+return div
 ```
