@@ -9,4 +9,4 @@ div.innerHTML = `<p>example text</p>`
 return div
 ```
 
-I also feel fairly proud about the file-uploading system, It's not incredibly complex, but it's versatile and effective.
+I also believe that the file-uploading system, although not incredibly complex, was implemented very effectively, especially the drag & drop which I had no piror experience with.
