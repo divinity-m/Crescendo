@@ -12,3 +12,7 @@ return div
 ```
 
 I also believe that the file-uploading system, although not incredibly complex, was implemented effectively, especially the drag & drop feature which I had no piror experience with.
+
+Despite the fact that I do like the bright blue theme, a couple of friends have told me that it's either very bright, or difficult to read due to the blue text. I'll admit that I did fall short in this category of web-design, I could have solved this through a dark-mode feature or sticking to the standard black/white text.
+
+I was able to get the music visualizer working, but I dislike how it looks. I would prefer if it was more erratic and spiked more in the right side, but I wasn't able to get it to work.
