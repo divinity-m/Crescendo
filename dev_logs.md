@@ -116,7 +116,7 @@ I also had to update `validateFiles`. Now it detects duplicates by comparing fil
 After this, I finished up all of the logic for `setObjectValues` without much issue and I added a backdrop blur to the img-element in the modify menu. The effect appears when the cursor hovers over it.
 
 I started to work on a custom slider for the audio element that syncs with the songs current time. I got the logic working, but getting the styling to look right has been a real pain, it includes working with `-webkit` in CSS, which is almost foreign to me.
-Right now the slider's design is very unfinished but I've made a little progress after finding this website which provides a lot of useful informaition on how to design range-type input's. [Website]("https://codepen.io/ShadowShahriar/pen/zYPPYrQ")
+Right now the slider's design is very unfinished but I've made a little progress after finding this website which provides a lot of useful informaition on how to design range-type input's: "https://codepen.io/ShadowShahriar/pen/zYPPYrQ".
 
 Things Added:
  - Created a property for identifying songs & playlists, requiring many adjustments in the script
@@ -127,8 +127,8 @@ Things Added:
 <br>
 
 # Day 8 - Monday | At home work #
-It took a few hours, but after using the website above as a template, filtering out the css-logic I couldn't make sense of, then mixing in javascript into the styling, I made a functional and decent looking slider for the audio element.
-I also wanted to put numbers on both sides of the slider to show the current time into the song and the total time of the song. Completing this didn't nearly as long as it did for the slider the slider, but I still had to do a bit of research because I didn't know how to convert seconds into a HH:MM:SS format.
+After using the website above as a template, filtering out the css-logic I couldn't make sense of, then mixing in javascript, I made a functional and decent looking slider for the audio element.
+I also tried to put numbers on both sides of the slider to show the duration of a song, and the time passed. This wasn't necessarily hard to get working, but I still had to do a bit of research because I didn't know how to convert seconds into a HH:MM:SS format.
 
 I started working on 4 new buttons: shuffle, previous song, next song, and loop. Can't have a music player without them. I also decided to make all of their icons .svg files instead of the typical .png which I've been using this entire project. I only did this because I recently remembered that .svg files scale with the screen, otherwise, I would've made every other one of my images a .svg.
 
