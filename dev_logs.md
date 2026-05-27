@@ -116,7 +116,7 @@ I also had to update `validateFiles`. Now it detects duplicates by comparing fil
 After this, I finished up all of the logic for `setObjectValues` without much issue and I added a backdrop blur to the img-element in the modify menu. The effect appears when the cursor hovers over it.
 
 I started to work on a custom slider for the audio element that syncs with the songs current time. I got the logic working, but getting the styling to look right has been a real pain, it includes working with `-webkit` in CSS, which is almost foreign to me.
-Right now the slider's design is very unfinished but I've made a little progress after finding this website which provides a lot of useful informaition on how to design range-type input's. `[Website]("https://codepen.io/ShadowShahriar/pen/zYPPYrQ")`
+Right now the slider's design is very unfinished but I've made a little progress after finding this website which provides a lot of useful informaition on how to design range-type input's. [Website]("https://codepen.io/ShadowShahriar/pen/zYPPYrQ")
 
 Things Added:
  - Created a property for identifying songs & playlists, requiring many adjustments in the script
