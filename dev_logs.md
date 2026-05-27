@@ -116,7 +116,7 @@ I also had to update `validateFiles`. Now it detects duplicates by comparing fil
 After this, I finished up all of the logic for `setObjectValues` without much issue and I added a backdrop blur to the img-element in the modify menu. The effect appears when the cursor hovers over it.
 
 I started to work on a custom slider for the audio element that syncs with the songs current time. I got the logic working, but getting the styling to look right has been a real pain, it includes working with `-webkit` in CSS, which is almost foreign to me.
-Right now the slider's design is very unfinished but I've made a little progress after finding this website which provides a lot of useful informaition on how to design range-type input's: "https://codepen.io/ShadowShahriar/pen/zYPPYrQ".
+Right now the slider's design is very unfinished but I've made a little progress after finding this website which provides a lot of useful informaition on how to design range-type input's: https://codepen.io/ShadowShahriar/pen/zYPPYrQ.
 
 Things Added:
  - Created a property for identifying songs & playlists, requiring many adjustments in the script
@@ -172,9 +172,10 @@ Things Added:
 <br>
 
 # Day 11 - Thursday | At home work #
-I started working on data saving and since I've already worked with saving local data in old projects, I thought it wouldn't be much of a issue. Then I encountered an issue. Javascript's `localStorage` API can't handle large files, it can barely handle 5MB, so there's no way I could get it to save audio files. Due to this, I had to learn about a whole new way to save data locally.
-I chose to learn how to work with `indexedDB`. At first, it was incredibly difficult to understand how it functions and it's methods. Even just `indexedDB.open("DB", 1)` made zero sense to me, but that's just how learning new things is. I had to use a lot of Youtube, Stackoverflow, and ChatGPT before things started making sense.
-Right now, the database only stores one items, a variable called `allPlaylists` which contains every playlist, and so by extension, every song, which is all I think actually matters.
+I started working on data saving and since I've already worked with saving local data in CS-20 projects, I thought it wouldn't be much of a issue. Then I encountered an issue. \
+Javascript's `localStorage` API can't handle large files—it can barely handle 5MB, so there's no way I could get it to save audio files, I was forced to learn a new method for saving data locally.
+I chose to learn how to work with `indexedDB`. At first, it was incredibly difficult to understand how it functions and it's methods. Even just the line `indexedDB.open("DB", 1)` made zero sense to me, but that's just how learning new things is. I had to use a lot of Youtube, Stackoverflow, and ChatGPT before everything started making sense.
+Right now, the database only stores one item, a variable called `allPlaylists` which contains every playlist—and so by extension, every song—which is all I think actually matters.
 
 Things Added:
  - A local auto save system
@@ -182,7 +183,7 @@ Things Added:
 <br>
 
 # Day 13 - Saturday | At home work #
-I started and finished working on the music visualizer. This was another new concept to me, but I quickly understood the basics setup after this video https://www.youtube.com/watch?v=AQggCuH4QkM. I created a new `visualizer.js` file to store all of the new code I added due to the fact that my main `script.js` file was getting crammed to the point where even I was struggling to navigate the code. From there I did a lot of extra research on how to make the visualizer more appealing, such as smoothening out the movement of its bars and making the bars near the center larger.
+I started and finished working on the music visualizer. This was another new concept to me, but I quickly understood the basics setup after watching this video: https://www.youtube.com/watch?v=AQggCuH4QkM. My main `script.js` file was getting crammed so I created a new `visualizer.js` file to store all of the new code. From there, I did a lot of extra research on how to make the visualizer more appealing, such as smoothening out the movement of its bars and making the bars near the center larger.
 
 Things Added:
  - The Music Visualizer
