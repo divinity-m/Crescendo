@@ -10,7 +10,7 @@ Things Added:
  - A `Songs` and `Playlist` class
  - Some file-uploading code complete
 
-
+<br>
 
 # Day 2 - Tuesday | In class & At home work #
 It took a long while to get working, but audio files can now be added into the website through clicking the drag-and-drop box and choosing a file from your file list, or dragging and dropping a file into the box. I also worked a little bit more on the basic UI to make it look decent.
@@ -25,6 +25,7 @@ Things Added:
  - Tiny progress on an anti-duplicate file system
  - A play-pause system
 
+<br>
 
 # Day 3 - Wednesday (Career Day) | At home work #
 I didn't give up. Adding duplicated files is a very common and bothersome user-mistake so I didn't want to just put aside preventing it. I started heavily testing what may have been going wrong in the code through the console and noticed something very important. When the standard built-in `.some()` method is paired with the `!==` operator, it returns true if there's a even single element in the array that's not equal to the provided value. I originally belived it only returned true if every single element is not equal to the provided value, and as a result the duplicate files would always get improperly validated.
@@ -38,7 +39,7 @@ Things Added:
  - UI improvements
  - Created a logo
 
-
+<br>
 
 # Day 4 - Thursday | In class & At home work #
 With the little time I had left in class due to the lesson on spreadsheets, I decided to focus more on designing the website than writing new logic. I had trouble recoloring icons such as a black play button image to match of my website. Gavin gave me a short lesson on photoshop and the skills he learned from digital arts.
@@ -47,7 +48,7 @@ At home I contacted Gavin and he gave me a more in depth guide on how to recolor
 Things Added:
  - UI improvements
 
-
+<br>
 
 # Day 5 - Friday | In class & At home work #
 I wanted to implement a scrolling into the "Playlists" and "Songs" sections of the website, but I couldn't figure out how to make the header tags stay in place when the div element scrolled up and down. None of my friends could figure it out either so I asked Mr. Durstling and found out that I needed to use a property called 'sticky' in css to keep the header in place and also increase the z-index to position the header over every other element.
