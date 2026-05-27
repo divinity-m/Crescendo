@@ -1,4 +1,4 @@
-Starting Date: March 23, 2026 \
+Starting Date: March 23, 2026 \ :smile:
 Days are just days-since-started, so there may be a large void in days at some parts (like Day 13 - Day 17).
 
 # Day 1 - Monday | In class & At home work #
