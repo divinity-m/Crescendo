@@ -162,7 +162,7 @@ Things Added:
 <br>
 
 # Day 10 - Wednesday | At home work #
-I finished up the `searchBarHandler` function fairly quickly.
+I finished up the `searchBarHandler` function fairly quickly. \
 I also made an `ondrop` event handler attribute for the `<img>` tag in the modify menu, allowing users to drop image files into the tag to replace images.
 
 Things Added:
