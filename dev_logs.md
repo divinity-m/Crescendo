@@ -70,6 +70,8 @@ Things Added:
  - Fixed bugs in the play-pause system
  - Kebab menu design
 
+<br>
+
 # Day 6 - Saturday (Spring Break has begun) | At home work #
 I started working on the project at around 9am-ish, and at the time I'm writing this, it's 7pm. Subtract 2h~ for the time spent eating and playing with siblings and that's about 8h~ hours of nonstop coding.
 In the morining I believe I spent about 1h changing up my style of code for a function called updatewebsite(), which refreshed all the playlist and song divs in the html with `.innerHTML`. It was called everytime something in the page changed, so even the slightest update would have it be called. Initially, I didn't really care too much about it, but then I realized, there's absolutely no reason to refresh 80% of the paged because ONE song was uploaded into the website. So I split updateWebsite() into 3 separate functions that could refresh parts of the page independently, only ever using the original function for very specific cases. The 3 separate functions also had their own modifications, I started swapping statements like
@@ -105,7 +107,7 @@ Things Added:
  - Comlpleted a lot of the kebab menu logic
  - UI improvements
 
-
+<br>
 
 # Day 7 - Sunday | At home work #
 Before working on the replacement logic for `setObjectValues`, I wanted to make a new property for the `Playlist` and `Song` classes called `identifier`. Currently, for my code to compare two songs or two playlists, it checks for their name property. This is how it finds duplicates and determines the id's for certain div elements.
@@ -124,7 +126,7 @@ Things Added:
  - Finished the kebab menu logic
  - UI improvements + Started making a custom audio-element slider
 
-
+<br>
 
 # Day 8 - Monday | At home work #
 It took a few hours, but after using the website above as a template, filtering out the css-logic I couldn't make sense of, then mixing in javascript into the styling, I made a functional and decent looking slider for the audio element.
@@ -139,7 +141,7 @@ Things Added:
  - Previous song, next song, and loop buttons
  - A bit of the shuffle button
 
-
+<br>
 
 # Day 9 - Tuesday | At home work #
 Okay. Coding the shuffle button was a lot more of a pain than I originally thought it would be. The shuffle button's logic itself wasn't the issue, rather, it was while I was testing it's logic that I discovered a fundamentally website breaking bug which took me from yesterday until today to find a solution for.
@@ -157,7 +159,7 @@ Things Added:
  - Finished the shuffle button
  - Started making a search bar
 
-
+<br>
 
 # Day 10 - Wednesday | At home work #
 I finished up the `searchBarHandler` function fairly quickly, and I made sure to make it avoid recreating song-divs that fit the searches query and already exist in the page. 
@@ -167,7 +169,7 @@ Things Added:
  - Finished the search bar
  - Images files can now be dropped onto the image in the modify menu
 
-
+<br>
 
 # Day 11 - Thursday | At home work #
 I started working on data saving and since I've already worked with saving local data in old projects, I thought it wouldn't be much of a issue. Then I encountered an issue. Javascript's `localStorage` API can't handle large files, it can barely handle 5MB, so there's no way I could get it to save audio files. Due to this, I had to learn about a whole new way to save data locally.
@@ -177,7 +179,7 @@ Right now, the database only stores one items, a variable called `allPlaylists` 
 Things Added:
  - A local auto save system
 
-
+<br>
 
 # Day 13 - Saturday | At home work #
 I started and finished working on the music visualizer. This was another new concept to me, but I quickly understood the basics setup after this video https://www.youtube.com/watch?v=AQggCuH4QkM. I created a new `visualizer.js` file to store all of the new code I added due to the fact that my main `script.js` file was getting crammed to the point where even I was struggling to navigate the code. From there I did a lot of extra research on how to make the visualizer more appealing, such as smoothening out the movement of its bars and making the bars near the center larger.
@@ -186,7 +188,7 @@ Things Added:
  - The Music Visualizer
  - A visualizer.js file
 
-
+<br>
 
 # Day 17 - Tuesday | At school work #
 Once I powered on the computer I immedietly encountered an elusive issue with my website. When I open the page normally, the audio-element would play, even if I tried to force it with `audioEl.play()`, but If I were to save my code (with ctrl + s), all audio-related functionality worked just fine. Just deciphering how this issue worked took a long while, so determining what specifically was causing it and how to mend it was outside of my programming knowledge. With that in mind, I asked Mr. Durstling if he was familiar with the bug, and fortunately he knew the exact reason and solution for it.
@@ -196,7 +198,7 @@ The fix was incredibly simple, I just had to create an event listener that unsus
 Things Fixed:
  - Audio element not playing
 
-
+<br>
 
 # Day 18 - Wednesday | In class & At home work #
 I decided to shorten the script.js file by creating a seperate file for all of the kebab menu related code. This separated about 600 lines of code.
@@ -206,7 +208,7 @@ Things Added:
  - A kebab-menu.js file
  - A drag/drop mechanism for organizing songs
 
-
+<br>
 
 # Day 23 - Monday | In class work #
 Playlists can now also be reordered with dragging and dropping.
