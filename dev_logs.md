@@ -2,37 +2,37 @@ Starting Date: March 23, 2026 \
 Days are just days-since-started, so there may be a large void in days at some parts (like Day 13 - Day 17).
 
 # Day 1 - Monday | In class & At home work #
-I spent the entire day working on the basic UI and i chose to use tailwind css to style everything. I decided to go with a blue theme simply because it's my favourite color. On a whim, I chose to name the website Crescendo, mainly because the word 'crescendo' is music-related and I think it sounds cool. Crescendo just means a gradual increase in the loudness of a song.
-At home, I created a `Songs` class, `Playlist` class, and a default `allSongs` object (from the `Playlist` class) to keep track of every existing song. I also completed a little bit of the file-uploading code at home, it doesn't work just yet but I plan to fix it up later.
+I spent the entire day working on the basic UI and I chose to use Tailwind CSS to style everything. I also decided to name the website Crescendo, mainly because the word 'crescendo' is music-related and I think it sounds cool.
+At home, I created a `Songs` class, `Playlist` class, and a default `allSongs` object (from the `Playlist` class) to keep track of every existing song. I also completed a little bit of the file-uploading code at home, it's still incomplete.
 
 Things Added:
- - Basic UI (via Tailwind CSS)
+ - Basic UI (via HTML + Tailwind CSS)
  - A `Songs` and `Playlist` class
  - Some file-uploading code complete
 
 <br>
 
 # Day 2 - Tuesday | In class & At home work #
-It took a long while to get working, but audio files can now be added into the website through clicking the drag-and-drop box and choosing a file from your file list, or dragging and dropping a file into the box. I also worked a little bit more on the basic UI to make it look decent.
-At home and in class I tried to add a safeguard to prevent duplicate-files, but nothing was working. I've had to find a way to iterate through the fileList obtained from `e.target.files` and `e.dataTransfer.files` then compare it's files to the already existing files in an array called allSongs.songs.
-To start, I made a function called `validateFiles` which accepts a `files` parameter and returns either `null` or an array of the validated/unduplicated files. I first converted the fileList into an array with `Array.from()` then passed that array into the `validateFiles` function. `validateFiles` iterates through the array of files with a `.forEach()` loop, converts every file into a Song object like so: `const potentialDupe = new Song(file)`, then compares eachs potential duplicate song to the existing song objects in the allSongs.songs array with an if-statement. This was the if-statement that compared the unvalidated and existing songs:
-` if (allSongs.songs.length < 1 || allSongs.songs.some(song => song.name !== potentialDupe.name)) unduplicatedFiles.push(file); `.
-I felt very condifent that this concise method would work perfectly, but it didn't. Every file I entered would immetiadly pass the validation checks and be pushed into the allSongs.songs array. I started to feel very stuck.
+Audio files can now be added into the website by clicking the drag-and-drop box to open your file list, or dragging and dropping a file into the box. I also improved the basic UI.
+I tried to add a safeguards to prevent duplicate-files, but nothing was working. I've been looking for a way to iterate through the fileList obtained from `e.target.files` and `e.dataTransfer.files` then compare it's files to the already existing/uploaded files in the `allSongs.songs` array.
+To start, I made a function called `validateFiles` which accepts a `files` parameter and returns either `null` or an array of the validated/unduplicated files. I first converted the fileList into an array with `Array.from()` then passed that array into the `validateFiles` function. `validateFiles` iterates through the array of files, converts every file into a Song object like so: `const potentialDupe = new Song(file)`, then compares eachs potential duplicate song to the existing song objects in the allSongs.songs array with an if-statement:
+` if (allSongs.songs.length < 1 || allSongs.songs.some(song => song.name !== potentialDupe.name)) unduplicatedFiles.push(file); `
+This method was concise, but failed.
 
 Things Added:
  - File-uploading system
  - UI improvements
- - Tiny progress on an anti-duplicate file system
+ - Minimal progress on duplicate-files prevention
  - A play-pause system
 
 <br>
 
 # Day 3 - Wednesday (Career Day) | At home work #
-I didn't give up. Adding duplicated files is a very common and bothersome user-mistake so I didn't want to just put aside preventing it. I started heavily testing what may have been going wrong in the code through the console and noticed something very important. When the standard built-in `.some()` method is paired with the `!==` operator, it returns true if there's a even single element in the array that's not equal to the provided value. I originally belived it only returned true if every single element is not equal to the provided value, and as a result the duplicate files would always get improperly validated.
+With the console, I started heavily testing what may have been going wrong in the duplicate-prevention code and noticed something very important. When the standard built-in `.some()` method is paired with the `!==` operator, it returns true if there's an element in the array that's not equal to the provided value. I originally belived it only returned true if every single element is not equal to the provided value, and as a result, the duplicate files would always get improperly validated.
 With this newfound knowledge, I quickly found a solution that worked: 
-` if (allSongs.songs.length < 1 || !(allSongs.songs.some(song => song.name === potentialDupe.name)) ) unduplicatedFiles.push(file); `.
+` if (allSongs.songs.length < 1 || !(allSongs.songs.some(song => song.name === potentialDupe.name)) ) unduplicatedFiles.push(file); `
 
-I didn't feel like adding anything more to the after struggling with this so I spent a couple hours on the UI. I also created a logo for the website and a little icon for the tab, the designs are based off of the literal standard crescendo musical notation which looks similar to the "<" symbol.
+After this, I spent a couple hours on the UI. I also created a logo for the website and a little tab-icon, the designs are based off of the standard crescendo musical notation.
 
 Things Added:
  - Anti-duplicate file system
@@ -42,8 +42,7 @@ Things Added:
 <br>
 
 # Day 4 - Thursday | In class & At home work #
-With the little time I had left in class due to the lesson on spreadsheets, I decided to focus more on designing the website than writing new logic. I had trouble recoloring icons such as a black play button image to match of my website. Gavin gave me a short lesson on photoshop and the skills he learned from digital arts.
-At home I contacted Gavin and he gave me a more in depth guide on how to recolor images with photoshop. His tips helped a ton and I can definitely see myself using them in future projects.
+I decided to focus more on designing the website than writing new logic. I had trouble recoloring icons to match of my website's theme so Gavin gave me a short lesson on photoshop and the skills he learned from digital arts. His advice helped a ton and I can definitely see myself using them in future projects as well.
 
 Things Added:
  - UI improvements
@@ -51,18 +50,18 @@ Things Added:
 <br>
 
 # Day 5 - Friday | In class & At home work #
-I wanted to implement a scrolling into the "Playlists" and "Songs" sections of the website, but I couldn't figure out how to make the header tags stay in place when the div element scrolled up and down. None of my friends could figure it out either so I asked Mr. Durstling and found out that I needed to use a property called 'sticky' in css to keep the header in place and also increase the z-index to position the header over every other element.
+I wanted to implement scrolling into the "Playlists" and "Songs" sections of the website, but I couldn't figure out how to make the header tags stay in place when their parent `div` element scrolled up and down. None of my friends could figure it out either so I asked Mr. Durstling and learned that I needed to use a CSS property called 'sticky' to keep the header in place. I also increased the z-index to position the header over every other element.
 
-At home, I discovered a very useful feature in google called 'override', allowing you to override web content locally with your own scripts. This breakthrough made coding with github 100x faster for me. Although, I still need to periodically update the github files themselves to keep the website up to date on the serverside and to backup my code.
+I discovered a very useful browser feature called 'Local Overrides', which allows me to make changes to web content locally with my own scripts. This breakthrough made coding with github much faster. Although, I still need to periodically update the repository scripts to keep the website up to date on the serverside.
 
-While polishing my code to make it more concise and readable, I encountered a couple bugs. I wanted to create a single audio element that played a song one at a time, rather than keep track of multiple audio elements in multiple divs. When I started this, I quickly came in contact with an error, when I pause the previously playing song so safely replace the audio's src and play a new song (all in one function), the console presented me with this error message:
+I encountered a couple bugs while trying to make my code more readable. I wanted to change a structural aspect of my HTML, initually, every song div would have their own `<audio>` tag with its own unique attributes, I wanted to only have one `<audio>` tag that plays every song. I tried to implement this and quickly encountered an error. Whenever I would try to play new a song and pause & replace the previous one, this error message popped up.
 ` The play() request was interrupted by a call to pause(). `
-I threw whatever I think of at my script but nothing stopped that error message from popping up. I tried playing the song first then pausing the previous one. I tried seperating the pause and play into seperate functions. Then finally, I tried asking chatGPT what I could possibly be doing wrong.
+I threw whatever I think of at my script but nothing fixed the error. I tried playing the song first then pausing the previous one. I tried seperating the pause and play into seperate functions. Then finally, I tried asking chatGPT what I could possibly be doing wrong.
 
-The issue revolves around how `.pause()` is synchronous with the code while `.play()` is asynchronous, causing it to have a slight delay with the overall process. With the way my code originally worked, I stored the `audio.play()` in a `promise` variable whenever I played a song. Whenever a song is paused, it's paused within an conditional that checks for the promise before pausing. As a result, both the pause() and play() become asynchronous, and due to how I started using only a single audio element to handle all the songs, the pause() and play() fight over who does what, the audio element has no clue whats going on, and everything just breaks. To fix this, I eliminated the promise-conditional for the play.pause() and ensured that the previous song would pause before a new song played, a simple and straightforward fix.
-I honestly feel ashamed that I couldn't fix the issue with my own coding knowledge, but I learned something new in the process so I think it balances out.
+The issue revolves around how `.pause()` is synchronous while `.play()` is asynchronous, causing it to have a slight delay with the overall process. With the way my code originally worked, I stored the `audio.play()` in a `promise` whenever I played a song. Whenever a song is paused, the `promise` is checked first before pausing. As a result, both the `.pause()` and `.play()` become asynchronous, and due to how I started using only a single audio element to handle all the songs, the `.pause()` and `.play()` fight over who does what, meanwhile the audio element has no clue whats going on, and everything just breaks. To fix this, I scrapped the `promise` entirely, ensuring that the previous song would pause before a new song played, a simple and straightforward fix.
+I dissapointed that I couldn't fix the issue with my own coding knowledge, but I learned something new in the process so I think it balances out.
 
-I began working on a kebab menu (the little 3 dots that open up a small menu) so users can add a specific song to a playlist or change the name of a song or playlist. I've never made anything like it before so I did a lot of research on youtube and also some help from chatGPT to figure out the basic UI and pop-up logic, it was definietly a lot simpler than I thought it would be to implement. I plan to work on the logic for its individual buttons later.
+I began working on a kebab menu (the little 3 dots that open up a small menu) so users can add a specific song to a playlist or change the name of a song/playlist. I've never made anything like it before so I did a lot of research on youtube and also got some help from chatGPT to figure out the setup for the UI and pop-up logic. This was definietly a lot less complex than I originally thought it was. So far, only the UI is set up, the logic for each button is still incomplete.
 
 Things Added:
  - UI improvements (scrolling)
@@ -73,14 +72,14 @@ Things Added:
 <br>
 
 # Day 6 - Saturday (Spring Break has begun) | At home work #
-I started working on the project at around 9am-ish, and at the time I'm writing this, it's 7pm. Subtract 2h~ for the time spent eating and playing with siblings and that's about 8h~ hours of nonstop coding.
-In the morining I believe I spent about 1h changing up my style of code for a function called updatewebsite(), which refreshed all the playlist and song divs in the html with `.innerHTML`. It was called everytime something in the page changed, so even the slightest update would have it be called. Initially, I didn't really care too much about it, but then I realized, there's absolutely no reason to refresh 80% of the paged because ONE song was uploaded into the website. So I split updateWebsite() into 3 separate functions that could refresh parts of the page independently, only ever using the original function for very specific cases. The 3 separate functions also had their own modifications, I started swapping statements like
+I spent around an hour revamping a lot of the code in a function called `updatewebsite()`. This function refreshed all the playlist and song divs in the HTML, it used `.innerHTML` quite often. It was called everytime something in the page changed, so even the slightest update would have it be called. Initially, I didn't really care too much about it, but then I realized, there's absolutely no reason to refresh 80% of the paged because a single song was uploaded into the website. So I split updateWebsite() into 3 separate functions that could refresh parts of the page independently. The 3 separate functions also had their own modifications as well:
 ``` javascript
+// ORIGINAL STYLE //
 songsEl.innerHTML = "";
 songsEl.innerHTML += "<div>a bunch of content</div>" // this would be looped to create a div for every song
-```
-to
-```javascript
+
+
+// REVAMP
 songsEl.replaceChildren();
 
 // this section below would be looped to create a div for every song
@@ -88,19 +87,19 @@ const div = document.createElement(div);
 div.innerHTML = "a bunch of content";
 songsEl.appendChild(div);
 ```
-despite typically having more lines, I believe it's a more efficient approach because it avoids the re-parsing and rebuilding caused by using `element.innerHTML +=` on an existing element.
+Despite the revamp having more lines, I believe it's a more efficient approach because it avoids the re-parsing and rebuilding caused by using `element.innerHTML +=` on an existing element.
 
-I also used up about another hour working on the basic buttons for the kebab menu, ones like, "Delete Song" and "Delete Playlist"; simple logic I had minimal issues integrating.
+I also used up about another hour working on the basic buttons for the kebab menu. I didn't encounter many issues with buttons like "Delete Song" and "Delete Playlist".
 
-Where things became complicated is the buttons which involved the creation of their own pop-up menu, such as "Add song to playlist", and "Change Details" (for renaming songs/playlists and changing their album picture). Unless I'm mistaken, I probably spent about 5 hours working on the "Add song to playlist" option alone—mainly because I vehemently chose not to get any help from anywhere, I wanted to see if the skills I learned from making the kebab menu internalized. And they did.
-I lost track of the amount of times my functions would clash with each other while I was working on this, it really was a struggle, but I fully completed the option.
-The when the options is clicked a function named `toggleAddPlaylistMenu` is called. This function reveals a menu div in the middle of the screen which looks similar to the playlists section of the website. This menu contains every playlist, excluding the default 'Songs' playlist. When one of the playlists in the menu is clicked, a song is added into it. Simple and straightforward, yet it took me 5 hours...
+Where things became complicated is the buttons which involved the creation of another pop-up menu, such as "Add song to playlist", and "Change Details". I probably spent about 5 hours working on the "Add song to playlist" option alone—mainly because I vehemently chose not to get outside help.
+I lost track of the amount of times my functions would clash with each other while I was working on this, it really was a struggle, but I managed to fully completed the button with nothing but my existing knowledge.
+The the "Add song to playlist option" is selected, a function named `toggleAddPlaylistMenu` is called. This function reveals a menu in the middle of the screen. This menu contains every playlist excluding the default 'Songs' playlist. When one of the playlists in the menu is clicked, a song is added into it.
 
-After that I spent another hour making updates to the UI. Now whatever playlist is being viewed is now bolded to pop out, same with whatever song is being played. Certain buttons also become transaprent when they're clicked.
+After that I spent another hour making updates to the UI. Now, the currently viewing playlist and currently playing song is bolded. Certain buttons also become transaprent when they're pressed.
 
-I started working on the "Change Details" kebab-menu option, which creates a menu div (named `modifyMenu` in my code) when its clicked. The pop-up functionality was already complete when I started because I worked on that alongside the "Add to playlist" option, so a portion of the hard part was already out of the way.
-I implemented logic to provide the modifyMenu with an image element, 1-2 input elements depending on wether a playlist or a song is being modified, and a button element.
-The image element runs an anonymous function when its clicked which requests an image file to replace the songs/playlists picture. The input elements accepts text values for replacing the name or music artist of a song/playlist. The button calls a function called `setObjectValues` to confirm every replacement. `setObjectValues` is currently unfinished, but I plan to work on it later.
+I started working on the "Change Details" kebab-menu option, which reveals a menu div (named `modifyMenu`) when its clicked. Some of it's functionality was already complete when I started because I worked on this alongside the "Add to playlist" button.
+I implemented logic to provide the modifyMenu with an image element, input elements, and a button element.
+The image element calls an anonymous function when its clicked. The function requests an image file to replace the image of the song/playlist. The input elements accept string data for replacing the name or music artist of a song/playlist. The button calls a function called `setObjectValues` to confirm every replacement. `setObjectValues` is currently unfinished, but I plan to work on it later.
 
 Things Added:
  - Improved website performance through splitting functions into smaller parts
