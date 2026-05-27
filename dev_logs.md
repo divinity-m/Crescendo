@@ -142,15 +142,17 @@ Things Added:
 <br>
 
 # Day 9 - Tuesday | At home work #
-Okay. Coding the shuffle button was a lot more of a pain than I originally thought it would be. The shuffle button's logic itself wasn't the issue, rather, it was while I was testing it's logic that I discovered a fundamentally website breaking bug which took me from yesterday until today to find a solution for.
-When a user looks into another playlist while a song is playing in a different playlist, the song continues playing on it's own without any issues, but if 'looping' is enabled and that song ends, what should happen is that the playlist which was playing the song should simply move onto the next song in it's array. But what was happening, was that the playlist the user is currently viewing would try to play the next song actual playlist's array, then an error would be thrown if that song didn't exist in the viewing playlists array. This issue makes it impossible to look through other playlists while listening to music, so I couldn't just overlook it.
-To fix it, I was very lost, in fact, I didn't even touch my code until today. I spent around 30 minutes to an hour just thinking of possible solutions then never going about using them them either because they would create more issues or they would be very inefficient and severely reduce code-readability. Nonetheless, I found something that worked. One new parameter.
-My playSong() function sounds simple but it does several checks and redefines a couple global variables before even touching `.play()`. It had 3 parameters, `songId`, `restart`, and `preshuffled`, the most important one here is songId, which is necessary for deciding what song is to be played. But the songId just tells the function what song to interact with, it doesn't give the function and information on what playlist is playing that song, to figure that out I originally just inserted this line into the function: `playingPlaylist === viewingPlaylist`. I honestly have no idea how I never saw any issues with that up until now, after all, the playing playlist isn't always the playlist the user is looking at. So I removed that line and instead gave the function a `playlistId` parameter so it can properly define `playingPlaylist`.
-I thought of implementing the solution yesterday but I avoided it because I believed that giving one function 4 parameters was unnecessary and overkill, but right now, see it as one of the best and probably most effective solutions with minimal drawbacks.
+Coding the shuffle button was a lot more of a pain than I originally thought it would be. The shuffle button's logic itself wasn't the issue, rather, it was while I was testing it's logic that I discovered an incredibly destructive bug which took me from yesterday until today to find a solution for. \
+
+When a user looks into another playlist while a song is playing in a different playlist, the song continues playing on it's own without any issues, but if looping is enabled and that song ends, the playlist the user is currently viewing would try to play the next song in the actual playlist's array, then if the viewing playist doesn't have that song, an error would be thrown. The best way I could think of fixing this was by adding a new parameter to certain funtions.
+
+The playSong() function checks several conditionals and redefines a couple global variables before even touching `.play()`. It had 3 parameters, `songId`, `restart`, and `preshuffled`, the most important one here is songId, which is necessary for deciding what song is to be played. But the songId only tells the function what song to interact with, it doesn't provide any information on what playlist is playing that song. To figure this out, I originally just used this line of code: `playingPlaylist = viewingPlaylist`. I honestly have no idea how I never saw any issues with that up until now, after all, the playlist thats currently playing song isn't always the playlist the user is observing. So I removed that line and gave the function a `playlistId` parameter so I can just directly provide it with the actual playing playlist.
+I usually don't like solving these type of problems by just adding a new paramater, because that usually requires me to look at every call for a function, but the solution worked really well so it was worth it. 
+
 After I finally fixed this issue, I spent a short while getting the shuffle logic to integrate correctly with the rest of the code.
 
 The website is basically complete now. There are just 3 more features I want to add. A search bar, a music visualizer which uses an API, and local data saving.
-I started working on a `searchBarHandler` function for the search bar's event listener, and I found out that it's structurally very similar to a function I already made `updateSongsSection` which fully refreshes a portion of the page, but it had a few key differences needed locating specific songs.
+I started working on a `searchBarHandler` function for the search bar's event listener and I found out that it's structurally very similar to my existing `updateSongsSection` function which fully refreshes the div for songs, so I was able to used them together.
 
 Things Added:
  - Fixed a bug which prevented music from playing while viewing other playlists
@@ -160,8 +162,8 @@ Things Added:
 <br>
 
 # Day 10 - Wednesday | At home work #
-I finished up the `searchBarHandler` function fairly quickly, and I made sure to make it avoid recreating song-divs that fit the searches query and already exist in the page. 
-I made an 'ondrop' event handler attribute for the `<img>` tag in the modify menu, allowing users to drop image files into the tag if they want to.
+I finished up the `searchBarHandler` function fairly quickly.
+I also made an `ondrop` event handler attribute for the `<img>` tag in the modify menu, allowing users to drop image files into the tag to replace images.
 
 Things Added:
  - Finished the search bar
