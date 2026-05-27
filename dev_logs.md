@@ -1,4 +1,6 @@
-Starting Date: March 23, 2026
+Starting Date: March 23, 2026 \
+Days are just days-since-started, so there may be a large void in days at some parts (like Day 13 - Day 17).
+
 # Day 1 - Monday | In class & At home work #
 I spent the entire day working on the basic UI and i chose to use tailwind css to style everything. I decided to go with a blue theme simply because it's my favourite color. On a whim, I chose to name the website Crescendo, mainly because the word 'crescendo' is music-related and I think it sounds cool. Crescendo just means a gradual increase in the loudness of a song.
 At home, I created a `Songs` class, `Playlist` class, and a default `allSongs` object (from the `Playlist` class) to keep track of every existing song. I also completed a little bit of the file-uploading code at home, it doesn't work just yet but I plan to fix it up later.
