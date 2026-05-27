@@ -211,7 +211,7 @@ Things Fixed:
 
 # Day 18 - Wednesday | In class & At home work #
 I decided to shorten the script.js file by creating a seperate file for all of the kebab-menu related code. This separated about 600 lines of code. \
-I've also added a new feature which allows users to drag their songs up and down a playlist. Adding the drag/drop mechanism was no issue, but I did have to research methods for reordering items in an array. For this feature I didn't want songs to swap places when they were moved around, I wanted them to simply "shift" up or down the playlist, while the songs around it shifted up or down by 1. Thankfully I could do this easily by using `.splice()` to reorder the array of songs.
+I've also added a new feature which allows users to drag their songs up and down a playlist. Adding the drag/drop mechanism was no issue, but I did have to research methods for reordering items in an array. For this feature I didn't want songs to swap places when they were dragged around, I wanted them to simply "shift" up or down the playlist, while the songs around it shifted up or down by 1. Thankfully I could do this easily by using `.splice()` to reorder the array of songs.
 
 Things Added:
  - A kebab-menu.js file
