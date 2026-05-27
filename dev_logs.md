@@ -1,4 +1,4 @@
-Starting Date: March 23, 2026 \ :smile:
+Starting Date: March 23, 2026 \
 Days are just days-since-started, so there may be a large void in days at some parts (like Day 13 - Day 17).
 
 # Day 1 - Monday | In class & At home work #
@@ -130,9 +130,9 @@ Things Added:
 After using the website above as a template, filtering out the css-logic I couldn't make sense of, then mixing in javascript, I made a functional and decent looking slider for the audio element.
 I also tried to put numbers on both sides of the slider to show the duration of a song, and the time passed. This wasn't necessarily hard to get working, but I still had to do a bit of research because I didn't know how to convert seconds into a HH:MM:SS format.
 
-I started working on 4 new buttons: shuffle, previous song, next song, and loop. Can't have a music player without them. I also decided to make all of their icons .svg files instead of the typical .png which I've been using this entire project. I only did this because I recently remembered that .svg files scale with the screen, otherwise, I would've made every other one of my images a .svg.
+I started working on 4 new buttons: shuffle, previous song, next song, and loop. I also decided to make all of their icons `.svg` files instead of the typical `.png` which I always use. I only did this because I recently remembered that `.svg` files scale with the screen.
 
-The previous song, next song, and loop buttons were very straightforward, it was only the shuffle button I had to do research to figure out how to get working. It's still incomplete right now, but I have a Fisher-Yates shuffle algorithm in place for it's basic functionality.
+The previous song, next song, and loop buttons were very straightforward, it was only the shuffle button I had to do research to figure out how to get working. It's still incomplete right now, but I have a Fisher-Yates shuffle algorithm in place to get most of it working.
 
 Things Added:
  - Finished the custom audio-element slider
