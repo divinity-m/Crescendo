@@ -56,12 +56,11 @@ I discovered a very useful browser feature called 'Local Overrides', which allow
 
 I encountered a couple bugs while trying to make my code more readable. I wanted to change a structural aspect of my HTML, initually, every song div would have their own `<audio>` tag with its own unique attributes, I wanted to only have one `<audio>` tag that plays every song. I tried to implement this and quickly encountered an error. Whenever I would try to play new a song and pause & replace the previous one, this error message popped up.
 ` The play() request was interrupted by a call to pause(). `
-I threw whatever I think of at my script but nothing fixed the error. I tried playing the song first then pausing the previous one. I tried seperating the pause and play into seperate functions. Then finally, I tried asking chatGPT what I could possibly be doing wrong.
+I threw whatever I think of at my script but nothing fixed the error. I tried playing the song first then pausing the previous one. I tried seperating the pause and play into seperate functions. Then finally, I tried asking ChatGPT what I could possibly be doing wrong.
 
 The issue revolves around how `.pause()` is synchronous while `.play()` is asynchronous, causing it to have a slight delay with the overall process. With the way my code originally worked, I stored the `audio.play()` in a `promise` whenever I played a song. Whenever a song is paused, the `promise` is checked first before pausing. As a result, both the `.pause()` and `.play()` become asynchronous, and due to how I started using only a single audio element to handle all the songs, the `.pause()` and `.play()` fight over who does what, meanwhile the audio element has no clue whats going on, and everything just breaks. To fix this, I scrapped the `promise` entirely, ensuring that the previous song would pause before a new song played, a simple and straightforward fix.
-I dissapointed that I couldn't fix the issue with my own coding knowledge, but I learned something new in the process so I think it balances out.
 
-I began working on a kebab menu (the little 3 dots that open up a small menu) so users can add a specific song to a playlist or change the name of a song/playlist. I've never made anything like it before so I did a lot of research on youtube and also got some help from chatGPT to figure out the setup for the UI and pop-up logic. This was definietly a lot less complex than I originally thought it was. So far, only the UI is set up, the logic for each button is still incomplete.
+I began working on a kebab menu (the little 3 dots that open up a small menu) so users can add a specific song to a playlist or change the name of a song/playlist. I've never made anything like it before so I did a lot of research on youtube and also got help from ChatGPT to figure out the setup for the UI and pop-up logic. This was definietly a lot less complex than I originally thought it was. So far, only the UI is set up, the logic for each button is still incomplete.
 
 Things Added:
  - UI improvements (scrolling)
@@ -174,8 +173,8 @@ Things Added:
 # Day 11 - Thursday | At home work #
 I started working on data saving and since I've already worked with saving local data in CS-20 projects, I thought it wouldn't be much of a issue. Then I encountered an issue. \
 Javascript's `localStorage` API can't handle large files—it can barely handle 5MB, so there's no way I could get it to save audio files, I was forced to learn a new method for saving data locally.
-I chose to learn how to work with `indexedDB`. At first, it was incredibly difficult to understand how it functions and it's methods. Even just the line `indexedDB.open("DB", 1)` made zero sense to me, but that's just how learning new things is. I had to use a lot of Youtube, Stackoverflow, and ChatGPT before everything started making sense.
-Right now, the database only stores one item, a variable called `allPlaylists` which contains every playlist—and so by extension, every song—which is all I think actually matters.
+I chose to learn how to work with `indexedDB`. At first, it was incredibly difficult to understand how it functions and it's methods. Even just the line `indexedDB.open("DB", 1)` made zero sense to me, but that's just how learning new things is. I turned to Youtube, Stackoverflow, and ChatGPT very often to clarify all of the basics.
+Right now, the database only stores one item, a variable called `allPlaylists` which contains every playlist, and because the playlists store the songs, it also contains every song.
 
 Things Added:
  - A local auto save system
