@@ -20,7 +20,11 @@ I also believe that the file-uploading system, although not incredibly complex, 
 
 ### Shortcomings
 Despite the fact that I do like the bright blue theme, a couple of friends have told me that it's either very bright or the blue text is difficult to read because it matches with he background. I'll admit that I did fall short in this category of web-design. I could have solved this through a dark-mode feature or sticking to the standard black/white text.
+
 \
+
 I was able to get the music visualizer working, but I dislike how it looks. I would prefer if it was more erratic and spiked more in the right side, but I wasn't able to get it to work.
+
 \
+
 My overall unfamiliarity with many aspects of this project such as the kebab menu, audio controls, and the music visualizer, forced me to turn to outside help on the internet, including AI. Although I made sure to only use it in cases where I needed some guidance (and I made sure to actually learn, not just copy+paste), it still certainly played a role in this project and I can't deny that.
