@@ -16,7 +16,7 @@ return div
 
 <br>
 
-I also believe that the file-uploading system, although not incredibly complex, was implemented effectively, especially the drag & drop feature which I had no piror experience with. \
+I also believe that the file-uploading system, although not incredibly complex, was implemented effectively, especially the drag & drop feature which I had no piror experience with.
 
 ___
 
