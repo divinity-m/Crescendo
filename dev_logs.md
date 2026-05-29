@@ -182,7 +182,7 @@ Things Added:
 <br>
 
 # Day 13 - Saturday | At home work #
-I started and finished working on the music visualizer. This was another new concept to me, but I quickly understood the basics setup after watching this video: https://www.youtube.com/watch?v=AQggCuH4QkM. My main `script.js` file was getting crammed so I created a new `visualizer.js` file to store all of the new code. From there, I did a lot of extra research on how to make the visualizer more appealing, such as smoothening out the movement of its bars and making the bars near the center larger.
+I started and finished working on the music (visualizer)[https://www.youtube.com]. This was another new concept to me, but I quickly understood the basics setup after watching [this video](https://www.youtube.com/watch?v=AQggCuH4QkM). My main `script.js` file was getting crammed so I created a new `visualizer.js` file to store all of the new code. From there, I did a lot of extra research on how to make the visualizer more appealing, such as smoothening out the movement of its bars and making the bars near the center larger.
 
 Things Added:
  - The Music Visualizer
