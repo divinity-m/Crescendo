@@ -90,7 +90,7 @@ function draw() {
     
     if (x >= cnvWidth - 10) dx = -1;
     if (x <= 0) dx = 1;
-    x += dx;
+    if (!audioEl.paused) x += dx;
     
 
     requestAnimationFrame(draw);
