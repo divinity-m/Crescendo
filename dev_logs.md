@@ -161,7 +161,7 @@ After I finally fixed this issue, I spent a short while getting the shuffle logi
 The website is basically complete now. There are just 3 more features I want to add. A search bar, a music visualizer which uses an API, and local data saving.
 I started working on a `searchBarHandler` function for the search bar's event listener and I found out that it's structurally very similar to my existing `updateSongsSection` function which fully refreshes the div for songs, so I was able to used them together.
 
-<img src="./Images/Modify Buttons.png" alt="Modify Buttons" width="200" height="200">
+<img src="./Images/Modify Buttons.png" alt="Modify Buttons" width="400" height="400">
 
 Things Added:
  - Fixed a bug which prevented music from playing while viewing other playlists
@@ -193,6 +193,8 @@ Things Added:
 
 # Day 13 - Saturday | At home work #
 I started and finished working on the music visualizer. This was another new concept to me, but I quickly understood the basics setup after watching [this video](https://www.youtube.com/watch?v=AQggCuH4QkM). My main `script.js` file was getting crammed so I created a new `visualizer.js` file to store all of the new code. From there, I did a lot of extra research on how to make the visualizer more appealing, such as smoothening out the movement of its bars and making the bars near the center larger.
+
+<img src="./Images/music-visualizer.png" alt="Music Visualizer" width="600" height="600">
 
 Things Added:
  - The Music Visualizer
@@ -230,6 +232,8 @@ Things Added:
 
 # Day 23 - Monday | In class work #
 I used to same logic for the songs to make the playlists reorganizable.
+
+<img src="./Images/move-items.png" alt="Moving Items" width="600" height="600">
 
 Things Added:
  - A drag/drop mechanism for organizing playlists
