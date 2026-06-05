@@ -161,6 +161,8 @@ After I finally fixed this issue, I spent a short while getting the shuffle logi
 The website is basically complete now. There are just 3 more features I want to add. A search bar, a music visualizer which uses an API, and local data saving.
 I started working on a `searchBarHandler` function for the search bar's event listener and I found out that it's structurally very similar to my existing `updateSongsSection` function which fully refreshes the div for songs, so I was able to used them together.
 
+<img src="./Images/Modify Buttons.png" alt="Modify Buttons" width="200" height="200">
+
 Things Added:
  - Fixed a bug which prevented music from playing while viewing other playlists
  - Finished the shuffle button
