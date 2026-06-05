@@ -68,6 +68,8 @@ The issue revolves around how `.pause()` is synchronous while `.play()` is async
 
 I began working on a kebab menu (the little 3 dots that open up a small menu) so users can add a specific song to a playlist or change the name of a song/playlist. I've never made anything like it before so I did a lot of research on youtube and also got help from ChatGPT to figure out the setup for the UI and pop-up logic. This was definietly a lot less complex than I originally thought it was. So far, only the UI is set up, the logic for each button is still incomplete.
 
+<img src="./Images/Kebab Menu.png" alt="Kebab Menu" width="400" height="400">
+
 Things Added:
  - UI improvements (scrolling)
  - Improved code-readability
