@@ -1,7 +1,7 @@
 # CRESCENDO - CSE Project
 Crescendo is a website for uploading and enjoying your favourite music. Although websites such as spotify already exist for music-listening, they don't allow you to upload your own songs (not without paying for a subscription at the very least) and are often flooded with audio/video ads, which directly interfere with the music listening experience. This project was made for music enjoyers who want to upload their own songs freely, organize them, and play them without any audio-type interruptions or restrictions.
 
-<img src="./Images/image_2026-06-05_100219164.png" alt="Page ScreenShot" width="200" height="200">
+<img src="./Images/image_2026-06-05_100219164.png" alt="Page ScreenShot" width="600" height="600">
 
 The functionality is programmed entirely out of Javascript while the website formatting and user interface and is built with HTML and Tailwind CSS. Audio files can be uploaded through drag & drop or via clicking on the drag & drop button. When a song is uploaded it's automatically added into a default "Songs" playlist, which collects and stores every song the user uploads. New playlists can be added with the "+" button next to the "Playlist" header and songs can be played by clicking on their names or the play-button within the "Now Playing" section.
 
