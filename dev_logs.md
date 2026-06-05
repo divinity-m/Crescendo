@@ -37,6 +37,9 @@ With this newfound knowledge, I quickly found a solution that worked:
 
 After this, I spent a couple hours on the UI. I also created a logo for the website and a little tab-icon, the designs are based off of the standard crescendo musical notation.
 
+
+<img src="./Images/crescendo_logo.png" alt="Logo" width="200" height="200">
+
 Things Added:
  - Anti-duplicate file system
  - UI improvements
