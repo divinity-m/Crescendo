@@ -19,7 +19,7 @@ To start, I made a function called `validateFiles` which accepts a `files` param
 ` if (allSongs.songs.length < 1 || allSongs.songs.some(song => song.name !== potentialDupe.name)) unduplicatedFiles.push(file); `
 This method was concise, but failed.
 
-<img src="./Images/DragDrop.png" alt="Drag and Drop" width="200" height="200">
+<img src="./Images/DragDrop.png" alt="Drag and Drop" width="400" height="400">
 
 
 Things Added:
